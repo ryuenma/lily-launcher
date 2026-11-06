@@ -1,6 +1,7 @@
 package com.lily.launcher
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -19,7 +20,10 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.FrameLayout
+import android.widget.LinearLayout
+import android.widget.TextView
 
 /**
  * Default HOME. Draws the mockup at 1:1 on the 1024×600 panel (scaled if the window differs),
@@ -27,6 +31,7 @@ import android.widget.FrameLayout
  *
  * GPS vehicle speed (LocationManager/GPS_PROVIDER) drives the speed-zone palette.
  * Thresholds + hysteresis live in Car; this activity only feeds Car.setSpeed().
+ * Thresholds are editable via a long-press dialog (Phase 3, programmatic, no bake).
  */
 class HomeActivity : Activity() {
     private lateinit var car: Car
@@ -43,7 +48,7 @@ class HomeActivity : Activity() {
         override fun onLocationChanged(loc: Location) {
             val acc = loc.accuracy
             val spd = loc.speed
-            if (acc > 20f || spd < 0f) return   // ignore low-quality / invalid fixes
+            if (acc > 20f || spd < 0f) return
             val kmh = (spd * 3.6).toInt()
             car.setSpeed(kmh)
             lastFixMs = System.currentTimeMillis()
@@ -58,7 +63,7 @@ class HomeActivity : Activity() {
     private val staleRunnable = object : Runnable {
         override fun run() {
             if (lastFixMs > 0 && System.currentTimeMillis() - lastFixMs > 3000L) {
-                car.setSpeed(0)   // tunnel / no fix → normal zone
+                car.setSpeed(0)
             }
             staleHandler.postDelayed(this, 1000L)
         }
@@ -68,15 +73,12 @@ class HomeActivity : Activity() {
         staleHandler.postDelayed(staleRunnable, 1000L)
     }
 
-    // ── Accelerometer supplement (early transition hint) ──
+    // ── Accelerometer supplement ──
     private var sensorManager: SensorManager? = null
     private val accelListener = object : SensorEventListener {
         override fun onSensorChanged(e: SensorEvent) {
-            // magnitude of linear acceleration; hint only, never overrides GPS zone
             val m = kotlin.math.sqrt((e.values[0]*e.values[0] + e.values[1]*e.values[1] + e.values[2]*e.values[2]).toDouble())
-            if (m > 2.5) {
-                // pre-warm: no zone change; GPS remains authoritative
-            }
+            if (m > 2.5) { /* hint only; GPS authoritative */ }
         }
         override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
     }
@@ -87,16 +89,18 @@ class HomeActivity : Activity() {
     override fun onCreate(saved: Bundle?) {
         super.onCreate(saved)
         car = (application as App).car
-        val ui = (application as App).ui.get()           // usually ready: loaded while Car and the activity started
+        val ui = (application as App).ui.get()
         stage = Stage(this, ui, car)
         val root = FrameLayout(this)
         root.setBackgroundColor(0xFF000000.toInt())
         root.addView(stage, FrameLayout.LayoutParams(Stage.W, Stage.H))
-        root.addOnLayoutChangeListener { _, l, t, r, b, _, _, _, _ ->      // fit other panel sizes, keep aspect
+        root.addOnLayoutChangeListener { _, l, t, r, b, _, _, _, _ ->
             val s = minOf((r - l) / Stage.W.toFloat(), (b - t) / Stage.H.toFloat())
             stage.pivotX = 0f; stage.pivotY = 0f; stage.scaleX = s; stage.scaleY = s
             stage.translationX = ((r - l) - Stage.W * s) / 2; stage.translationY = ((b - t) - Stage.H * s) / 2
         }
+        // long-press anywhere → threshold settings dialog
+        root.setOnLongClickListener { showThresholdDialog(); true }
         setContentView(root)
         car.onVolume = { stage.home.onVolume(); stage.knob.onVolume() }
         root.post { ui.preloadSheets() }
@@ -127,7 +131,7 @@ class HomeActivity : Activity() {
         stopLocationUpdates()
         stopAccel()
         staleHandler.removeCallbacks(staleRunnable)
-        stage.deck.playing = false           // stop animating while Home is covered
+        stage.deck.playing = false
         super.onPause()
     }
 
@@ -136,7 +140,6 @@ class HomeActivity : Activity() {
         try {
             locationManager?.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500L, 0f, locationListener, mainLooper)
         } catch (e: Exception) {
-            // GPS unavailable → normal zone
             car.setSpeed(0)
         }
     }
@@ -158,13 +161,34 @@ class HomeActivity : Activity() {
         try { sensorManager?.unregisterListener(accelListener) } catch (e: Exception) {}
     }
 
-    /** HOME pressed while already home: close any sheet (like the stock launcher). */
+    private fun showThresholdDialog() {
+        val layout = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(40, 20, 40, 20) }
+        val cautionLabel = TextView(this).apply { text = "Caution threshold (km/h)" }
+        val cautionInput = EditText(this).apply { setText(car.cautionThreshold().toString()); inputType = android.text.InputType.TYPE_CLASS_NUMBER }
+        val emergencyLabel = TextView(this).apply { text = "Emergency threshold (km/h)" }
+        val emergencyInput = EditText(this).apply { setText(car.emergencyThreshold().toString()); inputType = android.text.InputType.TYPE_CLASS_NUMBER }
+        layout.addView(cautionLabel); layout.addView(cautionInput)
+        layout.addView(emergencyLabel); layout.addView(emergencyInput)
+        AlertDialog.Builder(this)
+            .setTitle("Speed thresholds")
+            .setView(layout)
+            .setPositiveButton("Save") { _, _ ->
+                val c = cautionInput.text.toString().toIntOrNull() ?: car.cautionThreshold()
+                val e = emergencyInput.text.toString().toIntOrNull() ?: car.emergencyThreshold()
+                car.prefs.edit().putInt("cautionKmh", c).putInt("emergencyKmh", e).apply()
+                car.setSpeed(car.speedKmh) // re-evaluate zone
+                stage.render()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         if (Intent.ACTION_MAIN == intent.action) stage.sheet.close()
     }
 
-    override fun onBackPressed() { stage.sheet.back() }   // never leave Home with Back
+    override fun onBackPressed() { stage.sheet.back() }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
