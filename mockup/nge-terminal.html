@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="auto">
+<html lang="ja" data-theme="auto">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lily Launcher — NGE Terminal Mockup</title>
+<title>Lily Launcher — NGE Terminal Mockup v2</title>
 <style>
   :root {
     --bg: #0a0a12;
@@ -14,10 +14,9 @@
     --accent2: #e31c23;
     --chassis: #3a3448;
     --button: #b9afcb;
-    --glow: 0 0 8px currentColor, 0 0 16px currentColor;
-    --glow-sm: 0 0 4px currentColor;
-    --font: "Rajdhani", "Eurostile", "Microgramma", "Helvetica Neue", sans-serif;
-    --mono: "JetBrains Mono", "Consolas", monospace;
+    --font-jp: "Noto Serif JP", "Hiragino Mincho ProN", "Yu Mincho", serif;
+    --font-en: "Oswald", "Rajdhani", "Eurostile", "Helvetica Neue", sans-serif;
+    --font-mono: "JetBrains Mono", "DSEG7", "Consolas", monospace;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -25,7 +24,7 @@
   body {
     background: #1a1a2e;
     color: var(--text);
-    font-family: var(--font);
+    font-family: var(--font-en);
     display: flex;
     gap: 24px;
     padding: 24px;
@@ -33,7 +32,6 @@
     align-items: flex-start;
   }
 
-  /* ── Device bezel ── */
   .bezel {
     width: 1052px;
     height: 628px;
@@ -59,7 +57,6 @@
     line-height: 1.2;
   }
 
-  /* ── Phosphor glow overlay ── */
   .screen::after {
     content: '';
     position: absolute;
@@ -68,45 +65,29 @@
       0deg,
       transparent,
       transparent 2px,
-      rgba(0,0,0,0.03) 2px,
-      rgba(0,0,0,0.03) 4px
+      rgba(0,0,0,0.04) 2px,
+      rgba(0,0,0,0.04) 4px
     );
     pointer-events: none;
     z-index: 100;
   }
 
-  /* ── Header banner ── */
-  .header {
-    background: var(--accent);
-    color: #000;
-    padding: 4px 12px;
-    font-weight: 700;
-    font-size: 13px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    border-bottom: 2px solid #000;
-    position: relative;
-    overflow: hidden;
+  /* Honeycomb background (A.T. Field, ~240 hexes) */
+  .honeycomb-bg {
+    position: absolute;
+    inset: 0;
+    opacity: 0.07;
+    pointer-events: none;
+    z-index: 0;
   }
-  .header::before, .header::after {
-    content: '';
-    width: 20px;
-    height: 100%;
-    background: repeating-linear-gradient(90deg, #000 0px, #000 2px, transparent 2px, transparent 4px);
-    flex-shrink: 0;
-  }
-  .header .title { flex: 1; text-align: center; }
 
-  /* ── Hazard stripes (emergency state) ── */
+  /* Hazard stripes */
   .hazard-top, .hazard-bottom {
-    height: 6px;
+    height: 8px;
     background: repeating-linear-gradient(
       -45deg,
-      var(--accent2) 0px, var(--accent2) 8px,
-      #000 8px, #000 16px
+      var(--accent2) 0px, var(--accent2) 10px,
+      #000 10px, #000 20px
     );
     display: none;
   }
@@ -114,70 +95,121 @@
   .caution .hazard-top, .caution .hazard-bottom {
     background: repeating-linear-gradient(
       -45deg,
-      var(--text2) 0px, var(--text2) 8px,
-      #000 8px, #000 16px
+      var(--text2) 0px, var(--text2) 10px,
+      #000 10px, #000 20px
     );
     display: block;
   }
 
-  /* ── Main layout ── */
+  /* Header banner (NGE style: JP Mincho) */
+  .header {
+    background: var(--accent);
+    color: #000;
+    padding: 4px 12px;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 2px solid #000;
+    position: relative;
+    z-index: 2;
+    font-family: var(--font-jp);
+  }
+  .header::before, .header::after {
+    content: '';
+    width: 24px;
+    height: 100%;
+    background: repeating-linear-gradient(90deg, #000 0px, #000 2px, transparent 2px, transparent 4px);
+    flex-shrink: 0;
+  }
+  .header .title { flex: 1; text-align: center; }
+
+  /* Octagonal seal (corner) */
+  .seal-corner {
+    position: absolute;
+    top: 6px;
+    right: 12px;
+    border: 2px solid var(--text);
+    padding: 2px 8px;
+    font-size: 9px;
+    letter-spacing: 2px;
+    font-weight: 700;
+    font-family: var(--font-jp);
+    z-index: 3;
+    transform: rotate(-3deg);
+  }
+
+  /* Main layout */
   .main {
     flex: 1;
     display: grid;
-    grid-template-columns: 140px 1fr 140px;
-    gap: 8px;
-    padding: 8px;
+    grid-template-columns: 150px 1fr 150px;
+    gap: 6px;
+    padding: 6px;
     overflow: hidden;
+    position: relative;
+    z-index: 1;
   }
 
-  /* ── Side columns (metadata) ── */
+  /* Side columns */
   .side-col {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    font-size: 11px;
+    gap: 4px;
+    font-size: 10px;
     letter-spacing: 1px;
   }
   .meta-block {
     border: 1px solid var(--text);
-    padding: 4px 6px;
-    background: rgba(0,0,0,0.4);
+    padding: 3px 5px;
+    background: rgba(0,0,0,0.5);
   }
   .meta-block .label {
-    font-size: 9px;
-    opacity: 0.6;
+    font-size: 8px;
+    opacity: 0.5;
     letter-spacing: 2px;
-    margin-bottom: 2px;
+    margin-bottom: 1px;
+    font-family: var(--font-en);
   }
   .meta-block .value {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
-    font-family: var(--mono);
+    font-family: var(--font-mono);
   }
   .side-col .section-title {
-    font-size: 9px;
+    font-size: 8px;
     letter-spacing: 3px;
-    opacity: 0.5;
+    opacity: 0.4;
     border-bottom: 1px solid var(--text);
     padding-bottom: 2px;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
+    font-family: var(--font-en);
+  }
+  .side-col .jp-label {
+    font-family: var(--font-jp);
+    font-size: 9px;
+    opacity: 0.6;
+    font-weight: 700;
   }
 
-  /* ── Center display ── */
+  /* Center display */
   .center {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
     overflow: hidden;
   }
   .display-area {
     flex: 1;
     border: 2px solid var(--text);
     background: rgba(0,0,0,0.6);
-    padding: 12px;
+    padding: 10px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
     position: relative;
   }
   .display-area::before {
@@ -189,12 +221,13 @@
   }
 
   .display-label {
-    font-size: 10px;
+    font-size: 9px;
     letter-spacing: 3px;
     opacity: 0.5;
     border-bottom: 1px solid var(--text);
-    padding-bottom: 4px;
-    margin-bottom: 8px;
+    padding-bottom: 3px;
+    margin-bottom: 6px;
+    font-family: var(--font-en);
   }
 
   .display-content {
@@ -202,41 +235,42 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 6px;
+    gap: 4px;
   }
 
   .tape-title {
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 700;
     letter-spacing: 1px;
     line-height: 1.1;
-    text-shadow: var(--glow);
+    font-family: var(--font-jp);
   }
   .tape-artist {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 500;
     opacity: 0.8;
+    font-family: var(--font-jp);
   }
   .tape-readout {
-    font-family: var(--mono);
-    font-size: 12px;
+    font-family: var(--font-mono);
+    font-size: 11px;
     display: flex;
-    gap: 16px;
+    gap: 12px;
     opacity: 0.7;
   }
-  .tape-readout span { letter-spacing: 1px; }
 
   .radio-freq {
-    font-size: 32px;
+    font-size: 28px;
     font-weight: 700;
-    font-family: var(--mono);
-    text-shadow: var(--glow);
+    font-family: var(--font-mono);
     text-align: center;
+    letter-spacing: 2px;
   }
   .radio-station {
-    font-size: 14px;
+    font-size: 12px;
     text-align: center;
     opacity: 0.8;
+    font-family: var(--font-jp);
   }
 
   .empty-state {
@@ -244,36 +278,38 @@
     opacity: 0.4;
   }
   .empty-state .big {
-    font-size: 28px;
+    font-size: 24px;
     font-weight: 700;
     letter-spacing: 4px;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
+    font-family: var(--font-jp);
   }
   .empty-state .small {
-    font-size: 12px;
+    font-size: 11px;
     letter-spacing: 2px;
+    font-family: var(--font-en);
   }
 
-  /* ── Node diagram (source keys) ── */
+  /* Node diagram (MAGI triangle, pointy-top hexes) */
   .node-diagram {
-    height: 120px;
+    height: 110px;
     border: 1px solid var(--text);
     background: rgba(0,0,0,0.4);
     position: relative;
   }
   .node-diagram svg { width: 100%; height: 100%; }
 
-  /* ── Bottom bar ── */
+  /* Bottom bar */
   .bottom-bar {
-    height: 120px;
+    height: 110px;
     display: grid;
-    grid-template-columns: 1fr 200px 1fr;
-    gap: 8px;
-    padding: 8px;
+    grid-template-columns: 1fr 180px 1fr;
+    gap: 6px;
+    padding: 6px;
     border-top: 1px solid var(--text);
   }
 
-  /* ── Hex grid ── */
+  /* Hex grid (pointy-top hexagons) */
   .hex-grid {
     display: flex;
     align-items: center;
@@ -283,14 +319,13 @@
 
   .hex-btn {
     cursor: pointer;
-    transition: none;
   }
-  .hex-btn:hover .hex-fill { opacity: 0.8; }
+  .hex-btn:hover .hex-fill { opacity: 0.7; }
   .hex-btn.active .hex-fill { fill: var(--accent); }
   .hex-btn.latched .hex-fill { fill: var(--accent2); }
   .hex-btn .hex-text {
-    font-family: var(--font);
-    font-size: 10px;
+    font-family: var(--font-en);
+    font-size: 9px;
     font-weight: 700;
     fill: var(--text);
     text-anchor: middle;
@@ -300,17 +335,17 @@
   .hex-btn.active .hex-text { fill: #000; }
   .hex-btn.latched .hex-text { fill: #000; }
 
-  /* ── Volume knob ── */
+  /* Volume knob */
   .knob-area {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 4px;
+    gap: 3px;
   }
   .knob {
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     border: 2px solid var(--text);
     background: rgba(0,0,0,0.6);
@@ -320,74 +355,89 @@
     font-size: 10px;
     font-weight: 700;
     position: relative;
+    font-family: var(--font-mono);
   }
   .knob::after {
     content: '';
     position: absolute;
-    top: 4px;
+    top: 3px;
     left: 50%;
     transform: translateX(-50%);
     width: 2px;
-    height: 12px;
+    height: 10px;
     background: var(--text);
   }
   .knob-label {
-    font-size: 9px;
+    font-size: 8px;
     letter-spacing: 2px;
     opacity: 0.6;
+    font-family: var(--font-en);
   }
   .knob-value {
-    font-family: var(--mono);
-    font-size: 11px;
+    font-family: var(--font-mono);
+    font-size: 10px;
     font-weight: 700;
   }
 
-  /* ── Speed readout ── */
+  /* Speed readout */
   .speed-readout {
-    font-family: var(--mono);
-    font-size: 18px;
+    font-family: var(--font-mono);
+    font-size: 16px;
     font-weight: 700;
     text-align: center;
-    text-shadow: var(--glow);
     letter-spacing: 2px;
   }
   .speed-label {
-    font-size: 9px;
+    font-size: 8px;
     letter-spacing: 3px;
     opacity: 0.5;
     text-align: center;
+    font-family: var(--font-en);
+  }
+  .speed-zone-seal {
+    display: inline-block;
+    border: 2px solid var(--text);
+    padding: 1px 6px;
+    font-size: 8px;
+    letter-spacing: 2px;
+    font-weight: 700;
+    font-family: var(--font-jp);
+    transform: rotate(-3deg);
+    margin-top: 2px;
   }
 
-  /* ── Simulator panel ── */
+  /* Simulator panel */
   .sim-panel {
-    width: 320px;
+    width: 300px;
     flex-shrink: 0;
     background: #111;
     border: 1px solid #333;
     border-radius: 8px;
-    padding: 12px;
+    padding: 10px;
     max-height: 628px;
     overflow-y: auto;
+    font-size: 11px;
   }
   .sim-panel h2 {
-    font-size: 12px;
+    font-size: 11px;
     letter-spacing: 2px;
     color: var(--text2);
-    margin: 12px 0 6px;
+    margin: 10px 0 4px;
     border-bottom: 1px solid #333;
-    padding-bottom: 4px;
+    padding-bottom: 3px;
+    font-family: var(--font-en);
   }
   .sim-panel h2:first-child { margin-top: 0; }
   .sim-row {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 6px;
-    font-size: 11px;
+    gap: 6px;
+    margin-bottom: 5px;
   }
   .sim-row label {
     flex: 1;
     opacity: 0.7;
+    font-size: 10px;
   }
   .sim-row .seg {
     display: flex;
@@ -397,10 +447,10 @@
     background: #222;
     border: 1px solid #444;
     color: #888;
-    padding: 2px 6px;
-    font-size: 10px;
+    padding: 2px 5px;
+    font-size: 9px;
     cursor: pointer;
-    font-family: var(--font);
+    font-family: var(--font-en);
   }
   .sim-row .seg button.on {
     background: var(--text);
@@ -416,46 +466,51 @@
     background: #222;
     border: 1px solid #444;
     color: #888;
-    padding: 2px 6px;
-    font-size: 10px;
+    padding: 2px 5px;
+    font-size: 9px;
     cursor: pointer;
-    font-family: var(--font);
+    font-family: var(--font-en);
   }
   .sim-row .btns button.on {
     background: var(--accent);
     color: #000;
     border-color: var(--accent);
   }
-
-  /* ── Octagonal seal ── */
-  .seal {
-    display: inline-block;
-    border: 2px solid var(--text);
-    padding: 2px 6px;
-    font-size: 9px;
-    letter-spacing: 2px;
-    font-weight: 700;
-    transform: rotate(-5deg);
+  .sim-row input[type="range"] { width: 100px; }
+  .sim-row input[type="number"] {
+    width: 50px; background: #222; border: 1px solid #444;
+    color: #fff; padding: 2px; font-size: 10px;
   }
-
-  /* ── Utility classes for states ── */
-  .state-normal { }
-  .state-caution { }
-  .state-emergency { }
+  .sim-row .sw { display: flex; gap: 3px; }
+  .sim-row .sw button {
+    width: 14px; height: 14px; border: 1px solid #444; cursor: pointer;
+  }
 </style>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
 </head>
 <body>
 
-<!-- ═══ DEVICE ═══ -->
+<!-- DEVICE -->
 <div class="bezel">
   <div class="screen" id="screen">
     <div class="hazard-top"></div>
+    <!-- Honeycomb background (A.T. Field, ~240 hexes) -->
+    <svg class="honeycomb-bg" viewBox="0 0 1024 600" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <pattern id="hexPattern" width="24" height="41.57" patternUnits="userSpaceOnUse">
+          <polygon points="12,0 24,6 24,18 12,24 0,18 0,6" fill="none" stroke="currentColor" stroke-width="0.4"/>
+          <polygon points="12,24 24,30 24,42 12,48 0,42 0,30" fill="none" stroke="currentColor" stroke-width="0.4"/>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#hexPattern)"/>
+    </svg>
+
     <div class="header">
       <span class="bar"></span>
-      <span class="title" id="headerTitle">DIRECT LINK CONNECTION : LILY</span>
+      <span class="title" id="headerTitle">第一種戦闘配置 : LILY</span>
       <span class="bar"></span>
     </div>
+    <div class="seal-corner" id="sealCorner">NORMAL</div>
 
     <div class="main">
       <!-- Left metadata column -->
@@ -485,46 +540,42 @@
           <div class="label">VOL</div>
           <div class="value" id="metaVol">18/40</div>
         </div>
+        <div class="jp-label">見現時刻表示</div>
       </div>
 
       <!-- Center display -->
       <div class="center">
         <div class="display-area">
           <div class="display-label" id="displayLabel">DISPLAY: TAPE</div>
-          <div class="display-content" id="displayContent">
-            <!-- Filled by JS -->
-          </div>
+          <div class="display-content" id="displayContent"></div>
         </div>
 
-        <!-- Node diagram (source keys) -->
+        <!-- Node diagram (MAGI triangle, pointy-top hexes) -->
         <div class="node-diagram">
-          <svg viewBox="0 0 1024 120" preserveAspectRatio="xMidYMid meet">
-            <!-- Connection lines -->
-            <line x1="512" y1="60" x2="200" y2="30" stroke="currentColor" stroke-width="1" opacity="0.4"/>
-            <line x1="512" y1="60" x2="200" y2="90" stroke="currentColor" stroke-width="1" opacity="0.4"/>
-            <line x1="512" y1="60" x2="824" y2="30" stroke="currentColor" stroke-width="1" opacity="0.4"/>
-            <line x1="512" y1="60" x2="824" y2="90" stroke="currentColor" stroke-width="1" opacity="0.4"/>
-            <!-- Center label -->
-            <text x="512" y="64" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor" opacity="0.6">MAGI</text>
-            <!-- BT node -->
+          <svg viewBox="0 0 1024 110" preserveAspectRatio="xMidYMid meet">
+            <line x1="512" y1="55" x2="250" y2="25" stroke="currentColor" stroke-width="1" opacity="0.3"/>
+            <line x1="512" y1="55" x2="250" y2="85" stroke="currentColor" stroke-width="1" opacity="0.3"/>
+            <line x1="512" y1="55" x2="774" y2="25" stroke="currentColor" stroke-width="1" opacity="0.3"/>
+            <line x1="512" y1="55" x2="774" y2="85" stroke="currentColor" stroke-width="1" opacity="0.3"/>
+            <text x="512" y="59" text-anchor="middle" font-size="9" font-weight="700" fill="currentColor" opacity="0.5" font-family="var(--font-jp)">MAGI</text>
             <g class="node" id="nodeBt">
-              <circle cx="200" cy="30" r="16" fill="none" stroke="currentColor" stroke-width="2"/>
-              <text x="200" y="34" text-anchor="middle" font-size="8" font-weight="700" fill="currentColor">BT</text>
+              <polygon points="250,10 266,19 266,37 250,46 234,37 234,19" fill="none" stroke="currentColor" stroke-width="2"/>
+              <text x="250" y="30" text-anchor="middle" font-size="7" font-weight="700" fill="currentColor" font-family="var(--font-en)">BT</text>
+              <text x="250" y="55" text-anchor="middle" font-size="7" fill="currentColor" opacity="0.6" font-family="var(--font-jp)">Melchior</text>
             </g>
-            <!-- RADIO node -->
             <g class="node" id="nodeRadio">
-              <circle cx="200" cy="90" r="16" fill="none" stroke="currentColor" stroke-width="2"/>
-              <text x="200" y="94" text-anchor="middle" font-size="8" font-weight="700" fill="currentColor">RADIO</text>
+              <polygon points="250,66 266,75 266,93 250,102 234,93 234,75" fill="none" stroke="currentColor" stroke-width="2"/>
+              <text x="250" y="86" text-anchor="middle" font-size="7" font-weight="700" fill="currentColor" font-family="var(--font-en)">RADIO</text>
+              <text x="250" y="108" text-anchor="middle" font-size="7" fill="currentColor" opacity="0.6" font-family="var(--font-jp)">Balthasar</text>
             </g>
-            <!-- USB node -->
             <g class="node" id="nodeUsb">
-              <circle cx="824" cy="30" r="16" fill="none" stroke="currentColor" stroke-width="2"/>
-              <text x="824" y="34" text-anchor="middle" font-size="8" font-weight="700" fill="currentColor">USB</text>
+              <polygon points="774,10 790,19 790,37 774,46 758,37 758,19" fill="none" stroke="currentColor" stroke-width="2"/>
+              <text x="774" y="30" text-anchor="middle" font-size="7" font-weight="700" fill="currentColor" font-family="var(--font-en)">USB</text>
+              <text x="774" y="55" text-anchor="middle" font-size="7" fill="currentColor" opacity="0.6" font-family="var(--font-jp)">Casper</text>
             </g>
-            <!-- PHONE node -->
             <g class="node" id="nodePhone">
-              <circle cx="824" cy="90" r="16" fill="none" stroke="currentColor" stroke-width="2"/>
-              <text x="824" y="94" text-anchor="middle" font-size="8" font-weight="700" fill="currentColor">PHONE</text>
+              <polygon points="774,66 790,75 790,93 774,102 758,93 758,75" fill="none" stroke="currentColor" stroke-width="2"/>
+              <text x="774" y="86" text-anchor="middle" font-size="7" font-weight="700" fill="currentColor" font-family="var(--font-en)">PHONE</text>
             </g>
           </svg>
         </div>
@@ -557,54 +608,53 @@
           <div class="label">SPEED ZONE</div>
           <div class="value" id="metaSpeedZone">NORMAL</div>
         </div>
+        <div class="jp-label">提訴決議</div>
       </div>
     </div>
 
-    <!-- Bottom bar: hex grid + knob + speed -->
+    <!-- Bottom bar -->
     <div class="bottom-bar">
       <div class="hex-grid">
-        <svg viewBox="0 0 400 110" preserveAspectRatio="xMidYMid meet">
-          <!-- Row 1: 5 hexes -->
-          <g class="hex-btn" data-action="prev" transform="translate(40,20)">
-            <polygon class="hex-fill" points="0,-14 12,-7 12,7 0,14 -12,7 -12,-7" fill="none" stroke="currentColor" stroke-width="1.5"/>
-            <text class="hex-text" y="1">PREV</text>
+        <svg viewBox="0 0 400 100" preserveAspectRatio="xMidYMid meet">
+          <g class="hex-btn" data-action="prev" transform="translate(45,22)">
+            <polygon class="hex-fill" points="0,-16 14,-8 14,8 0,16 -14,8 -14,-8" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            <text class="hex-text" y="2">PREV</text>
           </g>
-          <g class="hex-btn" data-action="play" transform="translate(100,20)">
-            <polygon class="hex-fill" points="0,-14 12,-7 12,7 0,14 -12,7 -12,-7" fill="none" stroke="currentColor" stroke-width="1.5"/>
-            <text class="hex-text" y="1">PLAY</text>
+          <g class="hex-btn" data-action="play" transform="translate(115,22)">
+            <polygon class="hex-fill" points="0,-16 14,-8 14,8 0,16 -14,8 -14,-8" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            <text class="hex-text" y="2">PLAY</text>
           </g>
-          <g class="hex-btn" data-action="next" transform="translate(160,20)">
-            <polygon class="hex-fill" points="0,-14 12,-7 12,7 0,14 -12,7 -12,-7" fill="none" stroke="currentColor" stroke-width="1.5"/>
-            <text class="hex-text" y="1">NEXT</text>
+          <g class="hex-btn" data-action="next" transform="translate(185,22)">
+            <polygon class="hex-fill" points="0,-16 14,-8 14,8 0,16 -14,8 -14,-8" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            <text class="hex-text" y="2">NEXT</text>
           </g>
-          <g class="hex-btn" data-action="bt" transform="translate(220,20)">
-            <polygon class="hex-fill" points="0,-14 12,-7 12,7 0,14 -12,7 -12,-7" fill="none" stroke="currentColor" stroke-width="1.5"/>
-            <text class="hex-text" y="1">BT</text>
+          <g class="hex-btn" data-action="bt" transform="translate(255,22)">
+            <polygon class="hex-fill" points="0,-16 14,-8 14,8 0,16 -14,8 -14,-8" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            <text class="hex-text" y="2">BT</text>
           </g>
-          <g class="hex-btn" data-action="radio" transform="translate(280,20)">
-            <polygon class="hex-fill" points="0,-14 12,-7 12,7 0,14 -12,7 -12,-7" fill="none" stroke="currentColor" stroke-width="1.5"/>
-            <text class="hex-text" y="1">RADIO</text>
+          <g class="hex-btn" data-action="radio" transform="translate(325,22)">
+            <polygon class="hex-fill" points="0,-16 14,-8 14,8 0,16 -14,8 -14,-8" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            <text class="hex-text" y="2">RADIO</text>
           </g>
-          <!-- Row 2: 5 hexes, offset -->
-          <g class="hex-btn" data-action="usb" transform="translate(70,55)">
-            <polygon class="hex-fill" points="0,-14 12,-7 12,7 0,14 -12,7 -12,-7" fill="none" stroke="currentColor" stroke-width="1.5"/>
-            <text class="hex-text" y="1">USB</text>
+          <g class="hex-btn" data-action="usb" transform="translate(80,62)">
+            <polygon class="hex-fill" points="0,-16 14,-8 14,8 0,16 -14,8 -14,-8" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            <text class="hex-text" y="2">USB</text>
           </g>
-          <g class="hex-btn" data-action="phone" transform="translate(130,55)">
-            <polygon class="hex-fill" points="0,-14 12,-7 12,7 0,14 -12,7 -12,-7" fill="none" stroke="currentColor" stroke-width="1.5"/>
-            <text class="hex-text" y="1">PHONE</text>
+          <g class="hex-btn" data-action="phone" transform="translate(150,62)">
+            <polygon class="hex-fill" points="0,-16 14,-8 14,8 0,16 -14,8 -14,-8" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            <text class="hex-text" y="2">PHONE</text>
           </g>
-          <g class="hex-btn" data-action="switch" transform="translate(190,55)">
-            <polygon class="hex-fill" points="0,-14 12,-7 12,7 0,14 -12,7 -12,-7" fill="none" stroke="currentColor" stroke-width="1.5"/>
-            <text class="hex-text" y="1">SWITCH</text>
+          <g class="hex-btn" data-action="switch" transform="translate(220,62)">
+            <polygon class="hex-fill" points="0,-16 14,-8 14,8 0,16 -14,8 -14,-8" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            <text class="hex-text" y="2">SWITCH</text>
           </g>
-          <g class="hex-btn" data-action="auto" transform="translate(250,55)">
-            <polygon class="hex-fill" points="0,-14 12,-7 12,7 0,14 -12,7 -12,-7" fill="none" stroke="currentColor" stroke-width="1.5"/>
-            <text class="hex-text" y="1">AUTO</text>
+          <g class="hex-btn" data-action="auto" transform="translate(290,62)">
+            <polygon class="hex-fill" points="0,-16 14,-8 14,8 0,16 -14,8 -14,-8" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            <text class="hex-text" y="2">AUTO</text>
           </g>
-          <g class="hex-btn" data-action="more" transform="translate(310,55)">
-            <polygon class="hex-fill" points="0,-14 12,-7 12,7 0,14 -12,7 -12,-7" fill="none" stroke="currentColor" stroke-width="1.5"/>
-            <text class="hex-text" y="1">MORE</text>
+          <g class="hex-btn" data-action="more" transform="translate(360,62)">
+            <polygon class="hex-fill" points="0,-16 14,-8 14,8 0,16 -14,8 -14,-8" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            <text class="hex-text" y="2">MORE</text>
           </g>
         </svg>
       </div>
@@ -617,11 +667,11 @@
         <div class="knob-value" id="knobReadout">18/40</div>
       </div>
 
-      <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;">
+      <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;">
         <div class="speed-label">SPEED</div>
         <div class="speed-readout" id="speedDisplay">000</div>
         <div class="speed-label">km/h</div>
-        <div class="seal" id="speedZoneSeal">NORMAL</div>
+        <div class="speed-zone-seal" id="speedZoneSeal">NORMAL</div>
       </div>
     </div>
 
@@ -629,14 +679,14 @@
   </div>
 </div>
 
-<!-- ═══ SIMULATOR PANEL ═══ -->
+<!-- SIMULATOR PANEL -->
 <div class="sim-panel">
   <h2>CAR SIGNALS</h2>
 
   <div class="sim-row">
     <label>Speed (km/h)</label>
-    <input type="range" id="simSpeed" min="0" max="160" value="0" style="width:120px;">
-    <span id="simSpeedVal" style="font-family:var(--mono); font-size:11px; width:30px;">0</span>
+    <input type="range" id="simSpeed" min="0" max="160" value="0" style="width:100px;">
+    <span id="simSpeedVal" style="font-family:var(--font-mono); font-size:10px; width:25px;">0</span>
   </div>
 
   <div class="sim-row">
@@ -671,29 +721,28 @@
 
   <h2>STORAGE</h2>
   <div class="sim-row">
-    <label>Speed threshold: Caution (km/h)</label>
-    <input type="number" id="threshCaution" value="60" min="10" max="200" style="width:60px; background:#222; border:1px solid #444; color:#fff; padding:2px;">
+    <label>Caution (km/h)</label>
+    <input type="number" id="threshCaution" value="60" min="10" max="200">
   </div>
   <div class="sim-row">
-    <label>Speed threshold: Emergency (km/h)</label>
-    <input type="number" id="threshEmergency" value="100" min="20" max="250" style="width:60px; background:#222; border:1px solid #444; color:#fff; padding:2px;">
+    <label>Emergency (km/h)</label>
+    <input type="number" id="threshEmergency" value="100" min="20" max="250">
   </div>
 
   <h2>DISPLAY</h2>
   <div class="sim-row">
-    <label>Accent color</label>
-    <div class="sw" id="simAccent" style="display:flex; gap:4px;">
-      <button style="background:#ff4a1c; width:16px; height:16px; border:1px solid #444; cursor:pointer;" data-acc="#ff4a1c"></button>
-      <button style="background:#258ac3; width:16px; height:16px; border:1px solid #444; cursor:pointer;" data-acc="#258ac3"></button>
-      <button style="background:#2fb35a; width:16px; height:16px; border:1px solid #444; cursor:pointer;" data-acc="#2fb35a"></button>
-      <button style="background:#f5b400; width:16px; height:16px; border:1px solid #444; cursor:pointer;" data-acc="#f5b400"></button>
-      <button style="background:#e8332a; width:16px; height:16px; border:1px solid #444; cursor:pointer;" data-acc="#e8332a"></button>
+    <label>Accent</label>
+    <div class="sw" id="simAccent">
+      <button style="background:#ff4a1c;" data-acc="#ff4a1c"></button>
+      <button style="background:#258ac3;" data-acc="#258ac3"></button>
+      <button style="background:#2fb35a;" data-acc="#2fb35a"></button>
+      <button style="background:#f5b400;" data-acc="#f5b400"></button>
+      <button style="background:#e8332a;" data-acc="#e8332a"></button>
     </div>
   </div>
 </div>
 
 <script>
-  // ── State ──
   const S = {
     night: false, usb: 'none', bt: 'Galaxy S23', source: 'bt', track: 'paused',
     vol: 18, speed: 0, screen: 'home', sheet: null, reverse: false, call: null,
@@ -704,7 +753,6 @@
   const CAUTION_THRESHOLD = () => parseInt(document.getElementById('threshCaution').value) || 60;
   const EMERGENCY_THRESHOLD = () => parseInt(document.getElementById('threshEmergency').value) || 100;
 
-  // ── Speed zone logic ──
   function updateSpeedZone() {
     const speed = S.speed;
     const caution = CAUTION_THRESHOLD();
@@ -714,7 +762,6 @@
     else S.speedZone = 'normal';
   }
 
-  // ── Palette application ──
   function applyPalette() {
     const screen = document.getElementById('screen');
     screen.classList.remove('emergency', 'caution', 'normal');
@@ -727,7 +774,8 @@
       root.style.setProperty('--text2', '#e31c23');
       root.style.setProperty('--accent', '#ff4a1c');
       root.style.setProperty('--accent2', '#e31c23');
-      document.getElementById('headerTitle').textContent = 'EMERGENCY : SELF DESTRUCTION';
+      document.getElementById('headerTitle').textContent = '第一種戦闘配置 : LILY';
+      document.getElementById('sealCorner').textContent = 'EMERGENCY';
     } else if (S.speedZone === 'caution') {
       root.style.setProperty('--bg', '#0a0a12');
       root.style.setProperty('--text', '#f5b400');
@@ -735,6 +783,7 @@
       root.style.setProperty('--accent', '#f5b400');
       root.style.setProperty('--accent2', '#ff6a00');
       document.getElementById('headerTitle').textContent = 'CAUTION : SPEED LIMIT';
+      document.getElementById('sealCorner').textContent = 'CAUTION';
     } else {
       root.style.setProperty('--bg', '#0a0a12');
       root.style.setProperty('--text', '#4de89a');
@@ -742,9 +791,9 @@
       root.style.setProperty('--accent', prefs.accent || '#ff4a1c');
       root.style.setProperty('--accent2', '#e31c23');
       document.getElementById('headerTitle').textContent = 'DIRECT LINK CONNECTION : LILY';
+      document.getElementById('sealCorner').textContent = 'NORMAL';
     }
 
-    // Night mode override (headlights)
     if (S.night && S.speedZone === 'normal') {
       root.style.setProperty('--bg', '#050508');
       root.style.setProperty('--text', '#b9afcb');
@@ -752,12 +801,10 @@
     }
   }
 
-  // ── Render ──
   function render() {
     updateSpeedZone();
     applyPalette();
 
-    // Update metadata
     document.getElementById('metaSpeed').textContent = String(S.speed).padStart(3, '0') + ' km/h';
     document.getElementById('metaVol').textContent = S.vol + '/40';
     document.getElementById('metaSource').textContent = S.source.toUpperCase();
@@ -768,7 +815,6 @@
     document.getElementById('knobReadout').textContent = S.vol + '/40';
     document.getElementById('speedZoneSeal').textContent = S.speedZone.toUpperCase();
 
-    // Update display content
     const dc = document.getElementById('displayContent');
     const dl = document.getElementById('displayLabel');
 
@@ -798,79 +844,45 @@
       dc.innerHTML = '<div class="empty-state"><div class="big">NO SIGNAL</div><div class="small">PRESS SWITCH TO CONNECT A PHONE</div><div class="small" style="margin-top:4px;">WAITING</div></div>';
     }
 
-    // Update node diagram (source keys)
     updateNodes();
-
-    // Update hex button states
     updateHexButtons();
-
     syncSim();
   }
 
   function updateNodes() {
-    const btNode = document.getElementById('nodeBt');
-    const radioNode = document.getElementById('nodeRadio');
-    const usbNode = document.getElementById('nodeUsb');
-    const phoneNode = document.getElementById('nodePhone');
-
-    // Reset
-    [btNode, radioNode, usbNode, phoneNode].forEach(n => {
-      n.querySelectorAll('circle').forEach(c => { c.setAttribute('fill', 'none'); });
+    const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+    const text2 = getComputedStyle(document.documentElement).getPropertyValue('--text2').trim();
+    ['nodeBt','nodeRadio','nodeUsb','nodePhone'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.querySelectorAll('circle,polygon').forEach(c => c.setAttribute('fill', 'none'));
     });
-
-    // BT latched if source is bt
-    if (S.source === 'bt' && S.bt) {
-      btNode.querySelector('circle').setAttribute('fill', getComputedStyle(document.documentElement).getPropertyValue('--accent'));
-    }
-    if (S.source === 'radio') {
-      radioNode.querySelector('circle').setAttribute('fill', getComputedStyle(document.documentElement).getPropertyValue('--accent'));
-    }
-    if (S.source === 'usb') {
-      usbNode.querySelector('circle').setAttribute('fill', getComputedStyle(document.documentElement).getPropertyValue('--accent'));
-    }
-    if (S.bt) {
-      phoneNode.querySelector('circle').setAttribute('fill', getComputedStyle(document.documentElement).getPropertyValue('--text2'));
-    }
+    if (S.source === 'bt' && S.bt) { const el = document.getElementById('nodeBt'); if (el) el.querySelectorAll('circle,polygon').forEach(c => c.setAttribute('fill', accent)); }
+    if (S.source === 'radio') { const el = document.getElementById('nodeRadio'); if (el) el.querySelectorAll('circle,polygon').forEach(c => c.setAttribute('fill', accent)); }
+    if (S.source === 'usb') { const el = document.getElementById('nodeUsb'); if (el) el.querySelectorAll('circle,polygon').forEach(c => c.setAttribute('fill', accent)); }
+    if (S.bt) { const el = document.getElementById('nodePhone'); if (el) el.querySelectorAll('circle,polygon').forEach(c => c.setAttribute('fill', text2)); }
   }
 
   function updateHexButtons() {
     document.querySelectorAll('.hex-btn').forEach(btn => {
       btn.classList.remove('active', 'latched');
-      const action = btn.dataset.action;
-      if (action === 'bt' && S.source === 'bt') btn.classList.add('latched');
-      if (action === 'radio' && S.source === 'radio') btn.classList.add('latched');
-      if (action === 'usb' && S.source === 'usb') btn.classList.add('latched');
-      if (action === 'play' && S.track === 'playing') btn.classList.add('active');
-    });
-  }
-
-  // ── Simulator ──
-  function makeSeg(container, options, getVal, setVal) {
-    container.innerHTML = '';
-    options.forEach(([v, t]) => {
-      const b = document.createElement('button');
-      b.textContent = t;
-      b.onclick = () => { setVal(v); render(); };
-      container.appendChild(b);
-    });
-    // sync
-    container.querySelectorAll('button').forEach((b, i) => {
-      b.classList.toggle('on', options[i][0] === getVal());
+      const a = btn.dataset.action;
+      if (a === 'bt' && S.source === 'bt') btn.classList.add('latched');
+      if (a === 'radio' && S.source === 'radio') btn.classList.add('latched');
+      if (a === 'usb' && S.source === 'usb') btn.classList.add('latched');
+      if (a === 'play' && S.track === 'playing') btn.classList.add('active');
     });
   }
 
   function syncSim() {
-    // Night
     const nightSeg = document.getElementById('simNight');
     nightSeg.innerHTML = '';
-    [[false,'Off'],[true,'On']].forEach(([v,t],i) => {
+    [[false,'Off'],[true,'On']].forEach(([v,t]) => {
       const b = document.createElement('button'); b.textContent = t;
       b.onclick = () => { S.night = v; render(); };
       b.classList.toggle('on', S.night === v);
       nightSeg.appendChild(b);
     });
 
-    // BT
     const btSeg = document.getElementById('simBt');
     btSeg.innerHTML = '';
     [[null,'None'],['Galaxy S23','Galaxy S23'],["Mom's iPhone","Mom's iPhone"]].forEach(([v,t]) => {
@@ -880,7 +892,6 @@
       btSeg.appendChild(b);
     });
 
-    // Source
     const srcSeg = document.getElementById('simSource');
     srcSeg.innerHTML = '';
     [['bt','Bluetooth'],['radio','Radio'],['usb','USB']].forEach(([v,t]) => {
@@ -890,7 +901,6 @@
       srcSeg.appendChild(b);
     });
 
-    // Track
     const trkSeg = document.getElementById('simTrack');
     trkSeg.innerHTML = '';
     [['playing','Playing'],['paused','Paused'],['none','Released']].forEach(([v,t]) => {
@@ -900,7 +910,6 @@
       trkSeg.appendChild(b);
     });
 
-    // USB
     const usbSeg = document.getElementById('simUsb');
     usbSeg.innerHTML = '';
     [['none','Unplugged'],['ready','Plugged in'],['connected','AA connected']].forEach(([v,t]) => {
@@ -910,44 +919,31 @@
       usbSeg.appendChild(b);
     });
 
-    // Events
     const evBtns = document.getElementById('simEvents');
     evBtns.innerHTML = '';
-    const events = [
-      ['Reverse gear', () => { S.reverse = !S.reverse; render(); }],
-      ['Incoming call', () => { S.call = S.call ? null : 'incoming'; render(); }],
-    ];
-    events.forEach(([t, fn]) => {
+    [['Reverse gear', () => { S.reverse = !S.reverse; render(); }],
+     ['Incoming call', () => { S.call = S.call ? null : 'incoming'; render(); }]].forEach(([t, fn]) => {
       const b = document.createElement('button'); b.textContent = t;
       b.onclick = fn;
       evBtns.appendChild(b);
     });
 
-    // Accent
     document.querySelectorAll('#simAccent button').forEach(b => {
       b.classList.toggle('on', b.dataset.acc === prefs.accent);
       b.onclick = () => { prefs.accent = b.dataset.acc; render(); };
     });
   }
 
-  // Speed slider
   document.getElementById('simSpeed').addEventListener('input', e => {
     S.speed = parseInt(e.target.value);
     document.getElementById('simSpeedVal').textContent = S.speed;
     render();
   });
 
-  // Threshold inputs
   document.getElementById('threshCaution').addEventListener('change', () => render());
   document.getElementById('threshEmergency').addEventListener('change', () => render());
 
-  // Initial render
   render();
-
-  // Tick (clock update)
-  setInterval(() => {
-    // Update clock in metadata if needed
-  }, 10000);
 </script>
 </body>
 </html>
