@@ -1,0 +1,1526 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="auto">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lily Launcher: NGE Terminal Mockup v3 (7" Touch, GLM)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+  :root {
+    --bg: #0a0a12;
+    --bg2: #050508;
+    --text: #4de89a;
+    --text2: #f5b400;
+    --accent: #ff4a1c;
+    --accent2: #e31c23;
+    --stripe: #4de89a;
+    --chassis: #3a3448;
+    --button: #b9afcb;
+    --font-jp: "Noto Serif JP", "Hiragino Mincho ProN", "Yu Mincho", serif;
+    --font-en: "Oswald", "Rajdhani", "Eurostile", "Helvetica Neue", sans-serif;
+    --font-mono: "JetBrains Mono", "DSEG7", "Consolas", monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    background: #1a1a2e;
+    color: var(--text);
+    font-family: var(--font-en);
+    display: flex;
+    gap: 16px;
+    padding: 16px;
+    min-height: 100vh;
+    align-items: flex-start;
+    overflow: auto;
+  }
+
+  .bezel {
+    width: 1052px;
+    height: 628px;
+    background: var(--chassis);
+    border-radius: 12px;
+    padding: 14px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05);
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .screen {
+    width: 1024px;
+    height: 600px;
+    background: var(--bg);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    line-height: 1.2;
+    transition: background 0s;
+  }
+  .screen::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+    pointer-events: none;
+    z-index: 100;
+  }
+
+  .honeycomb-bg {
+    position: absolute;
+    inset: 0;
+    opacity: 0.06;
+    pointer-events: none;
+    z-index: 0;
+    color: var(--text);
+  }
+
+  /* Hazard stripes overlay, never layout-shifting */
+  .hazard-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 6px;
+    display: none;
+    z-index: 50;
+    pointer-events: none;
+  }
+  .hazard-overlay.bottom { top: auto; bottom: 0; }
+  .zone-caution .hazard-overlay { display: block; background: repeating-linear-gradient(-45deg, #f5b400 0px, #f5b400 8px, #000 8px, #000 16px); }
+  .zone-emergency .hazard-overlay { display: block; background: repeating-linear-gradient(-45deg, #e31c23 0px, #e31c23 8px, #000 8px, #000 16px); }
+
+  /* Ticker */
+  .ticker {
+    height: 18px;
+    background: var(--accent2);
+    color: #fff;
+    font-size: 10px;
+    letter-spacing: 2px;
+    font-family: var(--font-en);
+    font-weight: 700;
+    display: none;
+    align-items: center;
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+    z-index: 2;
+    flex-shrink: 0;
+  }
+  .ticker .ticker-text {
+    animation: ticker-scroll 12s linear infinite;
+    display: inline-block;
+    padding-left: 100%;
+  }
+  @keyframes ticker-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+  }
+  .ticker.caution { background: #f5b400; color: #000; display: flex; }
+  .ticker.emergency { background: #e31c23; color: #fff; display: flex; }
+
+  /* Octagonal seal */
+  .seal-corner {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    border: 2px solid var(--text);
+    padding: 2px 8px;
+    font-size: 10px;
+    letter-spacing: 2px;
+    font-weight: 700;
+    font-family: var(--font-jp);
+    z-index: 3;
+    transform: rotate(-3deg);
+    clip-path: polygon(10% 0%, 90% 0%, 100% 25%, 100% 75%, 90% 100%, 10% 100%, 0% 75%, 0% 25%);
+    background: rgba(0,0,0,0.6);
+  }
+
+  /* Header */
+  .header {
+    background: var(--accent);
+    color: #000;
+    padding: 6px 16px;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 2px solid #000;
+    position: relative;
+    z-index: 2;
+    font-family: var(--font-jp);
+    flex-shrink: 0;
+  }
+  .header::before, .header::after {
+    content: '';
+    width: 28px;
+    height: 100%;
+    background: repeating-linear-gradient(90deg, #000 0px, #000 2px, transparent 2px, transparent 4px);
+    flex-shrink: 0;
+  }
+  .header .title { flex: 1; text-align: center; }
+
+  /* Main layout */
+  .main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 180px 1fr 180px;
+    gap: 6px;
+    padding: 6px;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+  }
+
+  .side-col {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 11px;
+    letter-spacing: 1px;
+  }
+  .meta-block {
+    border: 1px solid var(--text);
+    padding: 4px 6px;
+    background: rgba(0,0,0,0.5);
+  }
+  .meta-block .label {
+    font-size: 8px;
+    opacity: 0.5;
+    letter-spacing: 2px;
+    margin-bottom: 1px;
+    font-family: var(--font-en);
+  }
+  .meta-block .value {
+    font-size: 12px;
+    font-weight: 700;
+    font-family: var(--font-mono);
+  }
+  .side-col .section-title {
+    font-size: 8px;
+    letter-spacing: 3px;
+    opacity: 0.4;
+    border-bottom: 1px solid var(--text);
+    padding-bottom: 2px;
+    margin-bottom: 3px;
+    font-family: var(--font-en);
+  }
+  .side-col .jp-label {
+    font-family: var(--font-jp);
+    font-size: 10px;
+    opacity: 0.6;
+    font-weight: 700;
+    margin-top: 4px;
+  }
+
+  /* Center */
+  .center {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    overflow: hidden;
+  }
+  .display-area {
+    flex: 1;
+    border: 2px solid var(--text);
+    background: rgba(0,0,0,0.6);
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    position: relative;
+    overflow: hidden;
+  }
+  .display-area::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--text);
+  }
+  .display-label {
+    font-size: 10px;
+    letter-spacing: 3px;
+    opacity: 0.5;
+    border-bottom: 1px solid var(--text);
+    padding-bottom: 3px;
+    margin-bottom: 6px;
+    font-family: var(--font-en);
+    flex-shrink: 0;
+  }
+  .display-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+    overflow: hidden;
+  }
+
+  .tape-title {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    line-height: 1.1;
+    font-family: var(--font-jp);
+  }
+  .tape-artist {
+    font-size: 16px;
+    font-weight: 500;
+    opacity: 0.8;
+    font-family: var(--font-jp);
+  }
+  .tape-readout {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    display: flex;
+    gap: 16px;
+    opacity: 0.7;
+    flex-wrap: wrap;
+  }
+  .radio-freq {
+    font-size: 36px;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    text-align: center;
+    letter-spacing: 2px;
+  }
+  .radio-station {
+    font-size: 14px;
+    text-align: center;
+    opacity: 0.8;
+    font-family: var(--font-jp);
+  }
+  .empty-state {
+    text-align: center;
+    opacity: 0.4;
+  }
+  .empty-state .big {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    margin-bottom: 6px;
+    font-family: var(--font-jp);
+  }
+  .empty-state .small {
+    font-size: 12px;
+    letter-spacing: 2px;
+    font-family: var(--font-en);
+  }
+
+  /* MAGI node diagram */
+  .magi-diagram {
+    height: 100px;
+    border: 1px solid var(--text);
+    background: rgba(0,0,0,0.4);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    flex-shrink: 0;
+  }
+  .magi-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+  .magi-trap {
+    width: 120px;
+    height: 50px;
+    clip-path: polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%);
+    border: 2px solid var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: var(--font-en);
+    letter-spacing: 1px;
+    background: rgba(0,0,0,0.6);
+    cursor: pointer;
+    transition: none;
+    color: var(--text);
+  }
+  .magi-trap.active {
+    background: var(--accent);
+    color: #000;
+    border-color: var(--accent);
+  }
+  .magi-trap.latched {
+    background: var(--accent);
+    color: #000;
+    border-color: var(--accent);
+  }
+  .magi-label {
+    font-size: 9px;
+    opacity: 0.6;
+    font-family: var(--font-jp);
+    letter-spacing: 1px;
+  }
+
+  /* Bottom bar */
+  .bottom-bar {
+    height: 120px;
+    display: grid;
+    grid-template-columns: 1fr 200px 1fr;
+    gap: 6px;
+    padding: 6px;
+    border-top: 1px solid var(--text);
+    flex-shrink: 0;
+  }
+
+  .hex-grid {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .hex-grid svg { width: 100%; height: 100%; }
+
+  .hex-btn { cursor: pointer; }
+  .hex-btn:focus-visible .hex-fill { stroke-width: 3; }
+  .hex-btn:hover .hex-fill { opacity: 0.75; }
+  .hex-btn.active .hex-fill { fill: var(--accent); }
+  .hex-btn.latched .hex-fill { fill: var(--accent); }
+  .hex-btn .hex-fill { fill: none; stroke: var(--text); stroke-width: 2; transition: none; }
+  .hex-btn.active .hex-text, .hex-btn.latched .hex-text { fill: #000; }
+  .hex-btn .hex-text {
+    font-family: var(--font-en);
+    font-size: 11px;
+    font-weight: 700;
+    fill: var(--text);
+    text-anchor: middle;
+    dominant-baseline: middle;
+    letter-spacing: 1px;
+    pointer-events: none;
+  }
+
+  /* Knob */
+  .knob-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+  .knob {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    border: 3px solid var(--text);
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    position: relative;
+    font-family: var(--font-mono);
+    cursor: ns-resize;
+    user-select: none;
+    touch-action: none;
+  }
+  .knob::after {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 3px;
+    height: 14px;
+    background: var(--text);
+  }
+  .knob-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    opacity: 0.6;
+    font-family: var(--font-en);
+  }
+  .knob-value {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  /* Speed readout */
+  .speed-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+  .speed-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    opacity: 0.5;
+    text-align: center;
+    font-family: var(--font-en);
+  }
+  .speed-readout {
+    font-family: var(--font-mono);
+    font-size: 32px;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 2px;
+  }
+  .speed-zone-seal {
+    display: inline-block;
+    border: 2px solid var(--text);
+    padding: 2px 8px;
+    font-size: 9px;
+    letter-spacing: 2px;
+    font-weight: 700;
+    font-family: var(--font-jp);
+    transform: rotate(-3deg);
+    margin-top: 4px;
+    clip-path: polygon(10% 0%, 90% 0%, 100% 25%, 100% 75%, 90% 100%, 10% 100%, 0% 75%, 0% 25%);
+  }
+
+  /* Warning overlay (not layout-shifting) */
+  .warning-overlay {
+    position: absolute;
+    inset: 0;
+    display: none;
+    z-index: 60;
+    pointer-events: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+    background: rgba(0,0,0,0.25);
+  }
+  .warning-overlay.active { display: flex; }
+  .warning-overlay .warning-text {
+    font-family: var(--font-jp);
+    font-size: 36px;
+    font-weight: 900;
+    letter-spacing: 4px;
+    color: var(--accent2);
+    text-transform: uppercase;
+    animation: pulse 1s ease-in-out infinite;
+  }
+  .warning-overlay .warning-sub {
+    font-family: var(--font-en);
+    font-size: 14px;
+    letter-spacing: 3px;
+    color: var(--text);
+    opacity: 0.8;
+  }
+  .warning-overlay .hazard-bar {
+    width: 80%;
+    height: 4px;
+    background: repeating-linear-gradient(-45deg, var(--accent2) 0px, var(--accent2) 8px, #000 8px, #000 16px);
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.45; }
+  }
+
+  /* Overlays: More sheet, Settings, Phone, AA, Reverse, Call */
+  .overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 70;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.7);
+    padding: 20px;
+  }
+  .overlay.active { display: flex; }
+  .overlay-panel {
+    background: var(--bg);
+    border: 2px solid var(--text);
+    padding: 14px;
+    max-width: 90%;
+    max-height: 90%;
+    overflow: auto;
+    position: relative;
+  }
+  .overlay-panel .overlay-title {
+    font-family: var(--font-jp);
+    font-size: 14px;
+    letter-spacing: 3px;
+    border-bottom: 1px solid var(--text);
+    padding-bottom: 6px;
+    margin-bottom: 10px;
+  }
+  .overlay-close {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    background: none;
+    border: 1px solid var(--text);
+    color: var(--text);
+    font-family: var(--font-en);
+    font-size: 10px;
+    padding: 2px 8px;
+    cursor: pointer;
+    min-height: 28px;
+  }
+  .overlay-close:focus-visible { outline: 2px solid var(--accent); }
+
+  /* More sheet tiles */
+  .more-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+  .more-tile {
+    border: 1px solid var(--text);
+    background: rgba(0,0,0,0.5);
+    padding: 10px 6px;
+    text-align: center;
+    font-family: var(--font-en);
+    font-size: 11px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .more-tile:hover { background: var(--accent); color: #000; }
+  .more-tile:focus-visible { outline: 2px solid var(--accent); }
+
+  /* Settings rows */
+  .settings-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-size: 11px;
+  }
+  .settings-row label { flex: 1; opacity: 0.7; font-family: var(--font-en); letter-spacing: 1px; }
+  .settings-row .seg { display: flex; gap: 2px; }
+  .settings-row .seg button {
+    background: #222; border: 1px solid #444; color: #888;
+    padding: 4px 8px; font-size: 10px; cursor: pointer;
+    font-family: var(--font-en); min-height: 28px;
+  }
+  .settings-row .seg button.on { background: var(--text); color: #000; border-color: var(--text); }
+  .settings-row input[type="number"] {
+    width: 60px; background: #222; border: 1px solid #444;
+    color: #fff; padding: 4px; font-size: 11px; font-family: var(--font-mono);
+  }
+  .settings-row .sw { display: flex; gap: 3px; }
+  .settings-row .sw button { width: 20px; height: 20px; border: 1px solid #444; cursor: pointer; }
+
+  /* Reverse / call / AA overlays content */
+  .full-banner {
+    font-family: var(--font-jp);
+    font-size: 48px;
+    font-weight: 900;
+    letter-spacing: 6px;
+    color: var(--accent2);
+    animation: pulse 1s ease-in-out infinite;
+  }
+  .full-sub {
+    font-family: var(--font-en);
+    font-size: 14px;
+    letter-spacing: 3px;
+    color: var(--text);
+    opacity: 0.8;
+  }
+  .full-hazard {
+    width: 80%;
+    height: 6px;
+    background: repeating-linear-gradient(-45deg, var(--accent2) 0px, var(--accent2) 8px, #000 8px, #000 16px);
+  }
+
+  /* Simulator panel */
+  .sim-panel {
+    width: 280px;
+    flex-shrink: 0;
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 10px;
+    max-height: 628px;
+    overflow-y: auto;
+    font-size: 11px;
+  }
+  .sim-panel h2 {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--text2);
+    margin: 10px 0 4px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 3px;
+    font-family: var(--font-en);
+  }
+  .sim-panel h2:first-child { margin-top: 0; }
+  .sim-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 5px;
+  }
+  .sim-row label { flex: 1; opacity: 0.7; font-size: 10px; }
+  .sim-row .seg { display: flex; gap: 2px; }
+  .sim-row .seg button {
+    background: #222; border: 1px solid #444; color: #888;
+    padding: 3px 8px; font-size: 9px; cursor: pointer;
+    font-family: var(--font-en); min-height: 28px;
+  }
+  .sim-row .seg button.on { background: var(--text); color: #000; border-color: var(--text); }
+  .sim-row .btns { display: flex; gap: 2px; flex-wrap: wrap; }
+  .sim-row .btns button {
+    background: #222; border: 1px solid #444; color: #888;
+    padding: 3px 8px; font-size: 9px; cursor: pointer;
+    font-family: var(--font-en); min-height: 28px;
+  }
+  .sim-row .btns button.on { background: var(--accent); color: #000; border-color: var(--accent); }
+  .sim-row input[type="range"] { width: 100px; }
+  .sim-row input[type="number"] {
+    width: 50px; background: #222; border: 1px solid #444;
+    color: #fff; padding: 2px; font-size: 10px;
+  }
+  .sim-row .sw { display: flex; gap: 3px; }
+  .sim-row .sw button { width: 16px; height: 16px; border: 1px solid #444; cursor: pointer; }
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    font-size: 10px;
+  }
+  .toggle-row label { flex: 1; opacity: 0.7; }
+  .toggle-row button {
+    background: #222; border: 1px solid #444; color: #888;
+    padding: 3px 10px; font-size: 9px; cursor: pointer;
+    font-family: var(--font-en); min-height: 28px;
+  }
+  .toggle-row button.on { background: var(--text); color: #000; border-color: var(--text); }
+
+  /* Focus */
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  button:focus-visible { outline: 2px solid var(--accent); }
+
+  /* Toast */
+  .toast {
+    position: absolute;
+    bottom: 130px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.85);
+    border: 1px solid var(--text);
+    color: var(--text);
+    font-family: var(--font-en);
+    font-size: 11px;
+    letter-spacing: 2px;
+    padding: 6px 12px;
+    z-index: 80;
+    display: none;
+  }
+  .toast.show { display: block; }
+
+  @media (max-width: 1080px) {
+    body { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bezel">
+  <div class="screen zone-normal" id="screen">
+    <div class="hazard-overlay top"></div>
+    <div class="hazard-overlay bottom"></div>
+
+    <svg class="honeycomb-bg" viewBox="0 0 1024 600" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <pattern id="hexPattern" width="24" height="41.57" patternUnits="userSpaceOnUse">
+          <polygon points="12,0 24,6 24,18 12,24 0,18 0,6" fill="none" stroke="currentColor" stroke-width="0.4"/>
+          <polygon points="12,24 24,30 24,42 12,48 0,42 0,30" fill="none" stroke="currentColor" stroke-width="0.4"/>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#hexPattern)"/>
+    </svg>
+
+    <div class="ticker" id="ticker">
+      <span class="ticker-text" id="tickerText">EMERGENCY... EMERGENCY... EMERGENCY... EMERGENCY... EMERGENCY... EMERGENCY... </span>
+    </div>
+
+    <div class="header">
+      <span class="bar"></span>
+      <span class="title" id="headerTitle">DIRECT LINK CONNECTION : LILY</span>
+      <span class="bar"></span>
+    </div>
+    <div class="seal-corner" id="sealCorner">NORMAL</div>
+
+    <div class="main">
+      <div class="side-col">
+        <div class="section-title">SYSTEM INFO</div>
+        <div class="meta-block"><div class="label">CODE</div><div class="value" id="metaCode">LILY-01</div></div>
+        <div class="meta-block"><div class="label">FILE</div><div class="value">HOME_SYS</div></div>
+        <div class="meta-block"><div class="label">MODE</div><div class="value" id="metaMode">AUTO</div></div>
+        <div class="meta-block"><div class="label">PRIORITY</div><div class="value">AAA</div></div>
+        <div class="meta-block"><div class="label">SPEED</div><div class="value" id="metaSpeed">000 km/h</div></div>
+        <div class="meta-block"><div class="label">VOL</div><div class="value" id="metaVol">18/40</div></div>
+        <div class="jp-label">見現時刻表示</div>
+        <div class="jp-label">危険</div>
+      </div>
+
+      <div class="center">
+        <div class="display-area">
+          <div class="display-label" id="displayLabel">DISPLAY: TAPE</div>
+          <div class="display-content" id="displayContent"></div>
+        </div>
+
+        <div class="magi-diagram" id="magiDiagram">
+          <div class="magi-node">
+            <div class="magi-trap" id="magiBt" data-source="bt" tabindex="0" role="button">BT</div>
+            <div class="magi-label">Melchior</div>
+          </div>
+          <div class="magi-node">
+            <div class="magi-trap" id="magiRadio" data-source="radio" tabindex="0" role="button">RADIO</div>
+            <div class="magi-label">Balthasar</div>
+          </div>
+          <div class="magi-node">
+            <div class="magi-trap" id="magiUsb" data-source="usb" tabindex="0" role="button">USB</div>
+            <div class="magi-label">Casper</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="side-col">
+        <div class="section-title">LAYER STATUS</div>
+        <div class="meta-block"><div class="label">LAYER 3</div><div class="value">CONNECTION</div></div>
+        <div class="meta-block"><div class="label">LAYER 2</div><div class="value">DATA LINK</div></div>
+        <div class="meta-block"><div class="label">LAYER 1</div><div class="value">PHYSICAL</div></div>
+        <div class="meta-block"><div class="label">SOURCE</div><div class="value" id="metaSource">BLUETOOTH</div></div>
+        <div class="meta-block"><div class="label">THEME</div><div class="value" id="metaTheme">AUTO</div></div>
+        <div class="meta-block"><div class="label">SPEED ZONE</div><div class="value" id="metaSpeedZone">NORMAL</div></div>
+        <div class="meta-block"><div class="label">MODULE</div><div class="value" id="metaModule">NONE</div></div>
+        <div class="jp-label">提訴決議</div>
+        <div class="jp-label">非常事態</div>
+      </div>
+    </div>
+
+    <div class="bottom-bar">
+      <div class="hex-grid">
+        <svg viewBox="0 0 420 116" preserveAspectRatio="xMidYMid meet" id="hexSvg">
+          <g class="hex-btn" data-action="prev" transform="translate(40,28)" tabindex="0" role="button">
+            <polygon class="hex-fill" points="0,-22 19,-11 19,11 0,22 -19,11 -19,-11"/>
+            <text class="hex-text" y="2">PREV</text>
+          </g>
+          <g class="hex-btn" data-action="play" transform="translate(116,28)" tabindex="0" role="button">
+            <polygon class="hex-fill" points="0,-22 19,-11 19,11 0,22 -19,11 -19,-11"/>
+            <text class="hex-text" y="2">PLAY</text>
+          </g>
+          <g class="hex-btn" data-action="next" transform="translate(192,28)" tabindex="0" role="button">
+            <polygon class="hex-fill" points="0,-22 19,-11 19,11 0,22 -19,11 -19,-11"/>
+            <text class="hex-text" y="2">NEXT</text>
+          </g>
+          <g class="hex-btn" data-action="bt" transform="translate(268,28)" tabindex="0" role="button">
+            <polygon class="hex-fill" points="0,-22 19,-11 19,11 0,22 -19,11 -19,-11"/>
+            <text class="hex-text" y="2">BT</text>
+          </g>
+          <g class="hex-btn" data-action="radio" transform="translate(344,28)" tabindex="0" role="button">
+            <polygon class="hex-fill" points="0,-22 19,-11 19,11 0,22 -19,11 -19,-11"/>
+            <text class="hex-text" y="2">RADIO</text>
+          </g>
+          <g class="hex-btn" data-action="usb" transform="translate(78,88)" tabindex="0" role="button">
+            <polygon class="hex-fill" points="0,-22 19,-11 19,11 0,22 -19,11 -19,-11"/>
+            <text class="hex-text" y="2">USB</text>
+          </g>
+          <g class="hex-btn" data-action="phone" transform="translate(154,88)" tabindex="0" role="button">
+            <polygon class="hex-fill" points="0,-22 19,-11 19,11 0,22 -19,11 -19,-11"/>
+            <text class="hex-text" y="2">PHONE</text>
+          </g>
+          <g class="hex-btn" data-action="switch" transform="translate(230,88)" tabindex="0" role="button">
+            <polygon class="hex-fill" points="0,-22 19,-11 19,11 0,22 -19,11 -19,-11"/>
+            <text class="hex-text" y="2">SWITCH</text>
+          </g>
+          <g class="hex-btn" data-action="auto" transform="translate(306,88)" tabindex="0" role="button">
+            <polygon class="hex-fill" points="0,-22 19,-11 19,11 0,22 -19,11 -19,-11"/>
+            <text class="hex-text" y="2">AUTO</text>
+          </g>
+          <g class="hex-btn" data-action="more" transform="translate(382,88)" tabindex="0" role="button">
+            <polygon class="hex-fill" points="0,-22 19,-11 19,11 0,22 -19,11 -19,-11"/>
+            <text class="hex-text" y="2">MORE</text>
+          </g>
+        </svg>
+      </div>
+
+      <div class="knob-area">
+        <div class="knob" id="knob" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="40" aria-valuenow="18"><span id="knobVal">18</span></div>
+        <div class="knob-label">VOL</div>
+        <div class="knob-value" id="knobReadout">18/40</div>
+      </div>
+
+      <div class="speed-block">
+        <div class="speed-label">SPEED</div>
+        <div class="speed-readout" id="speedDisplay">000</div>
+        <div class="speed-label">km/h</div>
+        <div class="speed-zone-seal" id="speedZoneSeal">NORMAL</div>
+      </div>
+    </div>
+
+    <!-- Overlays -->
+    <div class="overlay" id="overlayReverse">
+      <div class="overlay-panel" style="text-align:center;">
+        <div class="full-hazard"></div>
+        <div class="full-banner">REVERSE</div>
+        <div class="full-sub">CAMERA ACTIVE</div>
+        <div class="full-hazard"></div>
+      </div>
+    </div>
+
+    <div class="overlay" id="overlayCall">
+      <div class="overlay-panel" style="text-align:center;">
+        <div class="overlay-title">INCOMING CALL</div>
+        <div style="font-size:18px;margin:10px 0;" id="callPhone">UNKNOWN</div>
+        <div style="display:flex;gap:8px;justify-content:center;">
+          <button class="overlay-close" id="callAccept" style="position:static;">ACCEPT</button>
+          <button class="overlay-close" id="callDecline" style="position:static;">DECLINE</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="overlay" id="overlayAA">
+      <div class="overlay-panel" style="text-align:center;">
+        <div class="overlay-title">ANDROID AUTO</div>
+        <div class="empty-state"><div class="big">CONNECTED</div><div class="small">PHONE LINKED</div></div>
+        <button class="overlay-close" id="aaClose" style="position:static;margin-top:10px;">CLOSE</button>
+      </div>
+    </div>
+
+    <div class="overlay" id="overlayPhone">
+      <div class="overlay-panel" style="text-align:center;">
+        <div class="overlay-title">PHONE</div>
+        <div style="font-size:14px;margin:8px 0;" id="phoneName">NONE</div>
+        <div class="empty-state"><div class="small">STOCK PHONE APP</div></div>
+        <button class="overlay-close" id="phoneClose" style="position:static;margin-top:10px;">OPEN APP</button>
+      </div>
+    </div>
+
+    <div class="overlay" id="overlayMore">
+      <div class="overlay-panel">
+        <button class="overlay-close" id="moreClose">CLOSE</button>
+        <div class="overlay-title">MORE MODULES</div>
+        <div class="more-grid" id="moreGrid"></div>
+      </div>
+    </div>
+
+    <div class="overlay" id="overlaySettings">
+      <div class="overlay-panel">
+        <button class="overlay-close" id="settingsClose">CLOSE</button>
+        <div class="overlay-title">SETTINGS</div>
+        <div id="settingsBody"></div>
+      </div>
+    </div>
+
+    <div class="warning-overlay" id="warningOverlay">
+      <div class="hazard-bar"></div>
+      <div class="warning-text" id="warningText">EMERGENCY</div>
+      <div class="warning-sub" id="warningSub">SPEED EXCEEDED</div>
+      <div class="hazard-bar"></div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+  </div>
+</div>
+
+<!-- SIMULATOR PANEL -->
+<div class="sim-panel">
+  <h2>CAR SIGNALS</h2>
+
+  <div class="toggle-row">
+    <label>Day/Night Mode</label>
+    <button id="simDayNight">AUTO</button>
+  </div>
+
+  <div class="sim-row">
+    <label>Speed (km/h)</label>
+    <input type="range" id="simSpeed" min="0" max="160" value="0" style="width:100px;">
+    <span id="simSpeedVal" style="font-family:var(--font-mono); font-size:10px; width:25px;">0</span>
+  </div>
+
+  <div class="sim-row">
+    <label>Headlights</label>
+    <div class="seg" id="simHeadlights"></div>
+  </div>
+
+  <div class="sim-row">
+    <label>Bluetooth device</label>
+    <div class="seg" id="simBt"></div>
+  </div>
+
+  <div class="sim-row">
+    <label>Audio source</label>
+    <div class="seg" id="simSource"></div>
+  </div>
+
+  <div class="sim-row">
+    <label>BT track</label>
+    <div class="seg" id="simTrack"></div>
+  </div>
+
+  <div class="sim-row">
+    <label>USB phone</label>
+    <div class="seg" id="simUsb"></div>
+  </div>
+
+  <h2>EVENTS</h2>
+  <div class="sim-row">
+    <div class="btns" id="simEvents"></div>
+  </div>
+
+  <h2>STORAGE</h2>
+  <div class="sim-row">
+    <label>Caution (km/h)</label>
+    <input type="number" id="threshCaution" value="60" min="10" max="200">
+  </div>
+  <div class="sim-row">
+    <label>Emergency (km/h)</label>
+    <input type="number" id="threshEmergency" value="100" min="20" max="250">
+  </div>
+
+  <h2>DISPLAY</h2>
+  <div class="sim-row">
+    <label>Accent</label>
+    <div class="sw" id="simAccent">
+      <button style="background:#ff4a1c;" data-acc="#ff4a1c" title="orange-red"></button>
+      <button style="background:#258ac3;" data-acc="#258ac3" title="cyan"></button>
+      <button style="background:#2fb35a;" data-acc="#2fb35a" title="green"></button>
+      <button style="background:#f5b400;" data-acc="#f5b400" title="amber"></button>
+      <button style="background:#e8332a;" data-acc="#e8332a" title="red"></button>
+    </div>
+  </div>
+
+  <div class="sim-row">
+    <label>Settings</label>
+    <div class="btns">
+      <button id="openSettingsBtn">OPEN</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const S = {
+    night: false, headlights: false, usb: 'none', bt: 'Galaxy S23', source: 'bt', track: 'paused',
+    vol: 18, speed: 0, reverse: false, call: null, aaOpen: false, phoneOpen: false,
+    dayNightMode: 'auto', speedZone: 'normal', effectiveZone: 'normal',
+    moreSelection: null, lastToast: 0,
+  };
+  const prefs = { resumeOnStart: true, autoAA: true, accent: '#ff4a1c', theme: 'auto' };
+
+  const MORE_TILES = [
+    'Radio', 'USB Music', 'Video', 'Dashcam', 'Sound EQ', 'AUX', 'Files',
+    'Car', 'CAN', 'Wheel keys', 'Android', 'Screen off', 'Home setup'
+  ];
+
+  const CAUTION_THRESHOLD = () => parseInt(document.getElementById('threshCaution').value) || 60;
+  const EMERGENCY_THRESHOLD = () => parseInt(document.getElementById('threshEmergency').value) || 100;
+
+  function getTimeBasedTheme() {
+    const now = new Date();
+    const hour = now.getHours();
+    if (hour >= 17 || hour < 5) return 'night';
+    return 'day';
+  }
+
+  function updateDayNight() {
+    if (S.dayNightMode === 'auto') {
+      if (S.headlights) S.night = true;
+      else S.night = getTimeBasedTheme() === 'night';
+    } else {
+      if (S.headlights) S.night = true;
+    }
+  }
+
+  function updateSpeedZone() {
+    const speed = S.speed;
+    const caution = CAUTION_THRESHOLD();
+    const emergency = EMERGENCY_THRESHOLD();
+    if (speed > emergency) S.speedZone = 'emergency';
+    else if (speed > caution) S.speedZone = 'caution';
+    else S.speedZone = 'normal';
+    S.effectiveZone = S.reverse ? 'emergency' : S.speedZone;
+  }
+
+  function applyPalette() {
+    const screen = document.getElementById('screen');
+    screen.classList.remove('zone-normal', 'zone-caution', 'zone-emergency');
+    screen.classList.add('zone-' + S.effectiveZone);
+    const root = document.documentElement;
+    const ticker = document.getElementById('ticker');
+    const wo = document.getElementById('warningOverlay');
+
+    if (S.effectiveZone === 'emergency') {
+      root.style.setProperty('--bg', '#000000');
+      root.style.setProperty('--text', '#ff4a1c');
+      root.style.setProperty('--text2', '#e31c23');
+      root.style.setProperty('--accent', '#ff4a1c');
+      root.style.setProperty('--accent2', '#e31c23');
+      document.getElementById('headerTitle').textContent = '第一種戦闘配置 : LILY';
+      document.getElementById('sealCorner').textContent = 'EMERGENCY';
+      ticker.className = 'ticker emergency';
+      ticker.style.display = 'flex';
+      document.getElementById('tickerText').textContent = 'EMERGENCY... EMERGENCY... EMERGENCY... EMERGENCY... EMERGENCY... EMERGENCY... ';
+      document.getElementById('warningText').textContent = 'EMERGENCY';
+      document.getElementById('warningSub').textContent = S.reverse ? 'REVERSE GEAR' : 'SPEED EXCEEDED';
+      wo.classList.add('active');
+    } else if (S.effectiveZone === 'caution') {
+      root.style.setProperty('--bg', '#0a0a12');
+      root.style.setProperty('--text', '#f5b400');
+      root.style.setProperty('--text2', '#ff6a00');
+      root.style.setProperty('--accent', '#f5b400');
+      root.style.setProperty('--accent2', '#ff6a00');
+      document.getElementById('headerTitle').textContent = 'CAUTION : SPEED LIMIT';
+      document.getElementById('sealCorner').textContent = 'CAUTION';
+      ticker.className = 'ticker caution';
+      ticker.style.display = 'flex';
+      document.getElementById('tickerText').textContent = 'CAUTION... CAUTION... CAUTION... CAUTION... CAUTION... CAUTION... ';
+      document.getElementById('warningText').textContent = 'CAUTION';
+      document.getElementById('warningSub').textContent = 'SPEED LIMIT';
+      wo.classList.add('active');
+    } else {
+      root.style.setProperty('--bg', '#0a0a12');
+      root.style.setProperty('--text', '#4de89a');
+      root.style.setProperty('--text2', '#f5b400');
+      root.style.setProperty('--accent', prefs.accent || '#ff4a1c');
+      root.style.setProperty('--accent2', '#e31c23');
+      document.getElementById('headerTitle').textContent = 'DIRECT LINK CONNECTION : LILY';
+      document.getElementById('sealCorner').textContent = 'NORMAL';
+      ticker.className = 'ticker';
+      ticker.style.display = 'none';
+      wo.classList.remove('active');
+    }
+
+    if (S.night && S.effectiveZone === 'normal') {
+      root.style.setProperty('--bg', '#050508');
+      root.style.setProperty('--text', '#b9afcb');
+      root.style.setProperty('--text2', '#888888');
+      root.style.setProperty('--accent', prefs.accent || '#ff4a1c');
+    }
+
+    const dnBtn = document.getElementById('simDayNight');
+    if (dnBtn) {
+      dnBtn.textContent = S.dayNightMode === 'auto' ? 'AUTO' : (S.night ? 'NIGHT' : 'DAY');
+      dnBtn.classList.toggle('on', S.dayNightMode !== 'auto');
+    }
+  }
+
+  function renderDisplay() {
+    const dc = document.getElementById('displayContent');
+    const dl = document.getElementById('displayLabel');
+
+    if (S.reverse) {
+      dl.textContent = 'DISPLAY: REVERSE';
+      dc.innerHTML = '<div class="empty-state"><div class="big">REVERSE</div><div class="small">CAMERA ACTIVE</div></div>';
+    } else if (S.call) {
+      dl.textContent = 'DISPLAY: INCOMING CALL';
+      dc.innerHTML = '<div class="empty-state"><div class="big">INCOMING CALL</div><div class="small">' + (S.bt || 'UNKNOWN') + '</div></div>';
+    } else if (S.usb === 'connected') {
+      dl.textContent = 'DISPLAY: ANDROID AUTO';
+      dc.innerHTML = '<div class="empty-state"><div class="big">ANDROID AUTO</div><div class="small">CONNECTED</div></div>';
+    } else if (S.source === 'radio') {
+      dl.textContent = 'DISPLAY: RADIO';
+      dc.innerHTML = '<div class="radio-freq">FM 98.5</div><div class="radio-station">STATION NAME</div><div class="tape-readout"><span>MHZ</span><span>STEREO</span><span>RDS</span></div>';
+    } else if (S.source === 'usb') {
+      dl.textContent = 'DISPLAY: USB';
+      dc.innerHTML = '<div class="tape-title">USB Track Title</div><div class="tape-artist">Artist Name</div><div class="tape-readout"><span>TIME 02:34</span><span>LEN 04:12</span></div>';
+    } else if (S.bt) {
+      dl.textContent = 'DISPLAY: TAPE';
+      const trackState = S.track === 'playing' ? 'PLAYING' : (S.track === 'paused' ? 'PAUSED' : 'RELEASED');
+      const title = S.track === 'playing' ? 'Song Title Here' : 'No Signal';
+      const artist = S.track === 'playing' ? 'Artist Name' : '';
+      dc.innerHTML = '<div class="tape-title">' + title + '</div>' +
+        '<div class="tape-artist">' + artist + '</div>' +
+        '<div class="tape-readout"><span>TIME 02:34</span><span>LEN 04:12</span><span>' + trackState + '</span></div>';
+    } else {
+      dl.textContent = 'DISPLAY: EMPTY';
+      dc.innerHTML = '<div class="empty-state"><div class="big">NO SIGNAL</div><div class="small">PRESS SWITCH TO CONNECT A PHONE</div><div class="small" style="margin-top:4px;">WAITING</div></div>';
+    }
+  }
+
+  function renderMagi() {
+    ['magiBt','magiRadio','magiUsb'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.classList.remove('active', 'latched'); el.style.background = ''; el.style.color = ''; }
+    });
+    if (S.source === 'bt' && S.bt) {
+      const el = document.getElementById('magiBt');
+      if (el) { el.classList.add('latched'); el.style.background = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim(); el.style.color = '#000'; }
+    }
+    if (S.source === 'radio') {
+      const el = document.getElementById('magiRadio');
+      if (el) { el.classList.add('latched'); el.style.background = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim(); el.style.color = '#000'; }
+    }
+    if (S.source === 'usb') {
+      const el = document.getElementById('magiUsb');
+      if (el) { el.classList.add('latched'); el.style.background = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim(); el.style.color = '#000'; }
+    }
+  }
+
+  function renderHex() {
+    document.querySelectorAll('.hex-btn').forEach(btn => {
+      btn.classList.remove('active', 'latched');
+      const a = btn.dataset.action;
+      if (a === 'bt' && S.source === 'bt') btn.classList.add('latched');
+      if (a === 'radio' && S.source === 'radio') btn.classList.add('latched');
+      if (a === 'usb' && S.source === 'usb') btn.classList.add('latched');
+      if (a === 'play' && S.track === 'playing') btn.classList.add('active');
+      if (a === 'auto' && prefs.autoAA) btn.classList.add('active');
+    });
+  }
+
+  function renderOverlays() {
+    document.getElementById('overlayReverse').classList.toggle('active', S.reverse);
+    document.getElementById('overlayCall').classList.toggle('active', !!S.call);
+    document.getElementById('overlayAA').classList.toggle('active', S.aaOpen);
+    document.getElementById('overlayPhone').classList.toggle('active', S.phoneOpen);
+    if (S.call) document.getElementById('callPhone').textContent = S.bt || 'UNKNOWN';
+    document.getElementById('phoneName').textContent = S.bt || 'NONE';
+  }
+
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(S.lastToast);
+    S.lastToast = setTimeout(() => t.classList.remove('show'), 1800);
+  }
+
+  function render() {
+    updateDayNight();
+    updateSpeedZone();
+    applyPalette();
+
+    document.getElementById('metaSpeed').textContent = String(S.speed).padStart(3, '0') + ' km/h';
+    document.getElementById('metaVol').textContent = S.vol + '/40';
+    document.getElementById('metaSource').textContent = S.source.toUpperCase();
+    document.getElementById('metaTheme').textContent = S.night ? 'NIGHT' : 'DAY';
+    document.getElementById('metaSpeedZone').textContent = S.speedZone.toUpperCase();
+    document.getElementById('metaMode').textContent = S.dayNightMode.toUpperCase();
+    document.getElementById('speedDisplay').textContent = String(S.speed).padStart(3, '0');
+    document.getElementById('knobVal').textContent = S.vol;
+    document.getElementById('knobReadout').textContent = S.vol + '/40';
+    document.getElementById('speedZoneSeal').textContent = S.speedZone.toUpperCase();
+    document.getElementById('metaModule').textContent = S.moreSelection ? S.moreSelection.toUpperCase() : 'NONE';
+
+    renderDisplay();
+    renderMagi();
+    renderHex();
+    renderOverlays();
+    syncSim();
+  }
+
+  function syncSim() {
+    const nightSeg = document.getElementById('simHeadlights');
+    nightSeg.innerHTML = '';
+    [[false,'Off'],[true,'On']].forEach(([v,t]) => {
+      const b = document.createElement('button'); b.textContent = t;
+      b.onclick = () => { S.headlights = v; render(); };
+      b.classList.toggle('on', S.headlights === v);
+      nightSeg.appendChild(b);
+    });
+
+    const btSeg = document.getElementById('simBt');
+    btSeg.innerHTML = '';
+    [[null,'None'],['Galaxy S23','Galaxy S23'],["Mom's iPhone","Mom's iPhone"]].forEach(([v,t]) => {
+      const b = document.createElement('button'); b.textContent = t;
+      b.onclick = () => {
+        S.bt = v;
+        if (!v) { S.track = 'none'; }
+        else if (S.track === 'none') { S.track = prefs.resumeOnStart ? 'playing' : 'paused'; }
+        render();
+      };
+      b.classList.toggle('on', S.bt === v);
+      btSeg.appendChild(b);
+    });
+
+    const srcSeg = document.getElementById('simSource');
+    srcSeg.innerHTML = '';
+    [['bt','Bluetooth'],['radio','Radio'],['usb','USB']].forEach(([v,t]) => {
+      const b = document.createElement('button'); b.textContent = t;
+      b.onclick = () => { S.source = v; render(); };
+      b.classList.toggle('on', S.source === v);
+      srcSeg.appendChild(b);
+    });
+
+    const trkSeg = document.getElementById('simTrack');
+    trkSeg.innerHTML = '';
+    [['playing','Playing'],['paused','Paused'],['none','Released']].forEach(([v,t]) => {
+      const b = document.createElement('button'); b.textContent = t;
+      b.onclick = () => { if (S.bt) S.track = v; render(); };
+      b.classList.toggle('on', S.track === v);
+      trkSeg.appendChild(b);
+    });
+
+    const usbSeg = document.getElementById('simUsb');
+    usbSeg.innerHTML = '';
+    [['none','Unplugged'],['ready','Plugged in'],['connected','AA connected']].forEach(([v,t]) => {
+      const b = document.createElement('button'); b.textContent = t;
+      b.onclick = () => {
+        const prev = S.usb;
+        S.usb = v;
+        if (v === 'connected' && prev !== 'connected' && prefs.autoAA && !S.reverse && !S.call) {
+          S.aaOpen = true;
+        }
+        render();
+      };
+      b.classList.toggle('on', S.usb === v);
+      usbSeg.appendChild(b);
+    });
+
+    const evBtns = document.getElementById('simEvents');
+    evBtns.innerHTML = '';
+    [['Reverse gear', () => { S.reverse = !S.reverse; render(); }],
+     ['Incoming call', () => { S.call = S.call ? null : 'incoming'; if (!S.call) S.aaOpen = false; render(); }]].forEach(([t, fn]) => {
+      const b = document.createElement('button'); b.textContent = t;
+      b.onclick = fn;
+      evBtns.appendChild(b);
+    });
+
+    document.querySelectorAll('#simAccent button').forEach(b => {
+      b.classList.toggle('on', b.dataset.acc === prefs.accent);
+      b.onclick = () => { prefs.accent = b.dataset.acc; render(); };
+    });
+  }
+
+  // Day/night toggle
+  document.getElementById('simDayNight').addEventListener('click', () => {
+    if (S.dayNightMode === 'auto') {
+      S.dayNightMode = 'manual';
+      S.night = !S.night;
+    } else {
+      S.dayNightMode = 'auto';
+    }
+    render();
+  });
+
+  // Speed slider
+  document.getElementById('simSpeed').addEventListener('input', e => {
+    S.speed = parseInt(e.target.value);
+    document.getElementById('simSpeedVal').textContent = S.speed;
+    render();
+  });
+
+  // Thresholds
+  document.getElementById('threshCaution').addEventListener('change', () => render());
+  document.getElementById('threshEmergency').addEventListener('change', () => render());
+
+  // Hex button actions
+  function handleHexAction(action) {
+    switch (action) {
+      case 'prev': toast('PREV TRACK'); break;
+      case 'play':
+        if (S.bt) { S.track = S.track === 'playing' ? 'paused' : 'playing'; render(); }
+        else { toast('NO DEVICE'); }
+        break;
+      case 'next': toast('NEXT TRACK'); break;
+      case 'bt':
+        S.source = 'bt';
+        if (S.bt && S.track === 'none') S.track = prefs.resumeOnStart ? 'playing' : 'paused';
+        render();
+        break;
+      case 'radio':
+        S.source = 'radio';
+        render();
+        break;
+      case 'usb':
+        S.source = 'usb';
+        render();
+        break;
+      case 'phone':
+        S.phoneOpen = true;
+        render();
+        break;
+      case 'switch':
+        if (S.usb === 'connected') { S.aaOpen = true; render(); }
+        else { toast('NO PHONE'); }
+        break;
+      case 'auto':
+        prefs.autoAA = !prefs.autoAA;
+        render();
+        break;
+      case 'more':
+        document.getElementById('overlayMore').classList.add('active');
+        break;
+    }
+  }
+
+  document.querySelectorAll('.hex-btn').forEach(btn => {
+    btn.addEventListener('click', () => handleHexAction(btn.dataset.action));
+    btn.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleHexAction(btn.dataset.action); }
+    });
+  });
+
+  // MAGI traps
+  document.querySelectorAll('.magi-trap').forEach(trap => {
+    trap.addEventListener('click', () => {
+      const src = trap.dataset.source;
+      if (src === 'bt' && S.bt) { S.source = 'bt'; if (S.track === 'none') S.track = prefs.resumeOnStart ? 'playing' : 'paused'; render(); }
+      else if (src === 'radio') { S.source = 'radio'; render(); }
+      else if (src === 'usb') { S.source = 'usb'; render(); }
+    });
+    trap.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); trap.click(); }
+    });
+  });
+
+  // Knob drag
+  const knob = document.getElementById('knob');
+  let dragging = false, startY = 0, startVol = 0;
+  function setVolFromY(y) {
+    const rect = knob.getBoundingClientRect();
+    const center = rect.top + rect.height / 2;
+    const delta = (center - y) / 3; // px to vol
+    let v = Math.round(startVol + delta);
+    v = Math.max(0, Math.min(40, v));
+    S.vol = v;
+    render();
+  }
+  knob.addEventListener('pointerdown', e => {
+    dragging = true;
+    startY = e.clientY;
+    startVol = S.vol;
+    knob.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  });
+  knob.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    setVolFromY(e.clientY);
+  });
+  knob.addEventListener('pointerup', e => { dragging = false; knob.releasePointerCapture(e.pointerId); });
+  knob.addEventListener('pointercancel', () => { dragging = false; });
+  knob.addEventListener('keydown', e => {
+    if (e.key === 'ArrowUp') { S.vol = Math.min(40, S.vol + 1); render(); }
+    if (e.key === 'ArrowDown') { S.vol = Math.max(0, S.vol - 1); render(); }
+  });
+
+  // Overlays close
+  document.getElementById('moreClose').addEventListener('click', () => document.getElementById('overlayMore').classList.remove('active'));
+  document.getElementById('settingsClose').addEventListener('click', () => document.getElementById('overlaySettings').classList.remove('active'));
+  document.getElementById('aaClose').addEventListener('click', () => { S.aaOpen = false; render(); });
+  document.getElementById('phoneClose').addEventListener('click', () => { S.phoneOpen = false; toast('PHONE APP'); });
+  document.getElementById('callAccept').addEventListener('click', () => { S.call = null; S.aaOpen = false; render(); toast('CALL ACCEPTED'); });
+  document.getElementById('callDecline').addEventListener('click', () => { S.call = null; render(); toast('CALL DECLINED'); });
+
+  // More grid
+  const moreGrid = document.getElementById('moreGrid');
+  MORE_TILES.forEach(name => {
+    const b = document.createElement('button');
+    b.className = 'more-tile';
+    b.textContent = name;
+    b.addEventListener('click', () => {
+      S.moreSelection = name;
+      document.getElementById('overlayMore').classList.remove('active');
+      toast(name.toUpperCase());
+      render();
+    });
+    moreGrid.appendChild(b);
+  });
+
+  // Settings body
+  function renderSettings() {
+    const body = document.getElementById('settingsBody');
+    body.innerHTML = '';
+    // resumeOnStart
+    const r1 = document.createElement('div'); r1.className = 'settings-row';
+    r1.innerHTML = '<label>Resume on start</label>';
+    const seg1 = document.createElement('div'); seg1.className = 'seg';
+    [[true,'On'],[false,'Off']].forEach(([v,t]) => {
+      const b = document.createElement('button'); b.textContent = t;
+      b.classList.toggle('on', prefs.resumeOnStart === v);
+      b.onclick = () => { prefs.resumeOnStart = v; renderSettings(); };
+      seg1.appendChild(b);
+    });
+    r1.appendChild(seg1); body.appendChild(r1);
+
+    // autoAA
+    const r2 = document.createElement('div'); r2.className = 'settings-row';
+    r2.innerHTML = '<label>Auto Android Auto</label>';
+    const seg2 = document.createElement('div'); seg2.className = 'seg';
+    [[true,'On'],[false,'Off']].forEach(([v,t]) => {
+      const b = document.createElement('button'); b.textContent = t;
+      b.classList.toggle('on', prefs.autoAA === v);
+      b.onclick = () => { prefs.autoAA = v; renderSettings(); render(); };
+      seg2.appendChild(b);
+    });
+    r2.appendChild(seg2); body.appendChild(r2);
+
+    // theme (day/night/auto)
+    const r3 = document.createElement('div'); r3.className = 'settings-row';
+    r3.innerHTML = '<label>Theme</label>';
+    const seg3 = document.createElement('div'); seg3.className = 'seg';
+    [['auto','Auto'],['day','Day'],['night','Night']].forEach(([v,t]) => {
+      const b = document.createElement('button'); b.textContent = t;
+      const on = (v === 'auto' && S.dayNightMode === 'auto') || (v !== 'auto' && S.dayNightMode === 'manual' && ((v === 'night') === S.night));
+      b.classList.toggle('on', on);
+      b.onclick = () => {
+        if (v === 'auto') { S.dayNightMode = 'auto'; }
+        else { S.dayNightMode = 'manual'; S.night = (v === 'night'); }
+        renderSettings(); render();
+      };
+      seg3.appendChild(b);
+    });
+    r3.appendChild(seg3); body.appendChild(r3);
+
+    // accent
+    const r4 = document.createElement('div'); r4.className = 'settings-row';
+    r4.innerHTML = '<label>Accent</label>';
+    const sw = document.createElement('div'); sw.className = 'sw';
+    ['#ff4a1c','#258ac3','#2fb35a','#f5b400','#e8332a'].forEach(c => {
+      const b = document.createElement('button');
+      b.style.background = c;
+      b.classList.toggle('on', prefs.accent === c);
+      b.onclick = () => { prefs.accent = c; renderSettings(); render(); };
+      sw.appendChild(b);
+    });
+    r4.appendChild(sw); body.appendChild(r4);
+
+    // thresholds
+    const r5 = document.createElement('div'); r5.className = 'settings-row';
+    r5.innerHTML = '<label>Caution km/h</label>';
+    const in1 = document.createElement('input'); in1.type = 'number'; in1.value = CAUTION_THRESHOLD();
+    in1.addEventListener('change', () => { document.getElementById('threshCaution').value = in1.value; render(); });
+    r5.appendChild(in1); body.appendChild(r5);
+
+    const r6 = document.createElement('div'); r6.className = 'settings-row';
+    r6.innerHTML = '<label>Emergency km/h</label>';
+    const in2 = document.createElement('input'); in2.type = 'number'; in2.value = EMERGENCY_THRESHOLD();
+    in2.addEventListener('change', () => { document.getElementById('threshEmergency').value = in2.value; render(); });
+    r6.appendChild(in2); body.appendChild(r6);
+  }
+
+  document.getElementById('openSettingsBtn').addEventListener('click', () => {
+    renderSettings();
+    document.getElementById('overlaySettings').classList.add('active');
+  });
+
+  // Close overlays on Escape / outside click
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.overlay.active').forEach(o => o.classList.remove('active'));
+      S.aaOpen = false; S.phoneOpen = false;
+      render();
+    }
+  });
+  document.querySelectorAll('.overlay').forEach(ov => {
+    ov.addEventListener('click', e => {
+      if (e.target === ov) { ov.classList.remove('active'); if (ov.id === 'overlayAA') S.aaOpen = false; if (ov.id === 'overlayPhone') S.phoneOpen = false; render(); }
+    });
+  });
+
+  // Auto-open settings? no.
+
+  // Initial
+  render();
+
+  // Time-based theme refresh every minute
+  setInterval(() => { if (S.dayNightMode === 'auto') render(); }, 60000);
+</script>
+</body>
+</html>
