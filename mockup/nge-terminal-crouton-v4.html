@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lily Launcher — NGE Terminal Mockup v4 (Crouton)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  --bg:#0a0a12; --bg2:#050508; --text:#4de89a; --text2:#f5b400;
+  --accent:#ff4a1c; --accent2:#e31c23; --chassis:#3a3448; --button:#b9afcb;
+  --font-jp:"Noto Serif JP","Hiragino Mincho ProN","Yu Mincho",serif;
+  --font-en:"Oswald","Rajdhani",sans-serif;
+  --font-mono:"JetBrains Mono",Consolas,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#14141f;color:var(--text);font-family:var(--font-en);display:flex;gap:16px;padding:16px;min-height:100vh;align-items:flex-start}
+.bezel{width:1052px;height:628px;background:var(--chassis);border:2px solid #221f2e;padding:14px;flex-shrink:0;position:relative;overflow:hidden}
+.screen{width:1024px;height:600px;background:var(--bg);position:relative;overflow:hidden;display:flex;flex-direction:column;font-size:14px;line-height:1.2}
+.scanlines{position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.04) 2px,rgba(0,0,0,.04) 4px);pointer-events:none;z-index:120}
+.honeycomb-bg{position:absolute;inset:0;opacity:.06;pointer-events:none;z-index:0;color:var(--text)}
+/* hazard strips: overlay only, never in flow */
+.hazard{position:absolute;left:0;right:0;height:6px;display:none;z-index:90;background:repeating-linear-gradient(-45deg,var(--text2) 0,var(--text2) 8px,#000 8px,#000 16px)}
+.hazard.top{top:0}.hazard.bottom{bottom:0}
+.screen.caution .hazard,.screen.emergency .hazard{display:block}
+.screen.emergency .hazard{background:repeating-linear-gradient(-45deg,var(--accent2) 0,var(--accent2) 8px,#000 8px,#000 16px)}
+/* ticker: hidden in normal, scrolling in caution/emergency */
+.ticker{height:20px;background:#000;color:var(--text2);font-size:11px;letter-spacing:2px;font-weight:700;display:none;align-items:center;overflow:hidden;white-space:nowrap;position:relative;z-index:2;flex-shrink:0;border-bottom:1px solid #000}
+.ticker .ticker-text{display:inline-block;padding-left:100%;animation:ticker-scroll 14s linear infinite}
+@keyframes ticker-scroll{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
+.screen.caution .ticker{display:flex;background:var(--text2);color:#000}
+.screen.emergency .ticker{display:flex;background:var(--accent2);color:#fff}
+/* vertical JP rail (decorative, non-touchable — may be small) */
+.jp-rail{position:absolute;left:0;top:0;bottom:0;width:18px;z-index:1;display:flex;align-items:center;pointer-events:none}
+.jp-rail span{writing-mode:vertical-rl;font-family:var(--font-jp);font-size:10px;letter-spacing:4px;opacity:.45}
+.main-wrap{padding-left:18px;flex:1;display:flex;flex-direction:column;min-height:0}
+/* header banner */
+.header{background:#000;color:var(--accent);border-bottom:3px solid var(--accent);padding:8px 14px;font-weight:700;font-size:15px;letter-spacing:3px;text-transform:uppercase;display:flex;align-items:center;gap:14px;position:relative;z-index:2;font-family:var(--font-jp);flex-shrink:0}
+.header .bar{width:34px;height:18px;background:repeating-linear-gradient(90deg,var(--accent) 0,var(--accent) 3px,transparent 3px,transparent 6px);flex-shrink:0}
+.header .title{flex:1;text-align:center;white-space:nowrap;overflow:hidden}
+.header .clock{font-family:var(--font-mono);font-size:15px;color:var(--text);letter-spacing:1px}
+.main{flex:1;display:grid;grid-template-columns:146px 1fr 146px;gap:6px;padding:6px;overflow:hidden;position:relative;z-index:1}
+/* side columns: decorative — small text allowed (non-touchable) */
+.side-col{display:flex;flex-direction:column;gap:4px;font-size:10px;letter-spacing:1px}
+.meta-block{border:1px solid var(--text);padding:4px 6px;background:rgba(0,0,0,.55)}
+.meta-block .label{font-size:7px;opacity:.5;letter-spacing:2px}
+.meta-block .value{font-size:11px;font-weight:700;font-family:var(--font-mono)}
+.side-col .section-title{font-size:8px;letter-spacing:3px;opacity:.45;border-bottom:1px solid var(--text);padding-bottom:2px}
+.side-col .jp-label{font-family:var(--font-jp);font-size:9px;opacity:.55;font-weight:700;margin-top:2px}
+/* center */
+.center{display:flex;flex-direction:column;gap:6px;overflow:hidden}
+.display-area{flex:1;border:2px solid var(--text);background:rgba(0,0,0,.65);padding:10px 14px;display:flex;flex-direction:column;gap:6px;position:relative;overflow:hidden}
+.display-area::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--text)}
+.display-label{font-size:10px;letter-spacing:3px;opacity:.55;border-bottom:1px solid var(--text);padding-bottom:3px}
+.display-content{flex:1;display:flex;flex-direction:column;justify-content:center;gap:6px}
+.tape-title{font-size:26px;font-weight:700;line-height:1.1;font-family:var(--font-jp)}
+.tape-artist{font-size:15px;font-weight:500;opacity:.8;font-family:var(--font-jp)}
+.tape-readout{font-family:var(--font-mono);font-size:12px;display:flex;gap:14px;opacity:.75;flex-wrap:wrap}
+.radio-freq{font-size:38px;font-weight:700;font-family:var(--font-mono);text-align:center;letter-spacing:2px}
+.radio-station{font-size:14px;text-align:center;opacity:.8;font-family:var(--font-jp)}
+.empty-state{text-align:center;opacity:.5}
+.empty-state .big{font-size:28px;font-weight:700;letter-spacing:4px;margin-bottom:6px;font-family:var(--font-jp)}
+.empty-state .small{font-size:11px;letter-spacing:2px}
+.eq{font-family:var(--font-mono);font-size:11px;display:flex;gap:2px;align-items:flex-end;height:18px}
+.eq i{display:inline-block;width:5px;background:var(--text);opacity:.7}
+.eq i:nth-child(1){height:6px}.eq i:nth-child(2){height:11px}.eq i:nth-child(3){height:16px}.eq i:nth-child(4){height:8px}.eq i:nth-child(5){height:13px}
+.playing .eq i{animation:eq-bounce .6s ease-in-out infinite alternate}
+.eq i:nth-child(2){animation-delay:.1s}.eq i:nth-child(3){animation-delay:.2s}.eq i:nth-child(4){animation-delay:.15s}.eq i:nth-child(5){animation-delay:.25s}
+@keyframes eq-bounce{from{transform:scaleY(.4)}to{transform:scaleY(1)}}
+/* MAGI triangle: 3 trapezoid indicators, enlarged and readable */
+.magi-diagram{height:128px;border:1px solid var(--text);background:rgba(0,0,0,.5);position:relative;flex-shrink:0}
+.magi-diagram .magi-title{position:absolute;top:3px;left:6px;font-size:8px;letter-spacing:3px;opacity:.5}
+.magi-node{position:absolute;display:flex;flex-direction:column;align-items:center;gap:3px;z-index:2}
+.magi-node.top{left:50%;top:8px;transform:translateX(-50%)}
+.magi-node.bl{left:12%;bottom:8px}
+.magi-node.br{right:12%;bottom:8px}
+.magi-trap{width:150px;height:42px;clip-path:polygon(12% 0,88% 0,100% 100%,0 100%);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;letter-spacing:2px;background:rgba(0,0,0,.6);border:2px solid var(--text);color:var(--text);cursor:pointer;font-family:var(--font-en)}
+.magi-trap.active{background:var(--accent);color:#000}
+.magi-trap.latched{background:var(--accent2);color:#fff}
+.magi-label{font-size:9px;opacity:.65;font-family:var(--font-jp);letter-spacing:1px}
+.magi-hub{position:absolute;left:50%;top:56%;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;border:2px solid var(--text);background:#000;z-index:2;display:flex;align-items:center;justify-content:center;font-size:8px;font-family:var(--font-mono)}
+/* bottom bar */
+.bottom-bar{height:128px;display:grid;grid-template-columns:1fr 190px 210px;gap:6px;padding:6px;border-top:1px solid var(--text);flex-shrink:0;background:rgba(0,0,0,.4)}
+.hex-grid{display:flex;align-items:center;justify-content:center}
+.hex-grid svg{width:100%;height:100%}
+.hex-btn{cursor:pointer}
+.hex-btn:hover .hex-fill{opacity:.6}
+.hex-btn.active .hex-fill{fill:var(--accent)}
+.hex-btn.latched .hex-fill{fill:var(--accent2)}
+.hex-btn .hex-text{font-family:var(--font-en);font-size:11px;font-weight:700;fill:var(--text);text-anchor:middle;dominant-baseline:middle;letter-spacing:1px}
+.hex-btn.active .hex-text{fill:#000}.hex-btn.latched .hex-text{fill:#fff}
+/* volume knob: large and visible, draggable */
+.knob-area{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.knob{width:84px;height:84px;border-radius:50%;border:4px solid var(--text);background:#000;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;position:relative;font-family:var(--font-mono);cursor:ns-resize;user-select:none;touch-action:none}
+.knob::after{content:'';position:absolute;top:6px;left:50%;width:4px;height:18px;background:var(--text);transform-origin:50% 36px;transform:translateX(-50%)}
+.knob-ticks{position:absolute;inset:-7px;border-radius:50%;background:conic-gradient(from -135deg,var(--text2) 0deg 4deg,transparent 4deg 18deg,var(--text2) 18deg 22deg,transparent 22deg 36deg,var(--text2) 36deg 40deg,transparent 40deg 54deg,var(--text2) 54deg 58deg,transparent 58deg 72deg,var(--text2) 72deg 76deg,transparent 76deg 90deg,var(--text2) 90deg 94deg,transparent 94deg 108deg,var(--text2) 108deg 112deg,transparent 112deg 126deg,var(--text2) 126deg 130deg,transparent 130deg 144deg,var(--text2) 144deg 148deg,transparent 148deg 162deg,var(--text2) 162deg 166deg,transparent 166deg 180deg,var(--text2) 180deg 184deg,transparent 184deg 198deg,var(--text2) 198deg 202deg,transparent 202deg 216deg,var(--text2) 216deg 220deg,transparent 220deg 234deg,var(--text2) 234deg 238deg,transparent 238deg 252deg,var(--text2) 252deg 256deg,transparent 256deg 270deg);-webkit-mask:radial-gradient(circle,transparent 58%,#000 59%,#000 66%,transparent 67%);mask:radial-gradient(circle,transparent 58%,#000 59%,#000 66%,transparent 67%);pointer-events:none;opacity:.7}
+.knob-label{font-size:9px;letter-spacing:2px;opacity:.6}
+.knob-value{font-family:var(--font-mono);font-size:13px;font-weight:700}
+.knob-btns{display:flex;gap:6px}
+.knob-btns button{width:32px;height:28px;background:#000;border:1px solid var(--text);color:var(--text);font-family:var(--font-mono);cursor:pointer;font-size:14px}
+/* speed readout: BIG */
+.speed-area{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.speed-label{font-size:9px;letter-spacing:3px;opacity:.55}
+.speed-readout{font-family:var(--font-mono);font-size:56px;font-weight:700;line-height:1;letter-spacing:2px}
+.speed-unit{font-family:var(--font-mono);font-size:12px;opacity:.6}
+.speed-zone-seal{border:2px solid var(--text);padding:2px 10px;font-size:11px;letter-spacing:2px;font-weight:700;font-family:var(--font-jp);margin-top:3px;clip-path:polygon(10% 0,90% 0,100% 25%,100% 75%,90% 100%,10% 100%,0 75%,0 25%);background:rgba(0,0,0,.6)}
+/* octagonal corner seal */
+.seal-corner{position:absolute;top:8px;right:12px;border:2px solid var(--text);padding:3px 12px;font-size:11px;letter-spacing:2px;font-weight:700;font-family:var(--font-jp);z-index:5;transform:rotate(-3deg);clip-path:polygon(10% 0,90% 0,100% 25%,100% 75%,90% 100%,10% 100%,0 75%,0 25%);background:rgba(0,0,0,.7)}
+.screen.emergency .seal-corner{animation:seal-pulse .8s ease-in-out infinite}
+@keyframes seal-pulse{0%,100%{transform:rotate(-3deg) scale(1)}50%{transform:rotate(-3deg) scale(1.08)}}
+/* warning overlay: absolute, no layout shift. border frame pulses (flat, no glow) */
+.warning-overlay{position:absolute;inset:0;display:none;z-index:70;pointer-events:none;align-items:center;justify-content:center;flex-direction:column;gap:8px}
+.warning-overlay.active{display:flex}
+.warning-overlay .warn-frame{position:absolute;inset:14px;border:3px solid var(--accent2)}
+.screen.emergency .warning-overlay .warn-frame{animation:frame-pulse 1s ease-in-out infinite}
+@keyframes frame-pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.warning-overlay .warning-text{font-family:var(--font-jp);font-size:40px;font-weight:900;letter-spacing:5px;color:var(--accent2);animation:pulse .8s ease-in-out infinite}
+.warning-overlay .warning-sub{font-family:var(--font-en);font-size:15px;letter-spacing:4px;color:var(--text)}
+.warning-overlay .hazard-bar{width:70%;height:5px;background:repeating-linear-gradient(-45deg,var(--accent2) 0,var(--accent2) 8px,#000 8px,#000 16px)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+/* full overlays: reverse / call / AA / MORE — absolute, no layout shift */
+.full-overlay{position:absolute;inset:0;display:none;z-index:65;background:rgba(0,0,0,.92);align-items:center;justify-content:center;flex-direction:column;gap:10px}
+.full-overlay.active{display:flex}
+.full-overlay .ov-title{font-family:var(--font-jp);font-size:34px;font-weight:900;letter-spacing:4px;color:var(--accent)}
+.full-overlay .ov-sub{font-size:13px;letter-spacing:3px;opacity:.8}
+.full-overlay .ov-bar{width:80%;height:6px;background:repeating-linear-gradient(-45deg,var(--accent2) 0,var(--accent2) 8px,#000 8px,#000 16px)}
+/* MORE sheet: 13 octagonal tiles, each ≥64px */
+.more-sheet{position:absolute;inset:0;display:none;z-index:80;background:rgba(0,0,0,.95);padding:16px 20px}
+.more-sheet.active{display:block}
+.more-sheet h3{font-size:14px;letter-spacing:4px;color:var(--text2);margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+.more-sheet h3 .close{min-height:44px;min-width:44px;background:#000;border:1px solid var(--text2);color:var(--text2);font-size:16px;cursor:pointer;padding:6px 14px}
+.more-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;justify-items:center}
+.more-tile{width:72px;height:72px;clip-path:polygon(20% 0,80% 0,100% 20%,100% 80%,80% 100%,20% 100%,0 80%,0 20%);background:#000;border:2px solid var(--text);color:var(--text);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;font-family:var(--font-en);min-height:64px}
+.more-tile:hover{background:#111}
+.more-tile.picked{background:var(--accent);color:#000;border-color:var(--accent)}
+.more-tile .t-jp{font-family:var(--font-jp);font-size:11px;font-weight:700}
+.more-tile .t-en{font-size:8px;letter-spacing:1px;opacity:.8}
+.screen-dark .screen-inner{filter:brightness(.25)}
+/* SIM PANEL */
+.sim-panel{width:300px;flex-shrink:0;background:#111;border:1px solid #333;padding:12px;max-height:628px;overflow-y:auto;font-size:11px}
+.sim-panel h2{font-size:11px;letter-spacing:2px;color:var(--text2);margin:12px 0 5px;border-bottom:1px solid #333;padding-bottom:3px}
+.sim-panel h2:first-child{margin-top:0}
+.sim-row{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.sim-row label{flex:1;opacity:.75;font-size:10px}
+.seg{display:flex;gap:2px;flex-wrap:wrap}
+.seg button,.btns button{background:#222;border:1px solid #444;color:#999;padding:4px 8px;font-size:9px;cursor:pointer;font-family:var(--font-en);min-height:30px}
+.seg button.on{background:var(--text);color:#000;border-color:var(--text)}
+.btns{display:flex;gap:2px;flex-wrap:wrap}
+.btns button.on{background:var(--accent);color:#000;border-color:var(--accent)}
+.sim-row input[type=range]{width:100px}
+.sim-row input[type=number]{width:52px;background:#222;border:1px solid #444;color:#fff;padding:3px;font-size:10px}
+.sw{display:flex;gap:4px}
+.sw button{width:20px;height:20px;border:1px solid #444;cursor:pointer;min-height:20px}
+.sw button.on{outline:2px solid #fff;outline-offset:1px}
+.checkrow{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:10px}
+.checkrow label{flex:1;opacity:.75}
+.checkrow input{width:18px;height:18px}
+.vcheck{font-family:var(--font-mono);font-size:9px;color:#4de89a;margin-top:6px}
+</style>
+</head>
+<body>
+<div class="bezel">
+  <div class="screen" id="screen">
+    <div class="hazard top"></div>
+    <div class="hazard bottom"></div>
+    <svg class="honeycomb-bg" viewBox="0 0 1024 600" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <pattern id="hexP" width="26" height="45" patternUnits="userSpaceOnUse">
+          <polygon points="13,0 26,6.5 26,19.5 13,26 0,19.5 0,6.5" fill="none" stroke="currentColor" stroke-width=".5"/>
+          <polygon points="13,26 26,32.5 26,45.5 13,52 -13,45.5 0,32.5" fill="none" stroke="currentColor" stroke-width=".5"/>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#hexP)"/>
+    </svg>
+    <div class="jp-rail"><span>リリーランチャー // 直接接続端末</span></div>
+    <div class="main-wrap">
+      <div class="ticker" id="ticker"><span class="ticker-text" id="tickerText">EMERGENCY — SPEED LIMIT EXCEEDED — EMERGENCY — SPEED LIMIT EXCEEDED — EMERGENCY — </span></div>
+      <div class="header">
+        <span class="bar"></span>
+        <span class="title" id="headerTitle">直接リンク接続 : LILY</span>
+        <span class="bar"></span>
+        <span class="clock" id="clockEl">00:00</span>
+      </div>
+      <div class="seal-corner" id="sealCorner">通常</div>
+      <div class="main">
+        <div class="side-col">
+          <div class="section-title">SYSTEM INFO</div>
+          <div class="meta-block"><div class="label">CODE</div><div class="value">LILY-01</div></div>
+          <div class="meta-block"><div class="label">FILE</div><div class="value">HOME_SYS</div></div>
+          <div class="meta-block"><div class="label">MODE</div><div class="value" id="metaMode">AUTO</div></div>
+          <div class="meta-block"><div class="label">THEME</div><div class="value" id="metaTheme">DAY</div></div>
+          <div class="meta-block"><div class="label">PRIORITY</div><div class="value">AAA</div></div>
+          <div class="meta-block"><div class="label">VOL</div><div class="value" id="metaVol">18/40</div></div>
+          <div class="jp-label">見現時刻表示</div>
+          <div class="jp-label">危険手続き</div>
+        </div>
+        <div class="center">
+          <div class="display-area">
+            <div class="display-label" id="displayLabel">DISPLAY: TAPE</div>
+            <div class="display-content" id="displayContent"></div>
+          </div>
+          <svg class="magi-diagram" viewBox="0 0 640 128" preserveAspectRatio="none" aria-hidden="true">
+            <line x1="320" y1="58" x2="120" y2="98" stroke="var(--text)" stroke-width="1" opacity=".5"/>
+            <line x1="320" y1="58" x2="520" y2="98" stroke="var(--text)" stroke-width="1" opacity=".5"/>
+          </svg>
+          <div class="magi-diagram" style="position:relative">
+            <div class="magi-title">MAGI SYSTEM</div>
+            <div class="magi-node top"><div class="magi-trap" id="magiBt" data-src="bt">BLUETOOTH</div><div class="magi-label">Melchior</div></div>
+            <div class="magi-node bl"><div class="magi-trap" id="magiRadio" data-src="radio">RADIO</div><div class="magi-label">Balthasar</div></div>
+            <div class="magi-node br"><div class="magi-trap" id="magiUsb" data-src="usb">USB</div><div class="magi-label">Casper</div></div>
+            <div class="magi-hub">M</div>
+          </div>
+        </div>
+        <div class="side-col">
+          <div class="section-title">LAYER STATUS</div>
+          <div class="meta-block"><div class="label">LAYER 3</div><div class="value">CONNECTION</div></div>
+          <div class="meta-block"><div class="label">LAYER 2</div><div class="value">DATA LINK</div></div>
+          <div class="meta-block"><div class="label">LAYER 1</div><div class="value">PHYSICAL</div></div>
+          <div class="meta-block"><div class="label">SOURCE</div><div class="value" id="metaSource">BT</div></div>
+          <div class="meta-block"><div class="label">HEADLT</div><div class="value" id="metaHead">OFF</div></div>
+          <div class="meta-block"><div class="label">ZONE</div><div class="value" id="metaZone">NORMAL</div></div>
+          <div class="jp-label">提訴決議</div>
+          <div class="jp-label">非常事態</div>
+        </div>
+      </div>
+      <div class="bottom-bar">
+        <div class="hex-grid">
+          <svg viewBox="0 0 480 116" preserveAspectRatio="xMidYMid meet" aria-label="media controls">
+            <g class="hex-btn" data-action="prev" transform="translate(46,30)"><polygon class="hex-fill" points="0,-26 22.5,-13 22.5,13 0,26 -22.5,13 -22.5,-13" fill="none" stroke="currentColor" stroke-width="2"/><text class="hex-text" y="2">PREV</text></g>
+            <g class="hex-btn" data-action="play" transform="translate(134,30)"><polygon class="hex-fill" points="0,-26 22.5,-13 22.5,13 0,26 -22.5,13 -22.5,-13" fill="none" stroke="currentColor" stroke-width="2"/><text class="hex-text" y="2">PLAY</text></g>
+            <g class="hex-btn" data-action="next" transform="translate(222,30)"><polygon class="hex-fill" points="0,-26 22.5,-13 22.5,13 0,26 -22.5,13 -22.5,-13" fill="none" stroke="currentColor" stroke-width="2"/><text class="hex-text" y="2">NEXT</text></g>
+            <g class="hex-btn" data-action="bt" transform="translate(310,30)"><polygon class="hex-fill" points="0,-26 22.5,-13 22.5,13 0,26 -22.5,13 -22.5,-13" fill="none" stroke="currentColor" stroke-width="2"/><text class="hex-text" y="2">BT</text></g>
+            <g class="hex-btn" data-action="radio" transform="translate(398,30)"><polygon class="hex-fill" points="0,-26 22.5,-13 22.5,13 0,26 -22.5,13 -22.5,-13" fill="none" stroke="currentColor" stroke-width="2"/><text class="hex-text" y="2">RADIO</text></g>
+            <g class="hex-btn" data-action="usb" transform="translate(90,88)"><polygon class="hex-fill" points="0,-26 22.5,-13 22.5,13 0,26 -22.5,13 -22.5,-13" fill="none" stroke="currentColor" stroke-width="2"/><text class="hex-text" y="2">USB</text></g>
+            <g class="hex-btn" data-action="phone" transform="translate(178,88)"><polygon class="hex-fill" points="0,-26 22.5,-13 22.5,13 0,26 -22.5,13 -22.5,-13" fill="none" stroke="currentColor" stroke-width="2"/><text class="hex-text" y="2">PHONE</text></g>
+            <g class="hex-btn" data-action="switch" transform="translate(266,88)"><polygon class="hex-fill" points="0,-26 22.5,-13 22.5,13 0,26 -22.5,13 -22.5,-13" fill="none" stroke="currentColor" stroke-width="2"/><text class="hex-text" y="2">SWITCH</text></g>
+            <g class="hex-btn" data-action="auto" transform="translate(354,88)"><polygon class="hex-fill" points="0,-26 22.5,-13 22.5,13 0,26 -22.5,13 -22.5,-13" fill="none" stroke="currentColor" stroke-width="2"/><text class="hex-text" y="2">AUTO</text></g>
+            <g class="hex-btn" data-action="more" transform="translate(440,88)"><polygon class="hex-fill" points="0,-26 22.5,-13 22.5,13 0,26 -22.5,13 -22.5,-13" fill="none" stroke="currentColor" stroke-width="2"/><text class="hex-text" y="2">MORE</text></g>
+          </svg>
+        </div>
+        <div class="knob-area">
+          <div class="knob" id="knob"><div class="knob-ticks"></div><span id="knobVal">18</span></div>
+          <div class="knob-label">VOLUME</div>
+          <div class="knob-btns"><button id="volDown" aria-label="volume down">−</button><span class="knob-value" id="knobReadout">18/40</span><button id="volUp" aria-label="volume up">+</button></div>
+        </div>
+        <div class="speed-area">
+          <div class="speed-label">SPEED</div>
+          <div class="speed-readout" id="speedDisplay">000</div>
+          <div class="speed-unit">km/h</div>
+          <div class="speed-zone-seal" id="speedZoneSeal">通常</div>
+        </div>
+      </div>
+    </div>
+    <div class="warning-overlay" id="warningOverlay">
+      <div class="warn-frame"></div>
+      <div class="hazard-bar"></div>
+      <div class="warning-text" id="warningText">EMERGENCY</div>
+      <div class="warning-sub" id="warningSub">SPEED LIMIT EXCEEDED</div>
+      <div class="hazard-bar"></div>
+    </div>
+    <div class="full-overlay" id="ovReverse"><div class="ov-bar"></div><div class="ov-title">後方確認 : REVERSE</div><div class="ov-sub">CAMERA ACTIVE — WATCH FOR TRAFFIC</div><div class="ov-bar"></div></div>
+    <div class="full-overlay" id="ovCall"><div class="ov-bar"></div><div class="ov-title">着信 : INCOMING CALL</div><div class="ov-sub" id="ovCallSub">BLUETOOTH</div><div class="ov-bar"></div></div>
+    <div class="full-overlay" id="ovAA"><div class="ov-bar"></div><div class="ov-title">ANDROID AUTO</div><div class="ov-sub">USB CONNECTION ACTIVE</div><div class="ov-bar"></div></div>
+    <div class="more-sheet" id="moreSheet">
+      <h3><span>EXTRAS // 追加機能</span><button class="close" id="moreClose">✕ CLOSE</button></h3>
+      <div class="more-grid" id="moreGrid"></div>
+    </div>
+    <div class="scanlines"></div>
+  </div>
+</div>
+
+<div class="sim-panel">
+  <h2>CAR SIGNALS</h2>
+  <div class="sim-row"><label>Day/Night Mode</label><div class="seg" id="simDayNight"></div></div>
+  <div class="sim-row"><label>Speed (km/h)</label><input type="range" id="simSpeed" min="0" max="160" value="0"><span id="simSpeedVal" style="font-family:var(--font-mono);width:26px">0</span></div>
+  <div class="sim-row"><label>Headlights (not theme)</label><div class="seg" id="simNight"></div></div>
+  <div class="sim-row"><label>Bluetooth device</label><div class="seg" id="simBt"></div></div>
+  <div class="sim-row"><label>Audio source</label><div class="seg" id="simSource"></div></div>
+  <div class="sim-row"><label>BT track</label><div class="seg" id="simTrack"></div></div>
+  <div class="sim-row"><label>USB phone</label><div class="seg" id="simUsb"></div></div>
+  <div class="checkrow"><label>Volume (syncs knob)</label><input type="range" id="simVol" min="0" max="40" value="18" style="flex:1"></div>
+  <h2>EVENTS</h2>
+  <div class="sim-row"><div class="btns" id="simEvents"></div></div>
+  <h2>STORAGE</h2>
+  <div class="sim-row"><label>Caution (km/h)</label><input type="number" id="threshCaution" value="60" min="10" max="200"></div>
+  <div class="sim-row"><label>Emergency (km/h)</label><input type="number" id="threshEmergency" value="100" min="20" max="250"></div>
+  <h2>DISPLAY</h2>
+  <div class="sim-row"><label>Accent</label><div class="sw" id="simAccent">
+    <button style="background:#ff4a1c" data-acc="#ff4a1c" title="#ff4a1c"></button>
+    <button style="background:#258ac3" data-acc="#258ac3" title="#258ac3"></button>
+    <button style="background:#2fb35a" data-acc="#2fb35a" title="#2fb35a"></button>
+    <button style="background:#f5b400" data-acc="#f5b400" title="#f5b400"></button>
+    <button style="background:#e8332a" data-acc="#e8332a" title="#e8332a"></button>
+  </div></div>
+  <div class="vcheck" id="vcheck"></div>
+</div>
+
+<script>
+const S={speed:0,dnMode:'auto',manualNight:false,night:false,headlights:false,bt:'Galaxy S23',source:'bt',track:'paused',usb:'none',reverse:false,call:false,vol:18,sheet:null,zone:'normal',screenOff:false,pickedTile:null,trackIdx:0,lastSeek:0};
+const prefs={accent:'#ff4a1c',resumeOnStart:true,autoAA:true};
+const TRACKS=[["Song Title Here","Artist Name"],["Highway Lullaby","Tokyo Drive Club"],["Night Skyline","NGE Band"],["KANJI BLUE","Lily Unit"]];
+const TILES=[["ラジオ","Radio"],["ユーエスビー","USB Music"],["映像","Video"],["ドラレコ","Dashcam"],["音質","Sound EQ"],["外部","AUX"],["ファイル","Files"],["車両","Car"],["CAN","CAN"],["舵輪","Wheel keys"],["アンドロイド","Android"],["画面消灯","Screen off"],["ホーム設定","Home setup"]];
+const cautionT=()=>parseInt(document.getElementById('threshCaution').value)||60;
+const emergencyT=()=>parseInt(document.getElementById('threshEmergency').value)||100;
+function timeNight(){const h=new Date().getHours();return h>=17||h<5}
+function computeNight(){S.night = S.dnMode==='auto' ? timeNight() : S.manualNight}
+function computeZone(){const e=emergencyT(),c=cautionT();S.zone = S.speed>e?'emergency':(S.speed>c?'caution':'normal')}
+function render(){
+  computeNight();computeZone();
+  const screen=document.getElementById('screen'),root=document.documentElement;
+  screen.className='screen '+S.zone+(S.night?' night':'')+(S.screenOff?' screen-off':'');
+  function setPal(bg,txt,txt2,acc,acc2){
+    root.style.setProperty('--bg',bg);root.style.setProperty('--text',txt);
+    root.style.setProperty('--text2',txt2);root.style.setProperty('--accent',acc);
+    root.style.setProperty('--accent2',acc2);
+  }
+  const ht=document.getElementById('headerTitle'),seal=document.getElementById('sealCorner'),
+    tt=document.getElementById('tickerText'),wo=document.getElementById('warningOverlay'),
+    wt=document.getElementById('warningText'),ws=document.getElementById('warningSub'),
+    zm=document.getElementById('speedZoneSeal');
+  if(S.zone==='emergency'){
+    setPal('#000000','#ff4a1c','#e31c23','#ff4a1c','#e31c23');
+    ht.textContent='第一種戦闘配置 : LILY';seal.textContent='緊急';zm.textContent='緊急';
+    tt.textContent='EMERGENCY — 速度超過 — EMERGENCY — SPEED LIMIT EXCEEDED — EMERGENCY — ';wt.textContent='EMERGENCY';ws.textContent='SPEED LIMIT EXCEEDED';wo.classList.add('active');
+  }else if(S.zone==='caution'){
+    setPal('#0a0a12','#f5b400','#ff6a00','#f5b400','#ff6a00');
+    ht.textContent='注意 : 速度制限';seal.textContent='注意';zm.textContent='注意';
+    tt.textContent='CAUTION — 速度制限 — CAUTION — PLEASE SLOW DOWN — CAUTION — SLOW DOWN — ';wt.textContent='CAUTION';ws.textContent='SPEED LIMIT — SLOW DOWN';wo.classList.add('active');
+  }else{
+    if(S.night)setPal('#050508','#9db8ad','#8a8a9a',prefs.accent,'#e31c23');
+    else setPal('#0a0a12','#4de89a','#f5b400',prefs.accent,'#e31c23');
+    ht.textContent='直接リンク接続 : LILY';seal.textContent='通常';zm.textContent='通常';
+    wo.classList.remove('active');
+  }
+  const now=new Date(),hh=String(now.getHours()).padStart(2,'0'),mm=String(now.getMinutes()).padStart(2,'0');
+  document.getElementById('clockEl').textContent=hh+':'+mm;
+  document.getElementById('metaMode').textContent=S.dnMode.toUpperCase();
+  document.getElementById('metaTheme').textContent=S.night?'NIGHT':'DAY';
+  document.getElementById('metaVol').textContent=S.vol+'/40';
+  document.getElementById('metaSource').textContent=S.source.toUpperCase();
+  document.getElementById('metaHead').textContent=S.headlights?'ON':'OFF';
+  document.getElementById('metaZone').textContent=S.zone.toUpperCase();
+  document.getElementById('speedDisplay').textContent=String(S.speed).padStart(3,'0');
+  document.getElementById('knobVal').textContent=S.vol;
+  document.getElementById('knobReadout').textContent=S.vol+'/40';
+  const knob=document.getElementById('knob'),ang=-135+(S.vol/40)*270;
+  knob.style.transform='rotate('+ang+'deg)';
+  /* display */
+  const dc=document.getElementById('displayContent'),dl=document.getElementById('displayLabel');
+  const playing=S.track==='playing';
+  const eq='<span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>';
+  if(S.source==='radio'){
+    dl.textContent='DISPLAY: RADIO';
+    dc.className=(playing?'playing ':'')+'display-content';
+    dc.innerHTML='<div class="radio-freq">FM 98.5</div><div class="radio-station">東京放送 · STATION NAME</div><div class="tape-readout"><span>MHZ</span><span>STEREO</span><span>RDS</span>'+eq+'</div>';
+  }else if(S.source==='usb'){
+    dl.textContent='DISPLAY: USB';
+    const t=TRACKS[S.trackIdx%TRACKS.length];
+    dc.className=(playing?'playing ':'')+'display-content';
+    dc.innerHTML='<div class="tape-title">'+(playing?t[0]:'USB Track Title')+'</div><div class="tape-artist">'+(playing?t[1]:'Artist Name')+'</div><div class="tape-readout"><span>TIME 02:34</span><span>LEN 04:12</span><span>'+(playing?'PLAYING':'PAUSED')+'</span>'+eq+'</div>';
+  }else if(S.bt){
+    dl.textContent='DISPLAY: TAPE · '+S.bt.toUpperCase();
+    const t=TRACKS[S.trackIdx%TRACKS.length];
+    const state=S.track==='playing'?'PLAYING':(S.track==='paused'?'PAUSED':'RELEASED');
+    dc.className=(playing?'playing ':'')+'display-content';
+    if(S.track==='released')dc.innerHTML='<div class="empty-state"><div class="big">NO SIGNAL</div><div class="small">WAITING</div></div>';
+    else dc.innerHTML='<div class="tape-title">'+(playing?t[0]:'Paused — '+t[0])+'</div><div class="tape-artist">'+t[1]+'</div><div class="tape-readout"><span>TIME 02:34</span><span>LEN 04:12</span><span>'+state+'</span>'+eq+'</div>';
+  }else{
+    dl.textContent='DISPLAY: EMPTY';
+    dc.innerHTML='<div class="empty-state"><div class="big">NO SIGNAL</div><div class="small">PRESS SWITCH TO CONNECT</div><div class="small" style="margin-top:4px">WAITING</div></div>';
+  }
+  /* MAGI */
+  for(const id of['magiBt','magiRadio','magiUsb']){const el=document.getElementById(id);el.classList.remove('active','latched')}
+  const map={bt:'magiBt',radio:'magiRadio',usb:'magiUsb'};
+  const activeId=map[S.source];if(activeId)document.getElementById(activeId).classList.add('latched');
+  if(S.bt&&S.source==='bt')document.getElementById('magiBt').classList.add('active');
+  /* hex */
+  document.querySelectorAll('.hex-btn').forEach(b=>{b.classList.remove('active','latched');
+    const a=b.dataset.action;
+    if((a==='bt'&&S.source==='bt')||(a==='radio'&&S.source==='radio')||(a==='usb'&&S.source==='usb'))b.classList.add('latched');
+    if(a==='play'&&S.track==='playing')b.classList.add('active');
+    if(a==='more'&&S.sheet==='more')b.classList.add('active');
+    if(a==='phone'&&S.bt)b.classList.add('active');
+  });
+  /* overlays */
+  document.getElementById('ovReverse').classList.toggle('active',S.reverse);
+  document.getElementById('ovCall').classList.toggle('active',S.call);
+  document.getElementById('ovCallSub').textContent=(S.bt||'UNKNOWN DEVICE').toUpperCase()+' — BLUETOOTH';
+  document.getElementById('ovAA').classList.toggle('active',S.usb==='connected'&&!S.reverse&&!S.call);
+  document.getElementById('moreSheet').classList.toggle('active',S.sheet==='more');
+  document.getElementById('screen').classList.toggle('screen-dark',S.screenOff);
+  syncSim();
+}
+function syncSim(){
+  const seg=(id,opts,val,fn)=>{const el=document.getElementById(id);el.innerHTML='';opts.forEach(([v,t])=>{const b=document.createElement('button');b.textContent=t;b.onclick=()=>fn(v);b.classList.toggle('on',val===v);el.appendChild(b)})};
+  seg('simDayNight',[['auto','AUTO'],['manual','MANUAL']],S.dnMode,v=>{S.dnMode=v;if(v==='manual')S.manualNight=S.night;render()});
+  seg('simNight',[[false,'Off'],[true,'On']],S.headlights,v=>{S.headlights=v;render()});
+  seg('simBt',[[null,'None'],['Galaxy S23','Galaxy S23'],["Mom's iPhone","Mom's iPhone"]],S.bt,v=>{S.bt=v;if(!v)S.track='released';else if(S.track==='released')S.track=prefs.resumeOnStart?'playing':'paused';render()});
+  seg('simSource',[['bt','Bluetooth'],['radio','Radio'],['usb','USB']],S.source,v=>{S.source=v;render()});
+  seg('simTrack',[['playing','Playing'],['paused','Paused'],['released','Released']],S.track,v=>{if(S.bt)S.track=v;render()});
+  seg('simUsb',[['none','Unplugged'],['ready','Plugged in'],['connected','AA connected']],S.usb,v=>{S.usb=v;render()});
+  const ev=document.getElementById('simEvents');ev.innerHTML='';
+  const r=document.createElement('button');r.textContent='Reverse gear';r.classList.toggle('on',S.reverse);r.onclick=()=>{S.reverse=!S.reverse;render()};ev.appendChild(r);
+  const c=document.createElement('button');c.textContent='Incoming call';c.classList.toggle('on',S.call);c.onclick=()=>{S.call=!S.call;render()};ev.appendChild(c);
+  document.querySelectorAll('#simAccent button').forEach(b=>{b.classList.toggle('on',b.dataset.acc===prefs.accent);b.onclick=()=>{prefs.accent=b.dataset.acc;render()}});
+  document.getElementById('simSpeed').value=S.speed;document.getElementById('simSpeedVal').textContent=S.speed;
+  document.getElementById('simVol').value=S.vol;
+  document.getElementById('vcheck').textContent='CHK: speed='+S.speed+' zone='+S.zone+' night='+S.night+' mode='+S.dnMode+' src='+S.source+' bt='+(S.bt||'none')+' track='+S.track+' usb='+S.usb+' vol='+S.vol;
+}
+/* hex actions */
+document.querySelectorAll('.hex-btn').forEach(b=>b.addEventListener('click',()=>{
+  const a=b.dataset.action;
+  if(a==='bt'){S.source='bt';if(!S.bt){S.bt='Galaxy S23';S.track=prefs.resumeOnStart?'playing':'paused'}}
+  if(a==='radio')S.source='radio';
+  if(a==='usb')S.source='usb';
+  if(a==='play'&&S.bt)S.track=S.track==='playing'?'paused':'playing';
+  if(a==='prev'){S.trackIdx=(S.trackIdx-1+TRACKS.length)%TRACKS.length;S.track='playing'}
+  if(a==='next'){S.trackIdx=(S.trackIdx+1)%TRACKS.length;S.track='playing'}
+  if(a==='phone'){if(S.bt){S.call=!S.call}else{S.bt='Galaxy S23';S.call=true;S.track='paused'}}
+  if(a==='switch'){const cyc=[null,'Galaxy S23',"Mom's iPhone"];S.bt=cyc[(cyc.indexOf(S.bt)+1)%cyc.length];if(S.bt&&S.track==='released')S.track=prefs.resumeOnStart?'playing':'paused';if(!S.bt)S.track='released'}
+  if(a==='auto'){S.dnMode=S.dnMode==='auto'?'manual':'auto';if(S.dnMode==='manual')S.manualNight=!S.night}
+  if(a==='more')S.sheet=S.sheet==='more'?null:'more';
+  render();
+}));
+for(const id of['magiBt','magiRadio','magiUsb']){document.getElementById(id).addEventListener('click',()=>{S.source=document.getElementById(id).dataset.src;render()})}
+document.getElementById('moreClose').onclick=()=>{S.sheet=null;render()};
+const mg=document.getElementById('moreGrid');
+TILES.forEach(([jp,en])=>{const d=document.createElement('button');d.className='more-tile';d.innerHTML='<span class="t-jp">'+jp+'</span><span class="t-en">'+en+'</span>';d.onclick=()=>{S.pickedTile=en;if(en==='Screen off')S.screenOff=!S.screenOff;render()};d.dataset.tile=en;mg.appendChild(d)});
+/* knob: drag + buttons + slider sync */
+const knob=document.getElementById('knob');let dragY=null;
+function setVol(v){S.vol=Math.max(0,Math.min(40,Math.round(v)))}
+knob.addEventListener('pointerdown',e=>{dragY={y:e.clientY,v:S.vol};knob.setPointerCapture(e.pointerId)});
+knob.addEventListener('pointermove',e=>{if(!dragY)return;setVol(dragY.v+(dragY.y-e.clientY)/4);render()});
+knob.addEventListener('pointerup',()=>dragY=null);
+knob.addEventListener('wheel',e=>{e.preventDefault();setVol(S.vol+(e.deltaY<0?1:-1));render()},{passive:false});
+document.getElementById('volUp').onclick=()=>{setVol(S.vol+1);render()};
+document.getElementById('volDown').onclick=()=>{setVol(S.vol-1);render()};
+document.getElementById('simVol').addEventListener('input',e=>{setVol(parseInt(e.target.value));render()});
+document.getElementById('simSpeed').addEventListener('input',e=>{S.speed=parseInt(e.target.value);render()});
+document.getElementById('threshCaution').addEventListener('change',render);
+document.getElementById('threshEmergency').addEventListener('change',render);
+render();
+setInterval(()=>{if(S.dnMode==='auto'){computeNight();render()}},60000);
+</script>
+</body>
+</html>
