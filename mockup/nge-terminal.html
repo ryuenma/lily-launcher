@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lily Launcher — NGE Terminal Mockup</title>
+<title>Lily Launcher — NGE Terminal Mockup (7" Touch)</title>
 <style>
   :root {
     --bg: #0a0a12;
@@ -26,8 +26,8 @@
     color: var(--text);
     font-family: var(--font-en);
     display: flex;
-    gap: 24px;
-    padding: 24px;
+    gap: 16px;
+    padding: 16px;
     min-height: 100vh;
     align-items: flex-start;
   }
@@ -65,8 +65,8 @@
       0deg,
       transparent,
       transparent 2px,
-      rgba(0,0,0,0.04) 2px,
-      rgba(0,0,0,0.04) 4px
+      rgba(0,0,0,0.03) 2px,
+      rgba(0,0,0,0.03) 4px
     );
     pointer-events: none;
     z-index: 100;
@@ -75,35 +75,44 @@
   .honeycomb-bg {
     position: absolute;
     inset: 0;
-    opacity: 0.06;
+    opacity: 0.05;
     pointer-events: none;
     z-index: 0;
   }
 
-  .hazard-top, .hazard-bottom {
-    height: 8px;
+  /* Hazard stripes - overlay, not layout-shifting */
+  .hazard-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 6px;
     background: repeating-linear-gradient(
       -45deg,
-      var(--accent2) 0px, var(--accent2) 10px,
-      #000 10px, #000 20px
+      var(--accent2) 0px, var(--accent2) 8px,
+      #000 8px, #000 16px
     );
     display: none;
+    z-index: 50;
   }
-  .emergency .hazard-top, .emergency .hazard-bottom { display: block; }
-  .caution .hazard-top, .caution .hazard-bottom {
+  .hazard-overlay.bottom {
+    top: auto;
+    bottom: 0;
+  }
+  .emergency .hazard-overlay { display: block; }
+  .caution .hazard-overlay {
     background: repeating-linear-gradient(
       -45deg,
-      var(--text2) 0px, var(--text2) 10px,
-      #000 10px, #000 20px
+      var(--text2) 0px, var(--text2) 8px,
+      #000 8px, #000 16px
     );
     display: block;
   }
 
+  /* Ticker panel */
   .ticker {
-    height: 14px;
+    height: 16px;
     background: var(--accent2);
     color: #fff;
-    font-size: 9px;
+    font-size: 10px;
     letter-spacing: 2px;
     font-family: var(--font-en);
     font-weight: 700;
@@ -115,7 +124,7 @@
     z-index: 2;
   }
   .ticker .ticker-text {
-    animation: ticker-scroll 20s linear infinite;
+    animation: ticker-scroll 15s linear infinite;
     display: inline-block;
     padding-left: 100%;
   }
@@ -126,13 +135,14 @@
   .ticker.caution { background: var(--text2); color: #000; display: flex; }
   .ticker.emergency { background: var(--accent2); color: #fff; display: flex; }
 
+  /* Octagonal seal */
   .seal-corner {
     position: absolute;
-    top: 4px;
-    right: 8px;
+    top: 8px;
+    right: 12px;
     border: 2px solid var(--text);
-    padding: 1px 6px;
-    font-size: 8px;
+    padding: 2px 8px;
+    font-size: 10px;
     letter-spacing: 2px;
     font-weight: 700;
     font-family: var(--font-jp);
@@ -142,97 +152,102 @@
     background: rgba(0,0,0,0.6);
   }
 
+  /* Header banner */
   .header {
     background: var(--accent);
     color: #000;
-    padding: 3px 12px;
+    padding: 6px 16px;
     font-weight: 700;
-    font-size: 11px;
+    font-size: 14px;
     letter-spacing: 3px;
     text-transform: uppercase;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
     border-bottom: 2px solid #000;
     position: relative;
     z-index: 2;
     font-family: var(--font-jp);
+    flex-shrink: 0;
   }
   .header::before, .header::after {
     content: '';
-    width: 24px;
+    width: 28px;
     height: 100%;
     background: repeating-linear-gradient(90deg, #000 0px, #000 2px, transparent 2px, transparent 4px);
     flex-shrink: 0;
   }
   .header .title { flex: 1; text-align: center; }
 
+  /* Main layout: bigger touch targets */
   .main {
     flex: 1;
     display: grid;
-    grid-template-columns: 160px 1fr 160px;
-    gap: 4px;
-    padding: 4px;
+    grid-template-columns: 180px 1fr 180px;
+    gap: 6px;
+    padding: 6px;
     overflow: hidden;
     position: relative;
     z-index: 1;
   }
 
+  /* Side columns */
   .side-col {
     display: flex;
     flex-direction: column;
-    gap: 3px;
-    font-size: 10px;
+    gap: 4px;
+    font-size: 11px;
     letter-spacing: 1px;
   }
   .meta-block {
     border: 1px solid var(--text);
-    padding: 2px 4px;
+    padding: 4px 6px;
     background: rgba(0,0,0,0.5);
   }
   .meta-block .label {
-    font-size: 7px;
+    font-size: 8px;
     opacity: 0.5;
     letter-spacing: 2px;
     margin-bottom: 1px;
     font-family: var(--font-en);
   }
   .meta-block .value {
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 700;
     font-family: var(--font-mono);
   }
   .side-col .section-title {
-    font-size: 7px;
+    font-size: 8px;
     letter-spacing: 3px;
     opacity: 0.4;
     border-bottom: 1px solid var(--text);
-    padding-bottom: 1px;
-    margin-bottom: 2px;
+    padding-bottom: 2px;
+    margin-bottom: 3px;
     font-family: var(--font-en);
   }
   .side-col .jp-label {
     font-family: var(--font-jp);
-    font-size: 9px;
+    font-size: 10px;
     opacity: 0.6;
     font-weight: 700;
     margin-top: 4px;
   }
 
+  /* Center display */
   .center {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
     overflow: hidden;
   }
   .display-area {
     flex: 1;
     border: 2px solid var(--text);
     background: rgba(0,0,0,0.6);
-    padding: 8px;
+    padding: 12px;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
     position: relative;
   }
   .display-area::before {
@@ -244,12 +259,12 @@
   }
 
   .display-label {
-    font-size: 8px;
+    font-size: 10px;
     letter-spacing: 3px;
     opacity: 0.5;
     border-bottom: 1px solid var(--text);
-    padding-bottom: 2px;
-    margin-bottom: 4px;
+    padding-bottom: 3px;
+    margin-bottom: 6px;
     font-family: var(--font-en);
   }
 
@@ -258,39 +273,39 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 3px;
+    gap: 6px;
   }
 
   .tape-title {
-    font-size: 20px;
+    font-size: 26px;
     font-weight: 700;
     letter-spacing: 1px;
     line-height: 1.1;
     font-family: var(--font-jp);
   }
   .tape-artist {
-    font-size: 13px;
+    font-size: 16px;
     font-weight: 500;
     opacity: 0.8;
     font-family: var(--font-jp);
   }
   .tape-readout {
     font-family: var(--font-mono);
-    font-size: 10px;
+    font-size: 12px;
     display: flex;
-    gap: 10px;
+    gap: 16px;
     opacity: 0.7;
   }
 
   .radio-freq {
-    font-size: 26px;
+    font-size: 36px;
     font-weight: 700;
     font-family: var(--font-mono);
     text-align: center;
     letter-spacing: 2px;
   }
   .radio-station {
-    font-size: 11px;
+    font-size: 14px;
     text-align: center;
     opacity: 0.8;
     font-family: var(--font-jp);
@@ -301,35 +316,77 @@
     opacity: 0.4;
   }
   .empty-state .big {
-    font-size: 22px;
+    font-size: 28px;
     font-weight: 700;
     letter-spacing: 4px;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
     font-family: var(--font-jp);
   }
   .empty-state .small {
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 2px;
     font-family: var(--font-en);
   }
 
-  .node-diagram {
+  /* MAGI node diagram (3 trapezoid indicators) */
+  .magi-diagram {
     height: 100px;
     border: 1px solid var(--text);
     background: rgba(0,0,0,0.4);
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
   }
-  .node-diagram svg { width: 100%; height: 100%; }
+  .magi-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+  .magi-trap {
+    width: 120px;
+    height: 50px;
+    clip-path: polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%);
+    border: 2px solid var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: var(--font-en);
+    letter-spacing: 1px;
+    background: rgba(0,0,0,0.6);
+    cursor: pointer;
+    transition: none;
+  }
+  .magi-trap.active {
+    background: var(--accent);
+    color: #000;
+  }
+  .magi-trap.latched {
+    background: var(--accent2);
+    color: #000;
+  }
+  .magi-label {
+    font-size: 9px;
+    opacity: 0.6;
+    font-family: var(--font-jp);
+    letter-spacing: 1px;
+  }
 
+  /* Bottom bar */
   .bottom-bar {
-    height: 100px;
+    height: 120px;
     display: grid;
-    grid-template-columns: 1fr 160px 1fr;
-    gap: 4px;
-    padding: 4px;
+    grid-template-columns: 1fr 200px 1fr;
+    gap: 6px;
+    padding: 6px;
     border-top: 1px solid var(--text);
   }
 
+  /* Hex grid (pointy-top, BIG touch targets) */
   .hex-grid {
     display: flex;
     align-items: center;
@@ -345,7 +402,7 @@
   .hex-btn.latched .hex-fill { fill: var(--accent2); }
   .hex-btn .hex-text {
     font-family: var(--font-en);
-    font-size: 8px;
+    font-size: 11px;
     font-weight: 700;
     fill: var(--text);
     text-anchor: middle;
@@ -355,23 +412,24 @@
   .hex-btn.active .hex-text { fill: #000; }
   .hex-btn.latched .hex-text { fill: #000; }
 
+  /* Volume knob (bigger) */
   .knob-area {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2px;
+    gap: 4px;
   }
   .knob {
-    width: 44px;
-    height: 44px;
+    width: 70px;
+    height: 70px;
     border-radius: 50%;
-    border: 2px solid var(--text);
+    border: 3px solid var(--text);
     background: rgba(0,0,0,0.6);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 9px;
+    font-size: 14px;
     font-weight: 700;
     position: relative;
     font-family: var(--font-mono);
@@ -379,34 +437,35 @@
   .knob::after {
     content: '';
     position: absolute;
-    top: 3px;
+    top: 4px;
     left: 50%;
     transform: translateX(-50%);
-    width: 2px;
-    height: 8px;
+    width: 3px;
+    height: 14px;
     background: var(--text);
   }
   .knob-label {
-    font-size: 7px;
+    font-size: 9px;
     letter-spacing: 2px;
     opacity: 0.6;
     font-family: var(--font-en);
   }
   .knob-value {
     font-family: var(--font-mono);
-    font-size: 9px;
+    font-size: 12px;
     font-weight: 700;
   }
 
+  /* Speed readout (BIG) */
   .speed-readout {
     font-family: var(--font-mono);
-    font-size: 14px;
+    font-size: 32px;
     font-weight: 700;
     text-align: center;
     letter-spacing: 2px;
   }
   .speed-label {
-    font-size: 7px;
+    font-size: 9px;
     letter-spacing: 3px;
     opacity: 0.5;
     text-align: center;
@@ -415,18 +474,64 @@
   .speed-zone-seal {
     display: inline-block;
     border: 2px solid var(--text);
-    padding: 1px 5px;
-    font-size: 7px;
+    padding: 2px 8px;
+    font-size: 9px;
     letter-spacing: 2px;
     font-weight: 700;
     font-family: var(--font-jp);
     transform: rotate(-3deg);
-    margin-top: 2px;
+    margin-top: 4px;
     clip-path: polygon(10% 0%, 90% 0%, 100% 25%, 100% 75%, 90% 100%, 10% 100%, 0% 75%, 0% 25%);
   }
 
+  /* Warning overlay (not layout-shifting) */
+  .warning-overlay {
+    position: absolute;
+    inset: 0;
+    display: none;
+    z-index: 60;
+    pointer-events: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .warning-overlay.active {
+    display: flex;
+  }
+  .warning-overlay .warning-text {
+    font-family: var(--font-jp);
+    font-size: 36px;
+    font-weight: 900;
+    letter-spacing: 4px;
+    color: var(--accent2);
+    text-transform: uppercase;
+    animation: pulse 1s ease-in-out infinite;
+  }
+  .warning-overlay .warning-sub {
+    font-family: var(--font-en);
+    font-size: 14px;
+    letter-spacing: 3px;
+    color: var(--text);
+    opacity: 0.8;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+  .warning-overlay .hazard-bar {
+    width: 80%;
+    height: 4px;
+    background: repeating-linear-gradient(
+      -45deg,
+      var(--accent2) 0px, var(--accent2) 8px,
+      #000 8px, #000 16px
+    );
+  }
+
+  /* Simulator panel */
   .sim-panel {
-    width: 300px;
+    width: 280px;
     flex-shrink: 0;
     background: #111;
     border: 1px solid #333;
@@ -465,10 +570,11 @@
     background: #222;
     border: 1px solid #444;
     color: #888;
-    padding: 2px 5px;
+    padding: 3px 8px;
     font-size: 9px;
     cursor: pointer;
     font-family: var(--font-en);
+    min-height: 28px;
   }
   .sim-row .seg button.on {
     background: var(--text);
@@ -484,10 +590,11 @@
     background: #222;
     border: 1px solid #444;
     color: #888;
-    padding: 2px 5px;
+    padding: 3px 8px;
     font-size: 9px;
     cursor: pointer;
     font-family: var(--font-en);
+    min-height: 28px;
   }
   .sim-row .btns button.on {
     background: var(--accent);
@@ -501,7 +608,30 @@
   }
   .sim-row .sw { display: flex; gap: 3px; }
   .sim-row .sw button {
-    width: 14px; height: 14px; border: 1px solid #444; cursor: pointer;
+    width: 16px; height: 16px; border: 1px solid #444; cursor: pointer;
+  }
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    font-size: 10px;
+  }
+  .toggle-row label { flex: 1; opacity: 0.7; }
+  .toggle-row button {
+    background: #222;
+    border: 1px solid #444;
+    color: #888;
+    padding: 3px 10px;
+    font-size: 9px;
+    cursor: pointer;
+    font-family: var(--font-en);
+    min-height: 28px;
+  }
+  .toggle-row button.on {
+    background: var(--text);
+    color: #000;
+    border-color: var(--text);
   }
 </style>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
@@ -511,8 +641,10 @@
 <!-- DEVICE -->
 <div class="bezel">
   <div class="screen" id="screen">
-    <div class="hazard-top"></div>
-    <!-- Honeycomb background (A.T. Field) -->
+    <div class="hazard-overlay top"></div>
+    <div class="hazard-overlay bottom"></div>
+
+    <!-- Honeycomb background -->
     <svg class="honeycomb-bg" viewBox="0 0 1024 600" preserveAspectRatio="xMidYMid slice">
       <defs>
         <pattern id="hexPattern" width="24" height="41.57" patternUnits="userSpaceOnUse">
@@ -530,7 +662,7 @@
 
     <div class="header">
       <span class="bar"></span>
-      <span class="title" id="headerTitle">第一種戦闘配置 : LILY</span>
+      <span class="title" id="headerTitle">DIRECT LINK CONNECTION : LILY</span>
       <span class="bar"></span>
     </div>
     <div class="seal-corner" id="sealCorner">NORMAL</div>
@@ -574,34 +706,20 @@
           <div class="display-content" id="displayContent"></div>
         </div>
 
-        <!-- Node diagram (MAGI triangle, pointy-top hexes) -->
-        <div class="node-diagram">
-          <svg viewBox="0 0 1024 110" preserveAspectRatio="xMidYMid meet">
-            <line x1="512" y1="55" x2="250" y2="25" stroke="currentColor" stroke-width="1" opacity="0.3"/>
-            <line x1="512" y1="55" x2="250" y2="85" stroke="currentColor" stroke-width="1" opacity="0.3"/>
-            <line x1="512" y1="55" x2="774" y2="25" stroke="currentColor" stroke-width="1" opacity="0.3"/>
-            <line x1="512" y1="55" x2="774" y2="85" stroke="currentColor" stroke-width="1" opacity="0.3"/>
-            <text x="512" y="59" text-anchor="middle" font-size="9" font-weight="700" fill="currentColor" opacity="0.5" font-family="var(--font-jp)">MAGI</text>
-            <g class="node" id="nodeBt">
-              <polygon points="250,10 266,19 266,37 250,46 234,37 234,19" fill="none" stroke="currentColor" stroke-width="2"/>
-              <text x="250" y="30" text-anchor="middle" font-size="7" font-weight="700" fill="currentColor" font-family="var(--font-en)">BT</text>
-              <text x="250" y="55" text-anchor="middle" font-size="7" fill="currentColor" opacity="0.6" font-family="var(--font-jp)">Melchior</text>
-            </g>
-            <g class="node" id="nodeRadio">
-              <polygon points="250,66 266,75 266,93 250,102 234,93 234,75" fill="none" stroke="currentColor" stroke-width="2"/>
-              <text x="250" y="86" text-anchor="middle" font-size="7" font-weight="700" fill="currentColor" font-family="var(--font-en)">RADIO</text>
-              <text x="250" y="108" text-anchor="middle" font-size="7" fill="currentColor" opacity="0.6" font-family="var(--font-jp)">Balthasar</text>
-            </g>
-            <g class="node" id="nodeUsb">
-              <polygon points="774,10 790,19 790,37 774,46 758,37 758,19" fill="none" stroke="currentColor" stroke-width="2"/>
-              <text x="774" y="30" text-anchor="middle" font-size="7" font-weight="700" fill="currentColor" font-family="var(--font-en)">USB</text>
-              <text x="774" y="55" text-anchor="middle" font-size="7" fill="currentColor" opacity="0.6" font-family="var(--font-jp)">Casper</text>
-            </g>
-            <g class="node" id="nodePhone">
-              <polygon points="774,66 790,75 790,93 774,102 758,93 758,75" fill="none" stroke="currentColor" stroke-width="2"/>
-              <text x="774" y="86" text-anchor="middle" font-size="7" font-weight="700" fill="currentColor" font-family="var(--font-en)">PHONE</text>
-            </g>
-          </svg>
+        <!-- MAGI node diagram (3 trapezoid indicators) -->
+        <div class="magi-diagram">
+          <div class="magi-node">
+            <div class="magi-trap" id="magiBt" data-source="bt">BT</div>
+            <div class="magi-label">Melchior</div>
+          </div>
+          <div class="magi-node">
+            <div class="magi-trap" id="magiRadio" data-source="radio">RADIO</div>
+            <div class="magi-label">Balthasar</div>
+          </div>
+          <div class="magi-node">
+            <div class="magi-trap" id="magiUsb" data-source="usb">USB</div>
+            <div class="magi-label">Casper</div>
+          </div>
         </div>
       </div>
 
@@ -637,48 +755,50 @@
       </div>
     </div>
 
-    <!-- Bottom bar -->
+    <!-- Bottom bar: bigger touch targets -->
     <div class="bottom-bar">
       <div class="hex-grid">
-        <svg viewBox="0 0 400 100" preserveAspectRatio="xMidYMid meet">
-          <g class="hex-btn" data-action="prev" transform="translate(45,22)">
-            <polygon class="hex-fill" points="0,-16 14,-8 14,8 0,16 -14,8 -14,-8" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <svg viewBox="0 0 420 110" preserveAspectRatio="xMidYMid meet">
+          <!-- Row 1: 5 hexes, bigger -->
+          <g class="hex-btn" data-action="prev" transform="translate(50,24)">
+            <polygon class="hex-fill" points="0,-20 17,-10 17,10 0,20 -17,10 -17,-10" fill="none" stroke="currentColor" stroke-width="2"/>
             <text class="hex-text" y="2">PREV</text>
           </g>
-          <g class="hex-btn" data-action="play" transform="translate(115,22)">
-            <polygon class="hex-fill" points="0,-16 14,-8 14,8 0,16 -14,8 -14,-8" fill="none" stroke="currentColor" stroke-width="1.5"/>
+          <g class="hex-btn" data-action="play" transform="translate(130,24)">
+            <polygon class="hex-fill" points="0,-20 17,-10 17,10 0,20 -17,10 -17,-10" fill="none" stroke="currentColor" stroke-width="2"/>
             <text class="hex-text" y="2">PLAY</text>
           </g>
-          <g class="hex-btn" data-action="next" transform="translate(185,22)">
-            <polygon class="hex-fill" points="0,-16 14,-8 14,8 0,16 -14,8 -14,-8" fill="none" stroke="currentColor" stroke-width="1.5"/>
+          <g class="hex-btn" data-action="next" transform="translate(210,24)">
+            <polygon class="hex-fill" points="0,-20 17,-10 17,10 0,20 -17,10 -17,-10" fill="none" stroke="currentColor" stroke-width="2"/>
             <text class="hex-text" y="2">NEXT</text>
           </g>
-          <g class="hex-btn" data-action="bt" transform="translate(255,22)">
-            <polygon class="hex-fill" points="0,-16 14,-8 14,8 0,16 -14,8 -14,-8" fill="none" stroke="currentColor" stroke-width="1.5"/>
+          <g class="hex-btn" data-action="bt" transform="translate(290,24)">
+            <polygon class="hex-fill" points="0,-20 17,-10 17,10 0,20 -17,10 -17,-10" fill="none" stroke="currentColor" stroke-width="2"/>
             <text class="hex-text" y="2">BT</text>
           </g>
-          <g class="hex-btn" data-action="radio" transform="translate(325,22)">
-            <polygon class="hex-fill" points="0,-16 14,-8 14,8 0,16 -14,8 -14,-8" fill="none" stroke="currentColor" stroke-width="1.5"/>
+          <g class="hex-btn" data-action="radio" transform="translate(370,24)">
+            <polygon class="hex-fill" points="0,-20 17,-10 17,10 0,20 -17,10 -17,-10" fill="none" stroke="currentColor" stroke-width="2"/>
             <text class="hex-text" y="2">RADIO</text>
           </g>
-          <g class="hex-btn" data-action="usb" transform="translate(80,62)">
-            <polygon class="hex-fill" points="0,-16 14,-8 14,8 0,16 -14,8 -14,-8" fill="none" stroke="currentColor" stroke-width="1.5"/>
+          <!-- Row 2: 5 hexes, offset -->
+          <g class="hex-btn" data-action="usb" transform="translate(90,70)">
+            <polygon class="hex-fill" points="0,-20 17,-10 17,10 0,20 -17,10 -17,-10" fill="none" stroke="currentColor" stroke-width="2"/>
             <text class="hex-text" y="2">USB</text>
           </g>
-          <g class="hex-btn" data-action="phone" transform="translate(150,62)">
-            <polygon class="hex-fill" points="0,-16 14,-8 14,8 0,16 -14,8 -14,-8" fill="none" stroke="currentColor" stroke-width="1.5"/>
+          <g class="hex-btn" data-action="phone" transform="translate(170,70)">
+            <polygon class="hex-fill" points="0,-20 17,-10 17,10 0,20 -17,10 -17,-10" fill="none" stroke="currentColor" stroke-width="2"/>
             <text class="hex-text" y="2">PHONE</text>
           </g>
-          <g class="hex-btn" data-action="switch" transform="translate(220,62)">
-            <polygon class="hex-fill" points="0,-16 14,-8 14,8 0,16 -14,8 -14,-8" fill="none" stroke="currentColor" stroke-width="1.5"/>
+          <g class="hex-btn" data-action="switch" transform="translate(250,70)">
+            <polygon class="hex-fill" points="0,-20 17,-10 17,10 0,20 -17,10 -17,-10" fill="none" stroke="currentColor" stroke-width="2"/>
             <text class="hex-text" y="2">SWITCH</text>
           </g>
-          <g class="hex-btn" data-action="auto" transform="translate(290,62)">
-            <polygon class="hex-fill" points="0,-16 14,-8 14,8 0,16 -14,8 -14,-8" fill="none" stroke="currentColor" stroke-width="1.5"/>
+          <g class="hex-btn" data-action="auto" transform="translate(330,70)">
+            <polygon class="hex-fill" points="0,-20 17,-10 17,10 0,20 -17,10 -17,-10" fill="none" stroke="currentColor" stroke-width="2"/>
             <text class="hex-text" y="2">AUTO</text>
           </g>
-          <g class="hex-btn" data-action="more" transform="translate(360,62)">
-            <polygon class="hex-fill" points="0,-16 14,-8 14,8 0,16 -14,8 -14,-8" fill="none" stroke="currentColor" stroke-width="1.5"/>
+          <g class="hex-btn" data-action="more" transform="translate(410,70)">
+            <polygon class="hex-fill" points="0,-20 17,-10 17,10 0,20 -17,10 -17,-10" fill="none" stroke="currentColor" stroke-width="2"/>
             <text class="hex-text" y="2">MORE</text>
           </g>
         </svg>
@@ -692,7 +812,7 @@
         <div class="knob-value" id="knobReadout">18/40</div>
       </div>
 
-      <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;">
+      <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;">
         <div class="speed-label">SPEED</div>
         <div class="speed-readout" id="speedDisplay">000</div>
         <div class="speed-label">km/h</div>
@@ -701,12 +821,25 @@
     </div>
 
     <div class="hazard-bottom"></div>
+
+    <!-- Warning overlay (not layout-shifting) -->
+    <div class="warning-overlay" id="warningOverlay">
+      <div class="hazard-bar"></div>
+      <div class="warning-text" id="warningText">EMERGENCY</div>
+      <div class="warning-sub" id="warningSub">SPEED EXCEEDED</div>
+      <div class="hazard-bar"></div>
+    </div>
   </div>
 </div>
 
 <!-- SIMULATOR PANEL -->
 <div class="sim-panel">
   <h2>CAR SIGNALS</h2>
+
+  <div class="toggle-row">
+    <label>Day/Night Mode</label>
+    <button id="simDayNight" onclick="S.night=!S.night; render();">AUTO</button>
+  </div>
 
   <div class="sim-row">
     <label>Speed (km/h)</label>
@@ -771,12 +904,26 @@
   const S = {
     night: false, usb: 'none', bt: 'Galaxy S23', source: 'bt', track: 'paused',
     vol: 18, speed: 0, screen: 'home', sheet: null, reverse: false, call: null,
-    speedZone: 'normal',
+    speedZone: 'normal', dayNightMode: 'auto',
   };
   const prefs = { resumeOnStart: true, autoAA: true, accent: '#ff4a1c', theme: 'auto' };
 
   const CAUTION_THRESHOLD = () => parseInt(document.getElementById('threshCaution').value) || 60;
   const EMERGENCY_THRESHOLD = () => parseInt(document.getElementById('threshEmergency').value) || 100;
+
+  // Time-based day/night (17:00 night, 05:00 morning)
+  function getTimeBasedTheme() {
+    const now = new Date();
+    const hour = now.getHours();
+    if (hour >= 17 || hour < 5) return 'night';
+    return 'day';
+  }
+
+  function updateDayNight() {
+    if (S.dayNightMode === 'auto') {
+      S.night = getTimeBasedTheme() === 'night';
+    }
+  }
 
   function updateSpeedZone() {
     const speed = S.speed;
@@ -793,6 +940,7 @@
     screen.classList.add('state-' + S.speedZone);
     const root = document.documentElement;
     const ticker = document.getElementById('ticker');
+    const wo = document.getElementById('warningOverlay');
 
     if (S.speedZone === 'emergency') {
       root.style.setProperty('--bg', '#000000');
@@ -803,6 +951,10 @@
       document.getElementById('headerTitle').textContent = '第一種戦闘配置 : LILY';
       document.getElementById('sealCorner').textContent = 'EMERGENCY';
       ticker.className = 'ticker emergency';
+      ticker.style.display = 'flex';
+      document.getElementById('warningText').textContent = 'EMERGENCY';
+      document.getElementById('warningSub').textContent = 'SPEED EXCEEDED';
+      wo.classList.add('active');
     } else if (S.speedZone === 'caution') {
       root.style.setProperty('--bg', '#0a0a12');
       root.style.setProperty('--text', '#f5b400');
@@ -812,6 +964,10 @@
       document.getElementById('headerTitle').textContent = 'CAUTION : SPEED LIMIT';
       document.getElementById('sealCorner').textContent = 'CAUTION';
       ticker.className = 'ticker caution';
+      ticker.style.display = 'flex';
+      document.getElementById('warningText').textContent = 'CAUTION';
+      document.getElementById('warningSub').textContent = 'SPEED LIMIT';
+      wo.classList.add('active');
     } else {
       root.style.setProperty('--bg', '#0a0a12');
       root.style.setProperty('--text', '#4de89a');
@@ -821,6 +977,8 @@
       document.getElementById('headerTitle').textContent = 'DIRECT LINK CONNECTION : LILY';
       document.getElementById('sealCorner').textContent = 'NORMAL';
       ticker.className = 'ticker normal';
+      ticker.style.display = 'none';
+      wo.classList.remove('active');
     }
 
     if (S.night && S.speedZone === 'normal') {
@@ -828,9 +986,17 @@
       root.style.setProperty('--text', '#b9afcb');
       root.style.setProperty('--text2', '#888');
     }
+
+    // Update day/night toggle button
+    const dnBtn = document.getElementById('simDayNight');
+    if (dnBtn) {
+      dnBtn.textContent = S.dayNightMode === 'auto' ? 'AUTO' : (S.night ? 'NIGHT' : 'DAY');
+      dnBtn.classList.toggle('on', S.dayNightMode !== 'auto');
+    }
   }
 
   function render() {
+    updateDayNight();
     updateSpeedZone();
     applyPalette();
 
@@ -873,25 +1039,18 @@
       dc.innerHTML = '<div class="empty-state"><div class="big">NO SIGNAL</div><div class="small">PRESS SWITCH TO CONNECT A PHONE</div><div class="small" style="margin-top:4px;">WAITING</div></div>';
     }
 
-    updateNodes();
-    updateHexButtons();
-    syncSim();
-  }
-
-  function updateNodes() {
+    // Update MAGI node diagram
     const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
     const text2 = getComputedStyle(document.documentElement).getPropertyValue('--text2').trim();
-    ['nodeBt','nodeRadio','nodeUsb','nodePhone'].forEach(id => {
+    ['magiBt','magiRadio','magiUsb'].forEach(id => {
       const el = document.getElementById(id);
-      if (el) el.querySelectorAll('circle,polygon').forEach(c => c.setAttribute('fill', 'none'));
+      if (el) { el.classList.remove('active', 'latched'); el.style.background = ''; el.style.color = ''; }
     });
-    if (S.source === 'bt' && S.bt) { const el = document.getElementById('nodeBt'); if (el) el.querySelectorAll('circle,polygon').forEach(c => c.setAttribute('fill', accent)); }
-    if (S.source === 'radio') { const el = document.getElementById('nodeRadio'); if (el) el.querySelectorAll('circle,polygon').forEach(c => c.setAttribute('fill', accent)); }
-    if (S.source === 'usb') { const el = document.getElementById('nodeUsb'); if (el) el.querySelectorAll('circle,polygon').forEach(c => c.setAttribute('fill', accent)); }
-    if (S.bt) { const el = document.getElementById('nodePhone'); if (el) el.querySelectorAll('circle,polygon').forEach(c => c.setAttribute('fill', text2)); }
-  }
+    if (S.source === 'bt' && S.bt) { const el = document.getElementById('magiBt'); if (el) { el.classList.add('latched'); el.style.background = accent; el.style.color = '#000'; } }
+    if (S.source === 'radio') { const el = document.getElementById('magiRadio'); if (el) { el.classList.add('latched'); el.style.background = accent; el.style.color = '#000'; } }
+    if (S.source === 'usb') { const el = document.getElementById('magiUsb'); if (el) { el.classList.add('latched'); el.style.background = accent; el.style.color = '#000'; } }
 
-  function updateHexButtons() {
+    // Update hex button states
     document.querySelectorAll('.hex-btn').forEach(btn => {
       btn.classList.remove('active', 'latched');
       const a = btn.dataset.action;
@@ -900,6 +1059,8 @@
       if (a === 'usb' && S.source === 'usb') btn.classList.add('latched');
       if (a === 'play' && S.track === 'playing') btn.classList.add('active');
     });
+
+    syncSim();
   }
 
   function syncSim() {
@@ -963,16 +1124,33 @@
     });
   }
 
+  // Day/night toggle
+  document.getElementById('simDayNight').addEventListener('click', () => {
+    if (S.dayNightMode === 'auto') {
+      S.dayNightMode = 'manual';
+      S.night = !S.night;
+    } else {
+      S.dayNightMode = 'auto';
+    }
+    render();
+  });
+
+  // Speed slider
   document.getElementById('simSpeed').addEventListener('input', e => {
     S.speed = parseInt(e.target.value);
     document.getElementById('simSpeedVal').textContent = S.speed;
     render();
   });
 
+  // Threshold inputs
   document.getElementById('threshCaution').addEventListener('change', () => render());
   document.getElementById('threshEmergency').addEventListener('change', () => render());
 
+  // Initial render
   render();
+
+  // Update time-based theme every minute
+  setInterval(() => { if (S.dayNightMode === 'auto') render(); }, 60000);
 </script>
 </body>
 </html>
