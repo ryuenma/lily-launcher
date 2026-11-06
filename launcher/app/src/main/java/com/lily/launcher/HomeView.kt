@@ -77,6 +77,33 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
         drawPlate(c)
         drawDisplay(c)
         drawPads(c)
+        drawZoneOverlays(c)
+    }
+
+    // ── speed-zone overlays (no layout shift) ──
+    private fun drawZoneOverlays(c: Canvas) {
+        val zone = car.speedZone
+        if (zone == SpeedZone.NORMAL) return
+        val color = when (zone) {
+            SpeedZone.CAUTION -> parseCss("#f5b400")
+            SpeedZone.EMERGENCY -> parseCss("#e31c23")
+            else -> 0
+        }
+        val stripeH = 12f
+        fill.color = color
+        fill.alpha = 180
+        c.drawRect(0f, 0f, Stage.W.toFloat(), stripeH, fill)
+        c.drawRect(0f, Stage.H - stripeH, Stage.W.toFloat(), Stage.H.toFloat(), fill)
+        fill.alpha = 255
+        // warning overlay pulse
+        if (zone == SpeedZone.EMERGENCY || zone == SpeedZone.CAUTION) {
+            val pulse = (Math.sin(SystemClock.uptimeMillis() / 300.0) * 0.3 + 0.7).toFloat()
+            fill.color = color
+            fill.alpha = (pulse * 60).toInt()
+            c.drawRect(0f, 0f, Stage.W.toFloat(), Stage.H.toFloat(), fill)
+            fill.alpha = 255
+            postInvalidateDelayed(50)
+        }
     }
 
     // ── port tabs ──

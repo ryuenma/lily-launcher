@@ -20,6 +20,7 @@ import java.util.Locale
 
 enum class Src { BT, RADIO, USB }
 enum class Aa { NONE, CONNECTED }
+enum class SpeedZone { NORMAL, CAUTION, EMERGENCY }
 
 /**
  * Live car state from the NWD K2501 stereo, and the ways we act on it.
@@ -43,6 +44,27 @@ class Car(private val app: Context) {
     var vol = 0; private set
     var maxVol = 40; private set
     var reverse = false; private set
+    // ── speed (GPS-sourced) ──
+    var speedKmh = 0; private set
+    var speedZone = SpeedZone.NORMAL; private set
+    fun cautionThreshold() = runCatching { prefs.getInt("cautionKmh", DEFAULTS["cautionKmh"] as Int) }.getOrDefault(60)
+    fun emergencyThreshold() = runCatching { prefs.getInt("emergencyKmh", DEFAULTS["emergencyKmh"] as Int) }.getOrDefault(100)
+    fun setSpeed(kmh: Int) {
+        val prev = speedZone
+        speedKmh = kmh.coerceAtLeast(0)
+        val c = cautionThreshold(); val e = emergencyThreshold()
+        val hyst = 5
+        speedZone = when {
+            speedKmh >= e -> SpeedZone.EMERGENCY
+            speedKmh >= e - hyst && speedZone == SpeedZone.EMERGENCY -> SpeedZone.EMERGENCY
+            speedKmh >= c -> SpeedZone.CAUTION
+            speedKmh >= c - hyst && speedZone == SpeedZone.CAUTION -> SpeedZone.CAUTION
+            else -> SpeedZone.NORMAL
+        }
+        if (speedZone != prev) changed()
+        changed()
+    }
+    fun setSpeedZone(z: SpeedZone) { if (speedZone != z) { speedZone = z; changed() } }
     var inCall = false; private set
     var usbPlaying = false; private set
     var usbTitle = ""; private set
@@ -493,7 +515,7 @@ class Car(private val app: Context) {
         const val TAG = "LilyCar"
         private const val PANEL_DAY = 65            // LCD contrast + saturation in daylight (50 = factory, 100 = max)
         private const val PIM = "com.bt.BTPIMCallback"
-        val DEFAULTS = mapOf("resumeOnStart" to true, "autoAA" to true, "theme" to "auto", "accent" to "#FF5A1F", "lastAndroid" to "BT")
+        val DEFAULTS = mapOf("resumeOnStart" to true, "autoAA" to true, "theme" to "auto", "accent" to "#FF5A1F", "lastAndroid" to "BT", "cautionKmh" to 60, "emergencyKmh" to 100)
         private const val SOURCE_RADIO = 4
         private const val APP_BT_MUSIC = 15; private const val APP_USB_MUSIC = 2
         private const val K_VOL = "mcu_system_volume"; private const val K_MAXVOL = "mcu_max_volume"

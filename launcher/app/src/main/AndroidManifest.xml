@@ -4,6 +4,8 @@
 
     <!-- lets auto-open start Android Auto while another app is in front (granted by install.sh via appops) -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <!-- GPS vehicle speed (LocationManager/GPS_PROVIDER) -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <!-- track length: the phone sends it, the BT app drops it, the BT daemon logs it (granted by install.sh) -->
     <uses-permission android:name="android.permission.READ_LOGS" tools:ignore="ProtectedPermissions" />
 
