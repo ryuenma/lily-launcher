@@ -44,6 +44,24 @@ class Car(private val app: Context) {
     var vol = 0; private set
     var maxVol = 40; private set
     var reverse = false; private set
+    // ── day/night mode (time-based, AUTO/MANUAL) ──
+    var dayNightMode = "auto"; private set
+    fun setDayNightMode(mode: String) {
+        dayNightMode = mode
+        prefs.edit().putString("dayNightMode", mode).apply()
+        readSettings()
+    }
+    private fun resolveNight(): Boolean = when (dayNightMode) {
+        "manual_day" -> false
+        "manual_night" -> true
+        else -> { // auto: time-based 17:00 night, 05:00 morning
+            val c = java.util.Calendar.getInstance()
+            val h = c.get(java.util.Calendar.HOUR_OF_DAY)
+            val m = c.get(java.util.Calendar.MINUTE)
+            val minutes = h * 60 + m
+            minutes >= 17 * 60 || minutes < 5 * 60
+        }
+    }
     // ── speed (GPS-sourced) ──
     var speedKmh = 0; private set
     var speedZone = SpeedZone.NORMAL; private set
@@ -112,6 +130,7 @@ class Car(private val app: Context) {
     }
 
     fun start() {
+        dayNightMode = prefs.getString("dayNightMode", "auto") ?: "auto"
         lastAndroid = runCatching { Src.valueOf(str("lastAndroid")) }.getOrDefault(Src.BT)
         readSettings()
         io.post {                                   // system calls the first frame doesn't need: off the main thread
@@ -140,7 +159,13 @@ class Car(private val app: Context) {
         val oldSource = mcuSource
         mcuSource = sys(K_SOURCE, 0)
         val wasNight = night
-        night = sys(K_LIGHT, 0) != 0
+        // time-based day/night (AUTO/MANUAL), headlight as override if available
+        val headlightOn = sys(K_LIGHT, -1)  // -1 = unknown (no MCU)
+        night = when (dayNightMode) {
+            "manual_day" -> false
+            "manual_night" -> true
+            else -> if (headlightOn >= 0) (headlightOn != 0) else resolveNight()
+        }
         if (night != wasNight) applyPanel()
         muted = sys(K_MUTE, 0) != 0
         val wasReverse = reverse

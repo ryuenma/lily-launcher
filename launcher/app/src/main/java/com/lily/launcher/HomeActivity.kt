@@ -167,8 +167,21 @@ class HomeActivity : Activity() {
         val cautionInput = EditText(this).apply { setText(car.cautionThreshold().toString()); inputType = android.text.InputType.TYPE_CLASS_NUMBER }
         val emergencyLabel = TextView(this).apply { text = "Emergency threshold (km/h)" }
         val emergencyInput = EditText(this).apply { setText(car.emergencyThreshold().toString()); inputType = android.text.InputType.TYPE_CLASS_NUMBER }
+        val dayNightLabel = TextView(this).apply { text = "Day/night mode" }
+        val dayNightRow = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+        for (mode in listOf("auto", "manual_day", "manual_night")) {
+            val btn = android.widget.Button(this).apply {
+                text = when (mode) { "auto" -> "AUTO"; "manual_day" -> "DAY"; else -> "NIGHT" }
+                setOnClickListener {
+                    car.setDayNightMode(mode)
+                    stage.render()
+                }
+            }
+            dayNightRow.addView(btn)
+        }
         layout.addView(cautionLabel); layout.addView(cautionInput)
         layout.addView(emergencyLabel); layout.addView(emergencyInput)
+        layout.addView(dayNightLabel); layout.addView(dayNightRow)
         AlertDialog.Builder(this)
             .setTitle("Speed thresholds")
             .setView(layout)
