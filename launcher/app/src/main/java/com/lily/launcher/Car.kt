@@ -1,4 +1,4 @@
-package com.calm.launcher
+package com.lily.launcher
 
 import android.content.BroadcastReceiver
 import android.content.ComponentName
@@ -66,7 +66,7 @@ class Car(private val app: Context) {
     }
     val hasTrack: Boolean get() = btName != null && title.isNotEmpty()
 
-    val prefs = app.getSharedPreferences("calm", Context.MODE_PRIVATE)
+    val prefs = app.getSharedPreferences("lily", Context.MODE_PRIVATE)
     val listeners = ArrayList<() -> Unit>()
     /** Volume changes from the stereo (wheel, rotary knob, our knob). */
     var onVolume: ((Int) -> Unit)? = null
@@ -184,7 +184,7 @@ class Car(private val app: Context) {
                 MCU_STATE -> if (i.getByteExtra("extra_mcu_state", 0).toInt() == 1) { armStartBehaviour(); refreshBt(); applyPanel() }
                 KEY_ACTION -> when (i.getByteExtra("extra_key_value", 0).toInt()) {
                     KEY_PLAY, KEY_NEXT, KEY_PREV -> userActed = true
-                    KEY_SHOW_LAUNCHER -> launch("com.calm.launcher/.HomeActivity")   // was handled by the stock Home screen
+                    KEY_SHOW_LAUNCHER -> launch("com.lily.launcher/.HomeActivity")   // was handled by the stock Home screen
                 }
                 ZLINK -> poll.run()
             }
@@ -490,7 +490,7 @@ class Car(private val app: Context) {
 
 
     companion object {
-        const val TAG = "CalmCar"
+        const val TAG = "LilyCar"
         private const val PANEL_DAY = 65            // LCD contrast + saturation in daylight (50 = factory, 100 = max)
         private const val PIM = "com.bt.BTPIMCallback"
         val DEFAULTS = mapOf("resumeOnStart" to true, "autoAA" to true, "theme" to "auto", "accent" to "#FF5A1F", "lastAndroid" to "BT")

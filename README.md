@@ -1,20 +1,20 @@
-# Calm: I hated my car's infotainment screen, so I replaced it
+# Lily: I hated my car's infotainment screen, so I replaced it
 
 My car has a Chinese-made Android head unit (NWD K2501). It works, but I hated how its stock home screen looked every single time I got in. So I built my own: **a native Android launcher that replaces it**, pixel-matched to a design I made in HTML first.
 
-| Before: the stock home screen | After: Calm |
+| Before: the stock home screen | After: Lily |
 |---|---|
-| ![Stock home screen of the head unit](docs/before-stock.jpg) | ![Calm, day theme](docs/screenshot-day.png) |
+| ![Stock home screen of the head unit](docs/before-stock.jpg) | ![Lily, day theme](docs/screenshot-day.png) |
 
 *Left: the head unit's stock launcher, shown for comparison. Right: a render of the HTML mockup in `mockup/`; the app on the unit is pixel-matched to it.*
 
 It puts what's playing in the middle of the screen, a few big physical-looking keys under it, and gets out of the way when Android Auto, a call, or the reverse camera takes over. At night (headlights on) it switches to a dark theme:
 
-![Calm, night theme](docs/screenshot-night.png)
+![Lily, night theme](docs/screenshot-night.png)
 
 **Watch the 25-second launch trailer** (a straight-faced keynote parody; every number in it is measured, and the fine print is honest):
 
-[![Watch the trailer](docs/trailer-poster.jpg)](docs/calm-launcher-trailer.mp4)
+[![Watch the trailer](docs/trailer-poster.jpg)](docs/lily-launcher-trailer.mp4)
 
 ## What it does
 - **Now playing is the main thing:** Bluetooth song and artist, FM station and frequency, or the USB track, with an animated tape deck that only moves while music plays.
@@ -61,7 +61,7 @@ cd launcher
 UNIT=192.168.1.50:5555 ./scripts/install.sh     # build, install, make it the default Home
 UNIT=192.168.1.50:5555 ./scripts/rollback.sh    # stock launcher back as Home
 ```
-What `install.sh` changes: installs the app; grants it the `SYSTEM_ALERT_WINDOW` app-op and `READ_LOGS`; and sets the system property `persist.nwd.launcher.default` (NWD's firmware picks the Home app from it and ignores Android's normal setting). While running, the app also sets the LCD contrast and saturation by writing to the display's files under `/sys/devices/virtual/disp/` (65 by day, the factory 50 at night), which only works with root. The stock launcher is **never disabled**: its services keep running and `rollback.sh` restores everything. If Calm ever misbehaves and the screen is unusable, from a computer run `adb shell setprop persist.nwd.launcher.default com.android.launcher` (or `adb uninstall com.calm.launcher`).
+What `install.sh` changes: installs the app; grants it the `SYSTEM_ALERT_WINDOW` app-op and `READ_LOGS`; and sets the system property `persist.nwd.launcher.default` (NWD's firmware picks the Home app from it and ignores Android's normal setting). While running, the app also sets the LCD contrast and saturation by writing to the display's files under `/sys/devices/virtual/disp/` (65 by day, the factory 50 at night), which only works with root. The stock launcher is **never disabled**: its services keep running and `rollback.sh` restores everything. If Lily ever misbehaves and the screen is unusable, from a computer run `adb shell setprop persist.nwd.launcher.default com.android.launcher` (or `adb uninstall com.lily.launcher`).
 
 **`eq/` is riskier:** `apply.sh` overwrites the stock DSP settings file and locks its folder read-only. The values are tuned for my car and speakers (speaker delays, bass boost). Try them at low volume, keep `eq/original.xml` to undo, and don't expect them to suit another car.
 

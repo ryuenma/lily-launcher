@@ -1,4 +1,4 @@
-# How Calm talks to the NWD K2501
+# How Lily talks to the NWD K2501
 
 Everything below was found by reading what the unit's own apps send and receive (the stock launcher's Bluetooth, radio and music widgets, and the Bluetooth app) and by watching `logcat` on a real unit. No vendor code is included in this repo. Names are listed for interoperability.
 
@@ -17,7 +17,7 @@ Source ids: `mcu_current_source` 4 = radio, 0 = Android audio (Bluetooth music o
 | Night | `mcu_light_state` (headlights). |
 | Reverse / calls | `mcu_backcar_state`; `com.bt.ACTION_BT_INCOMING/OUTGOING_CALL`, `BEGIN_CALL_ONLINE`, `END_CALL`. Android Auto auto-open waits for both. |
 | Android Auto / CarPlay | System property `rw.zlink.connected`, polled every 2 s off the main thread; opens `com.zjinnova.zlink/.main.view.SplashActivity`. |
-| Wheel "show launcher" key (110) | Brings Calm to the front (the stock Home screen used to handle it). |
+| Wheel "show launcher" key (110) | Brings Lily to the front (the stock Home screen used to handle it). |
 | LCD contrast | Writes the display's sysfs attributes (65 by day, factory 50 at night). |
 
 ## Behaviour notes
@@ -26,7 +26,7 @@ Source ids: `mcu_current_source` 4 = radio, 0 = Android audio (Bluetooth music o
 - **After ignition-off** the stock BT app clears bit 4 of `nwd_arm_volume_type` and drops the audio while the phone keeps "playing". The launcher detects that and sends `ACTION_MEDIA_PLAY` to restore it.
 - **Song length** comes from the phone but is dropped by the stock Bluetooth app, so the launcher reads it from the Bluetooth daemon's log (`logcat -s nwdbt`, needs `READ_LOGS`). The stack cannot report the play *position*, so the elapsed time is counted from an observed track change.
 - **Performance:** the home screen and knob are separate GPU layers (the tape deck animation does not redraw the screen), bitmaps are preloaded off the main thread, and the app is AOT-compiled at install.
-- **Power:** the unit sleeps about 60 s after ACC goes off, on the MCU's timer; Calm holds no wake-locks.
+- **Power:** the unit sleeps about 60 s after ACC goes off, on the MCU's timer; Lily holds no wake-locks.
 
 ## `eq/`
-An optional tune for the unit's AK7602 DSP (`calm.xml`, `calm-allseats.xml`; undo with `original.xml`). The stock DSP service re-sends its saved settings to the chip on start and at every ignition-on, so `apply.sh` writes the file and locks the settings folder read-only. Band layout: 14 bands (32 Hz … 16 kHz), 15 = 0 dB, two steps per dB, maximum +6 dB.
+An optional tune for the unit's AK7602 DSP (`lily.xml`, `lily-allseats.xml`; undo with `original.xml`). The stock DSP service re-sends its saved settings to the chip on start and at every ignition-on, so `apply.sh` writes the file and locks the settings folder read-only. Band layout: 14 bands (32 Hz … 16 kHz), 15 = 0 dB, two steps per dB, maximum +6 dB.

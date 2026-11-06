@@ -1,4 +1,4 @@
-package com.calm.launcher
+package com.lily.launcher
 
 import android.content.Context
 import android.graphics.Bitmap

@@ -1,4 +1,4 @@
-package com.calm.launcher
+package com.lily.launcher
 
 import android.app.Activity
 import android.content.BroadcastReceiver

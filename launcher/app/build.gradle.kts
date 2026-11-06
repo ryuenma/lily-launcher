@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.calm.launcher"
+    namespace = "com.lily.launcher"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.calm.launcher"
+        applicationId = "com.lily.launcher"
         minSdk = 29
         targetSdk = 29          // Android 10 head unit; avoids newer background limits
         versionCode = 1

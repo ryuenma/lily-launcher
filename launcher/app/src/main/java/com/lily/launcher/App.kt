@@ -1,4 +1,4 @@
-package com.calm.launcher
+package com.lily.launcher
 
 import android.app.Application
 import java.util.concurrent.FutureTask

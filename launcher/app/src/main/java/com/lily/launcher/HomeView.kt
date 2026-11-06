@@ -1,4 +1,4 @@
-package com.calm.launcher
+package com.lily.launcher
 
 import android.annotation.SuppressLint
 import android.content.Context

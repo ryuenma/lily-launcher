@@ -1,4 +1,4 @@
-package com.calm.launcher
+package com.lily.launcher
 
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
