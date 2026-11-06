@@ -763,6 +763,1020 @@ body{
 </style>
 </head>
 <body>
-<!-- ==BODY== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-radio" viewBox="0 0 24 24"><rect x="2.5" y="8.5" width="19" height="12" rx="1"/><circle cx="8" cy="14.5" r="3"/><path d="M13.5 12h5M13.5 15h5M13.5 18h3M7 4l11-2"/></symbol>
+  <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></symbol>
+  <symbol id="i-video" viewBox="0 0 24 24"><rect x="2.5" y="5.5" width="19" height="13" rx="1"/><path d="M10 9l5 3-5 3z"/></symbol>
+  <symbol id="i-cam" viewBox="0 0 24 24"><path d="M3 8h4l2-3h6l2 3h4v11H3z"/><circle cx="12" cy="13" r="3.5"/></symbol>
+  <symbol id="i-eq" viewBox="0 0 24 24"><path d="M4 4v16M8 4v16M12 4v16M16 4v16M20 4v16"/><rect x="6.5" y="7" width="3" height="3"/><rect x="10.5" y="13" width="3" height="3"/><rect x="14.5" y="9" width="3" height="3"/></symbol>
+  <symbol id="i-aux" viewBox="0 0 24 24"><path d="M9 3v6a3 3 0 006 0V3M12 12v9"/><rect x="9" y="2" width="6" height="2"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 6h7l2 2h9v11H3z"/></symbol>
+  <symbol id="i-car" viewBox="0 0 24 24"><path d="M4 12l2-5h12l2 5v6H4zM6 18v2M18 18v2"/><circle cx="8" cy="14" r="1.5"/><circle cx="16" cy="14" r="1.5"/></symbol>
+  <symbol id="i-chip" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></symbol>
+  <symbol id="i-wheel" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2"/><path d="M12 14v6M10 11L5 8M14 11l5-3"/></symbol>
+  <symbol id="i-android" viewBox="0 0 24 24"><path d="M5 11a7 7 0 0114 0v8H5zM8 7L6 4M16 7l2-3"/><circle cx="9" cy="11" r=".8"/><circle cx="15" cy="11" r=".8"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M15 3a9 9 0 100 18 8 8 0 010-18z"/></symbol>
+  <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/><rect x="7" y="4" width="3" height="4"/><rect x="14" y="10" width="3" height="4"/><rect x="9" y="16" width="3" height="4"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M6 3l4 4-2 3a14 14 0 006 6l3-2 4 4-2 3c-9 0-18-9-18-18z"/></symbol>
+  <symbol id="i-bt" viewBox="0 0 24 24"><path d="M12 2v20M12 2l6 5-6 5M12 12l6 5-6 5"/></symbol>
+  <symbol id="i-map" viewBox="0 0 24 24"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2zM9 4v14M15 6v14"/></symbol>
+  <symbol id="i-msg" viewBox="0 0 24 24"><path d="M3 5h18v12H8l-5 4z"/></symbol>
+  <symbol id="i-pod" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v3"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><path d="M9 5v14M15 5v14"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5l11 7-11 7z"/></symbol>
+</svg>
+
+<div class="workspace" style="display:flex;gap:22px;align-items:flex-start">
+<div class="device-col">
+  <div class="bezel">
+    <div class="screen" id="screen" data-zone="normal">
+      <div class="hazard hazard-top" id="hazardTop"></div>
+      <svg class="hexbg" id="hexbg" viewBox="0 0 1024 600" preserveAspectRatio="none" aria-hidden="true"></svg>
+      <div class="vignette"></div>
+
+      <!-- ═════════ HEADER ═════════ -->
+      <header class="nge-header">
+        <div class="hdr-rail">
+          <div class="rail-bars"></div>
+          <div class="seal-oct seal-lg" id="nervSeal">
+            <div class="seal-in"><b>NERV</b><span>特務機関</span></div>
+          </div>
+        </div>
+        <div class="banner" id="banner">
+          <div class="banner-kicker">MAGI SYSTEM // CENTRAL DOGMA // TOKYO-3</div>
+          <div class="banner-title" id="headerTitle">DIRECT LINK CONNECTION : LILY</div>
+          <div class="banner-sub"><span id="headerJp">通常運転</span><span class="sep">//</span><span id="headerCode">CODE 258-AAAA</span></div>
+        </div>
+        <div class="hdr-rail">
+          <div class="seal-oct seal-lg" id="stateSeal">
+            <div class="seal-in"><b id="sealJp">正常</b><span id="sealEn">NORMAL</span></div>
+          </div>
+          <div class="rail-bars"></div>
+        </div>
+      </header>
+
+      <!-- ═════════ TICKER ═════════ -->
+      <div class="ticker" id="ticker">
+        <div class="ticker-track" id="tickerTrack">
+          <div class="tick-half" id="tickA"></div>
+          <div class="tick-half" id="tickB"></div>
+        </div>
+      </div>
+
+      <!-- ═════════ MAIN ═════════ -->
+      <main class="main">
+        <!-- left metadata -->
+        <aside class="meta-col">
+          <div class="meta-vrail">見現時刻表示 // 中枢接続</div>
+          <div class="meta-head"><span class="jp">中枢情報</span><span class="en">SYS INFO</span></div>
+          <div class="mrow"><span class="k">CODE</span><span class="v" id="metaCode">258-LILY</span></div>
+          <div class="mrow"><span class="k">FILE</span><span class="v">MAGI_SYS</span></div>
+          <div class="mrow"><span class="k">EXT</span><span class="v">4096</span></div>
+          <div class="mrow"><span class="k">MODE</span><span class="v" id="metaMode">AUTO</span></div>
+          <div class="mrow"><span class="k">PRIORITY</span><span class="v hot">AAA</span></div>
+          <div class="mrow"><span class="k">SPEED</span><span class="v" id="metaSpeed">000 km/h</span></div>
+          <div class="mrow"><span class="k">VOL</span><span class="v" id="metaVol">18/40</span></div>
+          <div class="barcode"></div>
+          <div class="barcode-label"><span>AUTH 0x3F9A</span><span>LILY-01</span></div>
+          <div class="meta-foot">
+            <div class="seal-oct seal-md" id="leftSeal">
+              <div class="seal-in"><b id="leftSealJp">危険</b><span>DANGER</span></div>
+            </div>
+            <div class="meta-note">SEQ 00-13<br>CHK 7726<br>REV 4.21</div>
+          </div>
+        </aside>
+
+        <!-- center display -->
+        <section class="center">
+          <div class="display" id="display">
+            <span class="cnr tl"></span><span class="cnr tr"></span><span class="cnr bl"></span><span class="cnr br"></span>
+            <div class="display-head">
+              <div class="dh-left">
+                <span class="dh-en" id="displayLabel">ACTIVE DISPLAY</span>
+                <span class="dh-jp" id="displayJp">見現時刻表示</span>
+              </div>
+              <span class="dh-right" id="displaySync">SYNC 100% // 00:00:00</span>
+            </div>
+            <div class="display-body" id="displayBody"></div>
+            <div class="display-foot"><span id="displayFoot">SRC: BT // AVRCP // TRACK 02</span><b id="displayFootJp">記録 // NOMINAL</b></div>
+          </div>
+
+          <!-- MAGI nodes -->
+          <div class="magi">
+            <div class="magi-head">
+              <span class="jp">MAGI SYSTEM // 三賢者会議</span>
+              <span class="right" id="magiStatus">CONSENSUS: GREEN</span>
+            </div>
+            <svg viewBox="0 0 700 104" preserveAspectRatio="xMidYMid meet">
+              <path class="magi-line" d="M350,36 L150,36 L350,66 Z"/>
+              <path class="magi-line" d="M350,36 L550,36 L350,66 Z"/>
+              <line class="magi-line hot" x1="350" y1="36" x2="150" y2="36"/>
+              <line class="magi-line hot" x1="350" y1="36" x2="550" y2="36"/>
+              <line class="magi-line hot" x1="350" y1="36" x2="350" y2="66"/>
+              <g class="magi-node" id="nodeBt" data-node="bt">
+                <polygon class="hex" points="150,15 168.2,25.5 168.2,46.5 150,57 131.8,46.5 131.8,25.5"/>
+                <polygon class="hex-in" points="150,19 164.6,27.5 164.6,44.5 150,53 135.4,44.5 135.4,27.5"/>
+                <text class="n-lbl" x="150" y="40">BT</text>
+                <text class="n-code" x="150" y="49">L-01</text>
+                <text class="n-name" x="150" y="8">MELCHIOR</text>
+                <text class="n-jp" x="150" y="70">メルキオール // 無線音声</text>
+              </g>
+              <g class="magi-node" id="nodeRadio" data-node="radio">
+                <polygon class="hex" points="550,15 568.2,25.5 568.2,46.5 550,57 531.8,46.5 531.8,25.5"/>
+                <polygon class="hex-in" points="550,19 564.6,27.5 564.6,44.5 550,53 535.4,44.5 535.4,27.5"/>
+                <text class="n-lbl" x="550" y="40">FM</text>
+                <text class="n-code" x="550" y="49">B-02</text>
+                <text class="n-name" x="550" y="8">BALTHASAR</text>
+                <text class="n-jp" x="550" y="70">バルタザール // 受信調整</text>
+              </g>
+              <g class="magi-node" id="nodeUsb" data-node="usb">
+                <polygon class="hex" points="350,45 368.2,55.5 368.2,76.5 350,87 331.8,76.5 331.8,55.5"/>
+                <polygon class="hex-in" points="350,49 364.6,57.5 364.6,74.5 350,83 335.4,74.5 335.4,57.5"/>
+                <text class="n-lbl" x="350" y="70">USB</text>
+                <text class="n-code" x="350" y="79">C-03</text>
+                <text class="n-name" x="350" y="99">CASPER // 外部記憶 // キャスパー</text>
+              </g>
+              <g class="magi-center">
+                <circle class="cross" cx="350" cy="36" r="8" fill="none"/>
+                <path class="diamond" d="M350,30 L356,36 L350,42 L344,36 Z"/>
+                <text class="c-lbl" x="350" y="24">LILY CORE</text>
+              </g>
+            </svg>
+          </div>
+        </section>
+
+        <!-- right metadata -->
+        <aside class="meta-col">
+          <div class="meta-vrail">提訴決議 // 非常事態</div>
+          <div class="meta-head"><span class="jp">階層状態</span><span class="en">LAYERS</span></div>
+          <div class="mrow"><span class="k">LAYER 3</span><span class="v">CONNECTION</span></div>
+          <div class="mrow"><span class="k">LAYER 2</span><span class="v">DATA LINK</span></div>
+          <div class="mrow"><span class="k">LAYER 1</span><span class="v">PHYSICAL</span></div>
+          <div class="mrow"><span class="k">SOURCE</span><span class="v" id="metaSource">BLUETOOTH</span></div>
+          <div class="mrow"><span class="k">THEME</span><span class="v" id="metaTheme">DAY</span></div>
+          <div class="mrow"><span class="k">ZONE</span><span class="v hot" id="metaZone">NORMAL</span></div>
+          <div class="clock-block">
+            <div class="clock-k">ACTIVE TIME DISPLAY</div>
+            <div class="clock-v" id="metaClock">00:00:00</div>
+            <div class="clock-s"><span>SYNC</span><span>100.0%</span></div>
+          </div>
+          <div class="meta-foot">
+            <div class="meta-note" style="text-align:left">PRT 00-13<br>ACK 0912<br>BUS 4001</div>
+            <div class="seal-oct seal-md" id="rightSeal">
+              <div class="seal-in"><b id="rightSealJp">承認</b><span>APPROVE</span></div>
+            </div>
+          </div>
+        </aside>
+      </main>
+      <!-- ═════════ BOTTOM DECK ═════════ -->
+      <footer class="deck">
+        <div class="deck-panel deck-left">
+          <div class="deck-label"><span>TRANSPORT &amp; ROUTING // 操作盤</span><span class="jp">手動制御</span></div>
+          <svg class="key-grid" viewBox="0 0 300 100" preserveAspectRatio="xMidYMid meet">
+            <g class="hex-key" data-action="prev" tabindex="0" role="button" aria-label="Previous track" transform="translate(57,27)">
+              <polygon class="hex-fill" points="0,-22 19.1,-11 19.1,11 0,22 -19.1,11 -19.1,-11"/>
+              <polygon class="hex-in" points="0,-18 15.6,-9 15.6,9 0,18 -15.6,9 -15.6,-9"/>
+              <text class="k-num" y="-11">01</text><text class="k-label" y="1">PREV</text><text class="k-jp" y="11">前へ</text>
+            </g>
+            <g class="hex-key" data-action="play" tabindex="0" role="button" aria-label="Play or pause" transform="translate(99,27)">
+              <polygon class="hex-fill" points="0,-22 19.1,-11 19.1,11 0,22 -19.1,11 -19.1,-11"/>
+              <polygon class="hex-in" points="0,-18 15.6,-9 15.6,9 0,18 -15.6,9 -15.6,-9"/>
+              <text class="k-num" y="-11">02</text><text class="k-label" y="1">PLAY</text><text class="k-jp" y="11">再生</text>
+            </g>
+            <g class="hex-key" data-action="next" tabindex="0" role="button" aria-label="Next track" transform="translate(141,27)">
+              <polygon class="hex-fill" points="0,-22 19.1,-11 19.1,11 0,22 -19.1,11 -19.1,-11"/>
+              <polygon class="hex-in" points="0,-18 15.6,-9 15.6,9 0,18 -15.6,9 -15.6,-9"/>
+              <text class="k-num" y="-11">03</text><text class="k-label" y="1">NEXT</text><text class="k-jp" y="11">次へ</text>
+            </g>
+            <g class="hex-key" data-action="bt" tabindex="0" role="button" aria-label="Bluetooth source" transform="translate(183,27)">
+              <polygon class="hex-fill" points="0,-22 19.1,-11 19.1,11 0,22 -19.1,11 -19.1,-11"/>
+              <polygon class="hex-in" points="0,-18 15.6,-9 15.6,9 0,18 -15.6,9 -15.6,-9"/>
+              <text class="k-num" y="-11">04</text><text class="k-label" y="1">BT</text><text class="k-jp" y="11">無線</text>
+            </g>
+            <g class="hex-key" data-action="radio" tabindex="0" role="button" aria-label="Radio source" transform="translate(225,27)">
+              <polygon class="hex-fill" points="0,-22 19.1,-11 19.1,11 0,22 -19.1,11 -19.1,-11"/>
+              <polygon class="hex-in" points="0,-18 15.6,-9 15.6,9 0,18 -15.6,9 -15.6,-9"/>
+              <text class="k-num" y="-11">05</text><text class="k-label" y="1">RADIO</text><text class="k-jp" y="11">受信</text>
+            </g>
+            <g class="hex-key" data-action="usb" tabindex="0" role="button" aria-label="USB source" transform="translate(78,60)">
+              <polygon class="hex-fill" points="0,-22 19.1,-11 19.1,11 0,22 -19.1,11 -19.1,-11"/>
+              <polygon class="hex-in" points="0,-18 15.6,-9 15.6,9 0,18 -15.6,9 -15.6,-9"/>
+              <text class="k-num" y="-11">06</text><text class="k-label" y="1">USB</text><text class="k-jp" y="11">外部</text>
+            </g>
+            <g class="hex-key" data-action="phone" tabindex="0" role="button" aria-label="Phone" transform="translate(120,60)">
+              <polygon class="hex-fill" points="0,-22 19.1,-11 19.1,11 0,22 -19.1,11 -19.1,-11"/>
+              <polygon class="hex-in" points="0,-18 15.6,-9 15.6,9 0,18 -15.6,9 -15.6,-9"/>
+              <text class="k-num" y="-11">07</text><text class="k-label" y="1">PHONE</text><text class="k-jp" y="11">電話</text>
+            </g>
+            <g class="hex-key" data-action="switch" tabindex="0" role="button" aria-label="Switch device" transform="translate(162,60)">
+              <polygon class="hex-fill" points="0,-22 19.1,-11 19.1,11 0,22 -19.1,11 -19.1,-11"/>
+              <polygon class="hex-in" points="0,-18 15.6,-9 15.6,9 0,18 -15.6,9 -15.6,-9"/>
+              <text class="k-num" y="-11">08</text><text class="k-label" y="1">SWITCH</text><text class="k-jp" y="11">切替</text>
+            </g>
+            <g class="hex-key" data-action="auto" tabindex="0" role="button" aria-label="Android Auto" transform="translate(204,60)">
+              <polygon class="hex-fill" points="0,-22 19.1,-11 19.1,11 0,22 -19.1,11 -19.1,-11"/>
+              <polygon class="hex-in" points="0,-18 15.6,-9 15.6,9 0,18 -15.6,9 -15.6,-9"/>
+              <text class="k-num" y="-11">09</text><text class="k-label" y="1">AUTO</text><text class="k-jp" y="11">自動</text>
+            </g>
+            <g class="hex-key" data-action="more" tabindex="0" role="button" aria-label="More modules" transform="translate(246,60)">
+              <polygon class="hex-fill" points="0,-22 19.1,-11 19.1,11 0,22 -19.1,11 -19.1,-11"/>
+              <polygon class="hex-in" points="0,-18 15.6,-9 15.6,9 0,18 -15.6,9 -15.6,-9"/>
+              <text class="k-num" y="-11">10</text><text class="k-label" y="1">MORE</text><text class="k-jp" y="11">拡張</text>
+            </g>
+          </svg>
+        </div>
+
+        <div class="deck-panel deck-mid">
+          <div class="deck-label"><span>MASTER VOLUME // 音量</span><span class="jp">調整</span></div>
+          <div class="vol-line">
+            <div class="knob-stage" id="knobStage" title="Drag up / down to change volume">
+              <svg class="knob-ticks" id="knobTicks" viewBox="0 0 100 100" aria-hidden="true"></svg>
+              <div class="knob" id="knob"><div class="knob-rot" id="knobRot"></div><div class="knob-cap">VOL</div></div>
+            </div>
+            <div class="vol-num"><div class="seg-vol" id="volSeg"></div><div class="vol-lab">LEVEL</div></div>
+          </div>
+          <div class="vol-sub"><span id="volText">18 / 40</span><span>OUT: MAIN</span></div>
+        </div>
+
+        <div class="deck-panel deck-right">
+          <div class="deck-label"><span>VEHICLE SPEED // 車両速度</span><span class="jp">実測</span></div>
+          <div class="speed-box">
+            <div class="seg-speed" id="speedSeg"></div>
+            <div class="speed-unit">km/h</div>
+          </div>
+          <div class="speed-bar" id="speedBar"></div>
+          <div class="zone-row">
+            <span class="zone-chip" data-zc="normal">N</span>
+            <span class="zone-chip" data-zc="caution">C</span>
+            <span class="zone-chip" data-zc="emergency">E</span>
+            <span class="zone-name" id="zoneName">NORMAL</span>
+          </div>
+          <div class="zone-thresh" id="zoneThresh">CAUTION 060 // EMERGENCY 100</div>
+        </div>
+      </footer>
+
+      <div class="hazard hazard-bottom" id="hazardBottom"></div>
+
+      <!-- ═════════ ANDROID AUTO OVERLAY ═════════ -->
+      <div class="overlay" id="aaOverlay">
+        <div class="aa-top">
+          <div class="aa-brand">ANDROID AUTO<span>投影接続 // 自動起動</span></div>
+          <div class="aa-mid">PROJECTION LINK // USB // NEVER OVER REVERSE OR CALL</div>
+          <div style="display:flex;gap:12px;align-items:center">
+            <div class="aa-time" id="aaClock">00:00</div>
+            <button class="ov-close" data-close="aa">AUTO / EXIT</button>
+          </div>
+        </div>
+        <div class="aa-main">
+          <div class="aa-map">
+            <svg viewBox="0 0 620 330" preserveAspectRatio="xMidYMid slice">
+              <defs>
+                <pattern id="mapGrid" width="40" height="40" patternUnits="userSpaceOnUse">
+                  <path d="M40 0H0V40" fill="none" stroke="currentColor" stroke-width=".5" opacity=".18"/>
+                </pattern>
+              </defs>
+              <rect width="620" height="330" fill="url(#mapGrid)"/>
+              <path d="M40 300 L150 230 L150 150 L260 150 L260 70 L400 70 L400 180 L520 180" fill="none" stroke="var(--c3)" stroke-width="7" opacity=".35"/>
+              <path d="M40 300 L150 230 L150 150 L260 150 L260 70 L400 70 L400 180 L520 180" fill="none" stroke="var(--c2)" stroke-width="2.5" stroke-dasharray="2 0"/>
+              <circle cx="260" cy="150" r="9" fill="var(--c2)"/>
+              <circle cx="260" cy="150" r="17" fill="none" stroke="var(--c2)" stroke-width="1" opacity=".6"/>
+              <path d="M40 300 L520 300 M40 240H560 M0 120H620 M500 0V330" stroke="currentColor" stroke-width="1" opacity=".10"/>
+              <text x="270" y="140" fill="var(--c1)" font-family="JetBrains Mono, monospace" font-size="9">SECTOR 04</text>
+              <text x="270" y="155" fill="var(--c2)" font-family="JetBrains Mono, monospace" font-size="8">TOKYO-3 // ROUTE A-7</text>
+            </svg>
+            <div class="map-tag">MAPS // 地図表示</div>
+            <div class="map-route">中央 dogma 方面 // 25 分</div>
+            <div class="map-eta"><b>14:52</b><span>ETA // 12.4 KM // 44 KM/H</span></div>
+          </div>
+          <div class="aa-side">
+            <div class="aa-card">
+              <div class="ac-k">NOW PLAYING // 再生中</div>
+              <div class="ac-v" id="aaTrack">NEON RAIN</div>
+              <div class="ac-s">KYOTO STATIC // 01:14 / 04:12</div>
+            </div>
+            <div class="aa-card">
+              <div class="ac-k">PHONE // 電話</div>
+              <div class="ac-v" id="aaPhone">Galaxy S23</div>
+              <div class="ac-s" id="aaPhoneMeta">CONNECTED // -42 dBm</div>
+            </div>
+            <div class="aa-card">
+              <div class="ac-k">MESSAGES // 通知</div>
+              <div class="ac-v">3 UNREAD</div>
+              <div class="ac-s">MAGI // SYSTEM // NERV</div>
+            </div>
+          </div>
+        </div>
+        <div class="aa-dock">
+          <div class="aa-app on"><svg><use href="#i-map"/></svg><span>MAPS</span></div>
+          <div class="aa-app"><svg><use href="#i-phone"/></svg><span>PHONE</span></div>
+          <div class="aa-app"><svg><use href="#i-music"/></svg><span>MUSIC</span></div>
+          <div class="aa-app"><svg><use href="#i-msg"/></svg><span>MSG</span></div>
+          <div class="aa-app"><svg><use href="#i-pod"/></svg><span>POD</span></div>
+          <div class="aa-app"><svg><use href="#i-bt"/></svg><span>BT</span></div>
+        </div>
+      </div>
+
+      <!-- ═════════ STOCK APP OVERLAY ═════════ -->
+      <div class="overlay" id="appOverlay">
+        <div class="ov-head">
+          <div>
+            <div class="ov-title"><span class="jp">外部起動</span><span class="en">STOCK APP</span></div>
+            <div class="ov-sub" id="appSub">EXTERNAL ACTIVITY // NEW_TASK</div>
+          </div>
+          <div class="ov-tools"><button class="ov-close" data-close="app">RETURN / 戻る</button></div>
+        </div>
+        <div class="page-wrap">
+          <div class="app-hero">
+            <div class="stripe top"></div>
+            <div class="corner-code tl" id="appCode">01 / 13</div>
+            <div class="corner-code br">NERV // LILY LAUNCHER</div>
+            <div class="code" id="appPackage">com.nwd.radio/.home_horizontalActivity</div>
+            <div class="name" id="appName">RADIO</div>
+            <div class="jp" id="appJp">ラジオ</div>
+            <div class="note">STOCK APP OPENED WITH startActivity + FLAG_ACTIVITY_NEW_TASK.<br>THE LAUNCHER STAYS OUT OF THE WAY. PRESS RETURN TO COME HOME.</div>
+            <div class="stripe bot"></div>
+          </div>
+        </div>
+      </div>
+      <!-- ═════════ MORE SHEET ═════════ -->
+      <div class="overlay" id="moreOverlay">
+        <div class="ov-head">
+          <div>
+            <div class="ov-title"><span class="jp">拡張機能</span><span class="en">MORE</span></div>
+            <div class="ov-sub">13 MODULES // STOCK ACTIVITIES // LILY SHELL</div>
+          </div>
+          <div class="ov-tools"><span class="ov-sub" style="margin:0">SELECT A MODULE</span><button class="ov-close" data-close="more">CLOSE / 閉じる</button></div>
+        </div>
+        <div class="more-grid" id="moreGrid">
+          <button class="more-tile" data-app="radio"><span class="tile-in"><span class="tile-top"><span>01</span><span>RADIO</span></span><span class="tile-ic"><svg><use href="#i-radio"/></svg></span><span class="tile-label">RADIO</span><span class="tile-jp">ラジオ受信</span></span></button>
+          <button class="more-tile" data-app="usbmusic"><span class="tile-in"><span class="tile-top"><span>02</span><span>USB</span></span><span class="tile-ic"><svg><use href="#i-music"/></svg></span><span class="tile-label">USB MUSIC</span><span class="tile-jp">外部音楽</span></span></button>
+          <button class="more-tile" data-app="video"><span class="tile-in"><span class="tile-top"><span>03</span><span>VIDEO</span></span><span class="tile-ic"><svg><use href="#i-video"/></svg></span><span class="tile-label">VIDEO</span><span class="tile-jp">映像再生</span></span></button>
+          <button class="more-tile" data-app="dashcam"><span class="tile-in"><span class="tile-top"><span>04</span><span>CAM</span></span><span class="tile-ic"><svg><use href="#i-cam"/></svg></span><span class="tile-label">DASHCAM</span><span class="tile-jp">走行記録</span></span></button>
+          <button class="more-tile" data-app="eq"><span class="tile-in"><span class="tile-top"><span>05</span><span>DSP</span></span><span class="tile-ic"><svg><use href="#i-eq"/></svg></span><span class="tile-label">SOUND EQ</span><span class="tile-jp">音響調整</span></span></button>
+          <button class="more-tile" data-app="aux"><span class="tile-in"><span class="tile-top"><span>06</span><span>AUX</span></span><span class="tile-ic"><svg><use href="#i-aux"/></svg></span><span class="tile-label">AUX</span><span class="tile-jp">外部入力</span></span></button>
+          <button class="more-tile" data-app="files"><span class="tile-in"><span class="tile-top"><span>07</span><span>FILE</span></span><span class="tile-ic"><svg><use href="#i-folder"/></svg></span><span class="tile-label">FILES</span><span class="tile-jp">保存領域</span></span></button>
+          <button class="more-tile" data-app="car"><span class="tile-in"><span class="tile-top"><span>08</span><span>CAR</span></span><span class="tile-ic"><svg><use href="#i-car"/></svg></span><span class="tile-label">CAR</span><span class="tile-jp">車両設定</span></span></button>
+          <button class="more-tile" data-app="can"><span class="tile-in"><span class="tile-top"><span>09</span><span>BUS</span></span><span class="tile-ic"><svg><use href="#i-chip"/></svg></span><span class="tile-label">CAN</span><span class="tile-jp">制御系統</span></span></button>
+          <button class="more-tile" data-app="wheel"><span class="tile-in"><span class="tile-top"><span>10</span><span>KEY</span></span><span class="tile-ic"><svg><use href="#i-wheel"/></svg></span><span class="tile-label">WHEEL KEYS</span><span class="tile-jp">操舵学習</span></span></button>
+          <button class="more-tile" data-app="android"><span class="tile-in"><span class="tile-top"><span>11</span><span>SYS</span></span><span class="tile-ic"><svg><use href="#i-android"/></svg></span><span class="tile-label">ANDROID</span><span class="tile-jp">端末設定</span></span></button>
+          <button class="more-tile" data-app="screenoff"><span class="tile-in"><span class="tile-top"><span>12</span><span>OFF</span></span><span class="tile-ic"><svg><use href="#i-moon"/></svg></span><span class="tile-label">SCREEN OFF</span><span class="tile-jp">画面消灯</span></span></button>
+          <button class="more-tile hot" data-app="settings"><span class="tile-in"><span class="tile-top"><span>13</span><span>CFG</span></span><span class="tile-ic"><svg><use href="#i-sliders"/></svg></span><span class="tile-label">HOME SETUP</span><span class="tile-jp">本体設定</span></span></button>
+        </div>
+        <div class="more-foot"><span>MODULES 01—13 // TILE LAUNCHES STOCK ACTIVITY OR LILY SHEET</span><span>HOME RETURN TARGET &lt; 175 ms</span></div>
+      </div>
+
+      <!-- ═════════ SETTINGS SHEET ═════════ -->
+      <div class="overlay" id="settingsOverlay">
+        <div class="ov-head">
+          <div>
+            <div class="ov-title"><span class="jp">本体設定</span><span class="en">HOME SETUP</span></div>
+            <div class="ov-sub">PREFERENCES // SHAREDPREFERENCES // SPEED THRESHOLDS</div>
+          </div>
+          <div class="ov-tools"><button class="ov-close" data-close="settings">DONE / 完了</button></div>
+        </div>
+        <div class="settings-list">
+          <div class="set-row">
+            <div class="set-main"><div class="set-name">PLAY WHEN PHONE CONNECTS</div><div class="set-jp">接続時に自動再生</div><div class="set-desc">BLUETOOTH MUSIC STARTS BY ITSELF</div></div>
+            <div class="seg" data-seg="resume"><button data-val="1">ON</button><button data-val="0">OFF</button></div>
+          </div>
+          <div class="set-row">
+            <div class="set-main"><div class="set-name">OPEN ANDROID AUTO AUTOMATICALLY</div><div class="set-jp">自動投影起動</div><div class="set-desc">WHEN THE PHONE CONNECTS OVER USB</div></div>
+            <div class="seg" data-seg="autoaa"><button data-val="1">ON</button><button data-val="0">OFF</button></div>
+          </div>
+          <div class="set-row">
+            <div class="set-main"><div class="set-name">LOOK</div><div class="set-jp">表示テーマ</div><div class="set-desc">AUTO FOLLOWS HEADLIGHTS // SAFETY PALETTE WINS AT SPEED</div></div>
+            <div class="seg" data-seg="theme"><button data-val="auto">AUTO</button><button data-val="graphite">GRAPHITE</button><button data-val="night">NIGHT</button></div>
+          </div>
+          <div class="set-row">
+            <div class="set-main"><div class="set-name">ACCENT</div><div class="set-jp">強調色</div><div class="set-desc">PLAY KEY, PROGRESS, KNOB INDICATOR</div></div>
+            <div class="accent-row" id="setAccent"></div>
+          </div>
+          <div class="set-row">
+            <div class="set-main"><div class="set-name">CAUTION THRESHOLD</div><div class="set-jp">警戒速度</div><div class="set-desc">PALETTE SHIFTS TO YELLOW / BLACK</div></div>
+            <input type="number" id="setCaution" min="10" max="200" value="60" style="width:64px;background:#17171e;border:1px solid #3a3a47;color:var(--c2);padding:4px 6px;font-family:var(--font-mono);font-size:10px;text-align:right">
+          </div>
+          <div class="set-row">
+            <div class="set-main"><div class="set-name">EMERGENCY THRESHOLD</div><div class="set-jp">非常速度</div><div class="set-desc">PALETTE SHIFTS TO BLACK / RED</div></div>
+            <input type="number" id="setEmergency" min="20" max="250" value="100" style="width:64px;background:#17171e;border:1px solid #3a3a47;color:var(--c2);padding:4px 6px;font-family:var(--font-mono);font-size:10px;text-align:right">
+          </div>
+        </div>
+        <div class="settings-foot"><span>AUTO-OPEN GUARD: NEVER OVER REVERSE CAMERA OR ACTIVE CALL</span><span id="settingsState">ZONE: NORMAL // THEME: DAY</span></div>
+      </div>
+      <!-- ═════════ PHONE ═════════ -->
+      <div class="overlay" id="phoneOverlay">
+        <div class="ov-head">
+          <div>
+            <div class="ov-title"><span class="jp">電話</span><span class="en">PHONE</span></div>
+            <div class="ov-sub">STOCK BT PHONE APP // DEVICE LIST AVAILABLE VIA SWITCH</div>
+          </div>
+          <div class="ov-tools"><button class="ov-close" data-close="phone">CLOSE / 戻る</button></div>
+        </div>
+        <div class="page-wrap">
+          <div class="phone-card">
+            <div>
+              <div class="pc-k">CONNECTED DEVICE // 接続端末</div>
+              <div class="pc-name" id="phoneName">Galaxy S23</div>
+              <div class="pc-jp" id="phoneJp">接続中 // ハンズフリー有効</div>
+            </div>
+            <div style="display:flex;align-items:flex-end;gap:14px">
+              <div class="signal" id="phoneSignal"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div>
+              <div class="meta-note" style="text-align:right" id="phoneMeta">MAC 3C:5A:B4:91:02<br>SIGNAL -42 dBm<br>HFP + A2DP</div>
+            </div>
+          </div>
+          <div class="call-log">
+            <div class="call-row"><span class="cr-type">着信</span><span class="cr-num">+81 90 0124 7726</span><span class="cr-time">14:21</span><span class="cr-st">MISSED</span></div>
+            <div class="call-row"><span class="cr-type">発信</span><span class="cr-num">+81 3 5555 0912</span><span class="cr-time">13:52</span><span class="cr-st">2:14</span></div>
+            <div class="call-row"><span class="cr-type">着信</span><span class="cr-num">+81 80 3391 0047</span><span class="cr-time">12:08</span><span class="cr-st">0:41</span></div>
+            <div class="call-row"><span class="cr-type">発信</span><span class="cr-num">+81 90 0124 7726</span><span class="cr-time">09:37</span><span class="cr-st">5:02</span></div>
+            <div class="call-row"><span class="cr-type">着信</span><span class="cr-num">+81 3 5555 0912</span><span class="cr-time">08:15</span><span class="cr-st">1:18</span></div>
+          </div>
+          <div class="ov-actions">
+            <button class="btn" data-close="phone" data-open-bt="1">DEVICE LIST / 端末</button>
+            <button class="btn solid" data-close="phone" data-toast="CALL BACK // +81 90 0124 7726">CALL BACK / 発信</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═════════ BT DEVICE LIST ═════════ -->
+      <div class="overlay" id="btOverlay">
+        <div class="ov-head">
+          <div>
+            <div class="ov-title"><span class="jp">端末選択</span><span class="en">BT DEVICES</span></div>
+            <div class="ov-sub">SWITCH KEY // STOCK BT PHONE APP // SELECT OR DISCONNECT</div>
+          </div>
+          <div class="ov-tools"><span class="ov-sub" style="margin:0" id="btScan">SCAN: READY</span><button class="ov-close" data-close="bt">CLOSE / 閉じる</button></div>
+        </div>
+        <div class="list" id="btList">
+          <div class="list-row" data-bt="Galaxy S23"><div class="lr-main"><div class="lr-name">GALAXY S23</div><div class="lr-meta">3C:5A:B4:91:02 // A2DP + HFP</div><div class="lr-jp">接続待機 // 優先端末</div></div><div class="lr-state">PAIRED<br>RSSI -42</div></div>
+          <div class="list-row" data-bt="Mom's iPhone"><div class="lr-main"><div class="lr-name">MOM'S IPHONE</div><div class="lr-meta">A4:83:E7:22:90:1C // HFP</div><div class="lr-jp">家族端末 // 自動接続なし</div></div><div class="lr-state">PAIRED<br>RSSI -61</div></div>
+          <div class="list-row" data-bt="none"><div class="lr-main"><div class="lr-name">DISCONNECT</div><div class="lr-meta">RELEASE AUDIO LINK // STANDBY</div><div class="lr-jp">接続解除 // 待機</div></div><div class="lr-state">RELEASE<br>NO LINK</div></div>
+        </div>
+        <div class="ov-actions" style="margin-top:8px">
+          <button class="btn" data-close="bt">CANCEL / 戻る</button>
+          <button class="btn solid" data-close="bt" data-toast="BT SCAN COMPLETE // 2 DEVICES">SCAN / 再検索</button>
+        </div>
+      </div>
+
+      <!-- ═════════ INCOMING CALL ═════════ -->
+      <div class="overlay call-overlay" id="callOverlay">
+        <div class="call-card">
+          <div class="call-strip"></div>
+          <div class="call-body">
+            <div class="call-kicker"><span>着信 // 電話</span><span class="en">INCOMING CALL</span></div>
+            <div class="call-name" id="callName">GALAXY S23</div>
+            <div class="call-meta" id="callMeta">MOBILE // +81 90 0124 7726 // HFP LINK 3</div>
+            <div class="call-jp" id="callJp">非常通信 // 応答待ち</div>
+            <div class="call-timer" id="callTimer" style="display:none">00:00</div>
+            <div class="call-btns">
+              <button class="call-btn ans" id="callAnswer">ANSWER / 応答</button>
+              <button class="call-btn dec" id="callDecline">DECLINE / 拒否</button>
+            </div>
+          </div>
+          <div class="call-strip bot"></div>
+        </div>
+      </div>
+
+      <!-- ═════════ REVERSE CAMERA ═════════ -->
+      <div class="overlay reverse-overlay" id="reverseOverlay">
+        <div class="rev-strip"></div>
+        <div class="rev-feed">
+          <svg viewBox="0 0 1024 520" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="feedGlow" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#1a1d21"/><stop offset=".55" stop-color="#101215"/><stop offset="1" stop-color="#050607"/>
+              </linearGradient>
+            </defs>
+            <rect width="1024" height="520" fill="url(#feedGlow)"/>
+            <path d="M210 520 L410 210 M814 520 L614 210 M512 520 V210" stroke="#4de89a" stroke-width="2" opacity=".45"/>
+            <path d="M300 520 L455 210 M724 520 L569 210" stroke="#4de89a" stroke-width="1.5" opacity=".28" stroke-dasharray="8 8"/>
+            <path d="M455 210 H569 M410 210 L455 210 M569 210 L614 210" stroke="#4de89a" stroke-width="1.5" opacity=".4"/>
+            <path d="M240 330 H784 M200 420 H824" stroke="#f5b400" stroke-width="1.5" opacity=".22"/>
+            <text x="512" y="270" fill="#4de89a" opacity=".22" text-anchor="middle" font-family="Oswald, sans-serif" font-size="30" letter-spacing="12">CAMERA FEED</text>
+            <text x="512" y="296" fill="#ff4a1c" opacity=".35" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" letter-spacing="4">NTSC // 720x480 // LIVE</text>
+          </svg>
+          <div class="rev-top">
+            <div><div class="k">REAR VIEW // 後方映像</div><div class="k" id="revClock">00:00:00</div></div>
+            <button class="ov-close red rev-exit" id="revExitBtn">EXIT / 解除</button>
+          </div>
+          <div class="rev-banner">
+            <div class="jp">後退</div>
+            <div class="en">REVERSE</div>
+            <div class="sub">周囲確認 // CHECK SURROUNDINGS</div>
+          </div>
+          <div class="rev-seal">
+            <div class="seal-oct seal-fill"><div class="seal-in"><b>危険</b><span>CAUTION</span></div></div>
+          </div>
+          <div class="rev-bottom">
+            <div><div class="warn">前方注意 // 安全確認</div><div class="tiny">CAM 01 // GUIDELINE ACTIVE // AUTO-AA SUPPRESSED</div></div>
+            <div class="tiny" id="revSpeed">000 KM/H</div>
+          </div>
+        </div>
+        <div class="rev-strip"></div>
+      </div>
+
+      <!-- ═════════ SCREEN OFF ═════════ -->
+      <div class="overlay sleep-overlay" id="sleepOverlay">
+        <div style="text-align:center">
+          <div class="s-jp">画面消灯</div>
+          <div class="s-en">SCREEN OFF // TAP ANYWHERE TO WAKE</div>
+        </div>
+      </div>
+
+      <div class="toast" id="toast"></div>
+      <div class="scanlines"></div>
+    </div><!-- /screen -->
+  </div><!-- /bezel -->
+  <div class="device-caption"><span><b>LILY LAUNCHER</b> // NGE TERMINAL INTERFACE // 1024 × 600</span><span>MAGI SYSTEM // DEEPSEEK BUILD // NO GLOW</span></div>
+</div><!-- /device-col -->
+<aside class="sim">
+  <div class="sim-title"><h1>SIMULATOR</h1><span class="v">TEST BENCH // DEEPSEEK</span></div>
+  <div class="sim-zone" id="simZone" data-z="normal">
+    <span class="zk">PALETTE ZONE</span>
+    <span class="zv" id="simZoneName">NORMAL // 正常</span>
+  </div>
+
+  <h2>VEHICLE SPEED<span>車両速度</span></h2>
+  <div class="sim-row">
+    <label for="simSpeed">Speed</label>
+    <span class="sim-val" id="simSpeedVal">000 km/h</span>
+  </div>
+  <input type="range" id="simSpeed" min="0" max="160" step="1" value="0" aria-label="Vehicle speed">
+  <div class="quick" id="simSpeedQuick">
+    <button data-speed="0">000</button>
+    <button data-speed="45">045</button>
+    <button data-speed="60">060</button>
+    <button data-speed="85">085</button>
+    <button data-speed="100">100</button>
+    <button data-speed="120">120</button>
+    <button data-speed="160">160</button>
+  </div>
+
+  <h2>CAR SIGNALS<span>車両信号</span></h2>
+  <div class="sim-row"><span class="sim-lab">Headlights <span class="jp">前照灯</span></span><div class="seg" id="simLights"></div></div>
+  <div class="sim-row"><span class="sim-lab">Theme <span class="jp">表示</span></span><div class="seg" id="simTheme"></div></div>
+  <div class="sim-row"><span class="sim-lab">Volume <span class="jp">音量</span></span><span class="sim-val" id="simVolVal">18 / 40</span></div>
+  <input type="range" id="simVol" min="0" max="40" step="1" value="18" aria-label="Volume">
+
+  <h2>AUDIO ROUTING<span>音声系統</span></h2>
+  <div class="sim-row"><span class="sim-lab">BT device <span class="jp">端末</span></span><div class="seg" id="simBt"></div></div>
+  <div class="sim-row"><span class="sim-lab">Audio source <span class="jp">入力</span></span><div class="seg" id="simSource"></div></div>
+  <div class="sim-row"><span class="sim-lab">BT track <span class="jp">再生</span></span><div class="seg" id="simTrack"></div></div>
+  <div class="sim-row"><span class="sim-lab">USB phone <span class="jp">USB端末</span></span><div class="seg" id="simUsb"></div></div>
+
+  <h2>EVENTS<span>事象</span></h2>
+  <div class="grid2">
+    <button class="bigbtn danger" id="simReverse">REVERSE GEAR<br><span style="font-family:var(--font-jp);font-size:6px">後退</span></button>
+    <button class="bigbtn danger" id="simCall">INCOMING CALL<br><span style="font-family:var(--font-jp);font-size:6px">着信</span></button>
+  </div>
+
+  <h2>SPEED THRESHOLDS<span>閾値</span></h2>
+  <div class="sim-row"><span class="sim-lab">Caution <span class="jp">警戒</span></span><input type="number" id="simCaution" min="10" max="200" value="60"></div>
+  <div class="sim-row"><span class="sim-lab">Emergency <span class="jp">非常</span></span><input type="number" id="simEmergency" min="20" max="250" value="100"></div>
+
+  <h2>ACCENT<span>強調色</span></h2>
+  <div class="sim-row"><span class="sim-lab">Accent color</span>
+    <div class="swatches" id="simAccent">
+      <button data-accent="#ff4a1c" style="background:#ff4a1c" title="Orange"></button>
+      <button data-accent="#258ac3" style="background:#258ac3" title="Blue"></button>
+      <button data-accent="#2fb35a" style="background:#2fb35a" title="Green"></button>
+      <button data-accent="#f5b400" style="background:#f5b400" title="Yellow"></button>
+      <button data-accent="#e8332a" style="background:#e8332a" title="Red"></button>
+    </div>
+  </div>
+
+  <h2>SCREENS<span>画面</span></h2>
+  <div class="grid2">
+    <button class="bigbtn" data-screen="more">MORE SHEET</button>
+    <button class="bigbtn" data-screen="settings">SETTINGS</button>
+    <button class="bigbtn" data-screen="phone">PHONE APP</button>
+    <button class="bigbtn" data-screen="aa">ANDROID AUTO</button>
+    <button class="bigbtn" data-screen="home">RETURN HOME</button>
+    <button class="bigbtn" data-screen="off">SCREEN OFF</button>
+  </div>
+
+  <div class="sep-line"></div>
+  <div class="sim-note">
+    <b>SPEED</b> 0—160 KM/H. THRESHOLDS CONFIGURABLE.<br>
+    <b>PALETTE</b> INSTANT STATE CHANGE — NO ANIMATION, NO GLOW.<br>
+    <b>GUARDS</b> AA NEVER OPENS OVER REVERSE OR CALL.<br>
+    <b>KNOB</b> DRAG UP / DOWN (OR WHEEL) FOR REAL VOLUME.
+  </div>
+</aside>
+</div><!-- /workspace -->
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   LILY // NGE TERMINAL — state machine + renderer
+   ═══════════════════════════════════════════════════════════ */
+const $ = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+
+const S = {
+  speed: 0,
+  headlights: false,
+  bt: "Galaxy S23",
+  source: "bt",
+  track: "playing",
+  usb: "none",
+  vol: 18,
+  reverse: false,
+  call: null,
+  callStart: 0,
+  aaOpen: false,
+  pendingAA: false,
+  sheet: null,
+  app: null,
+  phone: false,
+  btList: false,
+  screenOff: false,
+  trackIdx: 0,
+  radioIdx: 0,
+  radioOn: true
+};
+
+const prefs = {
+  resumeOnStart: true,
+  autoAA: true,
+  theme: "auto",
+  accent: "#ff4a1c",
+  caution: 60,
+  emergency: 100
+};
+
+const ACCENTS = [
+  ["#ff4a1c", "ORG"],
+  ["#258ac3", "BLU"],
+  ["#2fb35a", "GRN"],
+  ["#f5b400", "YEL"],
+  ["#e8332a", "RED"]
+];
+
+const BT_TRACKS = [
+  { t: "NEON RAIN", a: "KYOTO STATIC", jp: "京都スタティック" },
+  { t: "CITY LIGHTS", a: "MAGI SOUNDSYSTEM", jp: "マギ・サウンド" },
+  { t: "A.T. FIELD", a: "TOKYO-3 ENSEMBLE", jp: "東京第三楽団" }
+];
+const USB_TRACKS = [
+  { t: "ROAD TRIP MIX 03", a: "USB · FOLDER 01", jp: "外部記憶 // 第01" },
+  { t: "EVENING COMMUTE", a: "USB · FOLDER 01", jp: "夕刻走行 // 第02" },
+  { t: "SYNC RATIO", a: "USB · FOLDER 02", jp: "同期比率 // 第03" }
+];
+const STATIONS = [
+  { f: "98.3", b: "FM", n: "CITY FM", jp: "都市放送" },
+  { f: "93.5", b: "FM", n: "RED FM", jp: "赤色電波" },
+  { f: "104.8", b: "FM", n: "FEVER", jp: "熱波放送" },
+  { f: "1053", b: "AM", n: "AM TALK", jp: "AM 対話" }
+];
+
+const APPS = {
+  radio: { n: "RADIO", jp: "ラジオ", pkg: "com.nwd.radio/.home_horizontalActivity", code: "01" },
+  usbmusic: { n: "USB MUSIC", jp: "外部音楽", pkg: "com.nwd.android.music.ui/.home_horizontalActivity", code: "02" },
+  video: { n: "VIDEO", jp: "映像再生", pkg: "com.nwd.android.video.ui/.home_horizontalActivity", code: "03" },
+  dashcam: { n: "DASHCAM", jp: "走行記録", pkg: "com.nwd.carkithd2cam/.home_horizontalActivity", code: "04" },
+  eq: { n: "SOUND EQ", jp: "音響調整", pkg: "com.nwd.audioset/.home_horizontalActivity", code: "05" },
+  aux: { n: "AUX", jp: "外部入力", pkg: "com.nwd.auxin/.home_horizontalActivity", code: "06" },
+  files: { n: "FILES", jp: "保存領域", pkg: "com.nwd.filemanager/.FileManager", code: "07" },
+  car: { n: "CAR", jp: "車両設定", pkg: "com.android.car.setting/.home_horizontalActivity", code: "08" },
+  can: { n: "CAN", jp: "制御系統", pkg: "com.nwd.can.setting/.ui.MainActivity", code: "09" },
+  wheel: { n: "WHEEL KEYS", jp: "操舵学習", pkg: "com.android.launcher/com.nwd.wheel.learning.MainActivity", code: "10" },
+  android: { n: "ANDROID", jp: "端末設定", pkg: "com.android.settings/.Settings", code: "11" }
+};
+
+const ZONES = {
+  normal: { title: "DIRECT LINK CONNECTION : LILY", jp: "通常運転", code: "CODE 258-AAAA", sealJp: "正常", sealEn: "NORMAL" },
+  caution: { title: "CAUTION : SPEED LIMIT", jp: "速度警戒区域", code: "LIMIT 060—100", sealJp: "警戒", sealEn: "CAUTION" },
+  emergency: { title: "第一種戦闘配置 : LILY", jp: "非常事態発令中", code: "EMERGENCY 100+", sealJp: "非常", sealEn: "EMERGENCY" }
+};
+
+function zoneOf() {
+  if (S.speed > prefs.emergency) return "emergency";
+  if (S.speed >= prefs.caution) return "caution";
+  return "normal";
+}
+function pad(n, len=3) { return String(Math.max(0, Math.round(n))).padStart(len, "0"); }
+function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+function wrap(i, len) { return ((i % len) + len) % len; }
+function playing() {
+  if (S.source === "radio") return S.radioOn;
+  if (S.source === "bt" && !S.bt) return false;
+  return S.track === "playing";
+}
+function themeName() {
+  if (prefs.theme === "night") return "NIGHT";
+  if (prefs.theme === "graphite") return "GRAPHITE";
+  return S.headlights ? "NIGHT" : "DAY";
+}
+function sourceLabel() {
+  return { bt: "BLUETOOTH", radio: "RADIO", usb: "USB" }[S.source] || "NONE";
+}
+
+/* ───────── honeycomb background (~240 pointy-top hexes) ───────── */
+function buildHexBackground() {
+  const svg = $("#hexbg");
+  const r = 34, w = Math.sqrt(3) * r, v = 1.5 * r;
+  const cols = Math.ceil(1024 / w) + 2;
+  const rows = Math.ceil(600 / v) + 2;
+  let html = "", n = 0;
+  for (let row = -1; row <= rows; row++) {
+    const cy = row * v + 4;
+    const off = (row & 1) ? w / 2 : 0;
+    for (let col = -1; col <= cols; col++) {
+      const cx = col * w + w / 2 + off;
+      if (cx < -w || cx > 1024 + w || cy < -v || cy > 600 + v) continue;
+      const pts = [];
+      for (let k = 0; k < 6; k++) {
+        const a = (-90 + k * 60) * Math.PI / 180;
+        pts.push((cx + Math.cos(a) * r).toFixed(1) + "," + (cy + Math.sin(a) * r).toFixed(1));
+      }
+      const major = n % 9 === 0;
+      const alert = n % 13 === 0;
+      html += `<polygon class="hex-cell${major ? " major" : ""}${alert ? " alert" : ""}" points="${pts.join(" ")}"/>`;
+      n++;
+    }
+  }
+  svg.innerHTML = html;
+}
+
+/* ───────── seven-segment readouts ───────── */
+const SEG_DEF = {
+  a: "4,0 20,0 17,3 7,3",
+  b: "24,2 24,20 21,17 21,5",
+  c: "24,24 24,42 21,39 21,27",
+  d: "4,44 20,44 17,41 7,41",
+  e: "0,24 3,27 3,39 0,42",
+  f: "0,2 3,5 3,17 0,20",
+  g: "4,22 7,20 17,20 20,22 17,24 7,24"
+};
+const SEG_MAP = {
+  "0": "abcdef", "1": "bc", "2": "abged", "3": "abgcd", "4": "fgbc",
+  "5": "afgcd", "6": "afgecd", "7": "abc", "8": "abcdefg", "9": "abcdfg"
+};
+function segSVG(value, digits, colorVar) {
+  const str = String(Math.max(0, Math.round(value))).padStart(digits, "0").slice(-digits);
+  const width = digits * 30 - 5;
+  let out = `<svg viewBox="0 0 ${width} 44" preserveAspectRatio="xMidYMid meet" aria-hidden="true">`;
+  for (let i = 0; i < digits; i++) {
+    const lit = SEG_MAP[str[i]] || "";
+    out += `<g transform="translate(${i * 30},0)">`;
+    for (const seg of "abcdefg") {
+      const on = lit.includes(seg);
+      out += `<path d="${SEG_DEF[seg]}" fill="${on ? colorVar : "currentColor"}" fill-opacity="${on ? 1 : .085}"/>`;
+    }
+    out += `</g>`;
+  }
+  return out + "</svg>";
+}
+
+/* ───────── palette + header + ticker ───────── */
+function applyPalette(z) {
+  const scr = $("#screen");
+  scr.dataset.zone = z;
+  const tn = themeName();
+  scr.classList.toggle("night", tn === "NIGHT" && z === "normal");
+  scr.classList.toggle("graphite", tn === "GRAPHITE" && z === "normal");
+  scr.style.setProperty("--ua", z === "normal" ? prefs.accent : "var(--c1)");
+
+  const cfg = ZONES[z];
+  $("#headerTitle").textContent = cfg.title;
+  $("#headerJp").textContent = cfg.jp;
+  $("#headerCode").textContent = cfg.code;
+  $("#sealJp").textContent = cfg.sealJp;
+  $("#sealEn").textContent = cfg.sealEn;
+  $("#leftSealJp").textContent = z === "normal" ? "危険" : (z === "caution" ? "警戒" : "危険");
+  $("#rightSealJp").textContent = z === "normal" ? "承認" : (z === "caution" ? "保留" : "否認");
+  $("#rightSeal").classList.toggle("seal-fill", z === "emergency");
+
+  const ticker = $("#ticker");
+  ticker.classList.toggle("show", z !== "normal");
+  ticker.classList.toggle("emergency", z === "emergency");
+  if (ticker.dataset.z !== z) {
+    ticker.dataset.z = z;
+    if (z !== "normal") {
+      const msg = z === "caution"
+        ? "CAUTION // 速度超過注意 // SPEED LIMIT // 安全運転 // "
+        : "EMERGENCY // 非常事態 // 第一種戦闘配置 // OVER SPEED // 危険 // ";
+      const chunk = Array(5).fill(`<span>${msg}</span>`).join("");
+      $("#tickA").innerHTML = chunk;
+      $("#tickB").innerHTML = chunk;
+    }
+  }
+  $("#magiStatus").textContent = z === "normal" ? "CONSENSUS: GREEN" : (z === "caution" ? "CONSENSUS: HOLD" : "CONSENSUS: VETO");
+  $("#displayFootJp").textContent = z === "normal" ? "記録 // NOMINAL" : (z === "caution" ? "記録 // CAUTION" : "記録 // BREACH");
+}
+/* ───────── display templates ───────── */
+function tunerSVG(st) {
+  const isAM = st.b === "AM";
+  const min = isAM ? 500 : 87.5;
+  const max = isAM ? 1700 : 108.5;
+  const left = 14, right = 626, W = 640, H = 44;
+  const xOf = m => left + ((m - min) / (max - min)) * (right - left);
+  const val = isAM ? 1053 : parseFloat(st.f);
+  let g = `<svg class="tuner" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">`;
+  const start = isAM ? 600 : 88, end = isAM ? 1600 : 108, step = isAM ? 100 : 1;
+  for (let m = start; m <= end; m += step) {
+    const x = xOf(m);
+    const big = isAM ? m % 200 === 0 : m % 2 === 0;
+    g += `<line x1="${x}" y1="${big ? 2 : 8}" x2="${x}" y2="${big ? 16 : 14}" stroke="var(--c1)" stroke-width="${big ? 1 : .6}" opacity="${big ? .7 : .38}"/>`;
+    if (isAM ? m % 400 === 0 : m % 4 === 0) {
+      g += `<text x="${x}" y="27" fill="var(--c1)" opacity=".58" font-size="6.5" text-anchor="middle" font-family="JetBrains Mono, monospace">${m}</text>`;
+    }
+  }
+  const nx = xOf(val);
+  g += `<line x1="${nx}" y1="0" x2="${nx}" y2="35" stroke="var(--c2)" stroke-width="2.5"/>`;
+  g += `<polygon points="${nx - 4},35 ${nx + 4},35 ${nx},41" fill="var(--c2)"/>`;
+  g += `<line x1="${left}" y1="39" x2="${right}" y2="39" stroke="var(--line-strong)" stroke-width="1"/>`;
+  return g + `</svg>`;
+}
+
+function emptyHTML(big, jp, small) {
+  return `<div class="empty">
+    <div class="big">${big}</div>
+    <div class="jp">${jp}</div>
+    <div class="small">${small}</div>
+    <div class="bars"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i></div>
+  </div>`;
+}
+
+function npHTML(kind) {
+  const list = kind === "usb" ? USB_TRACKS : BT_TRACKS;
+  const tr = list[wrap(S.trackIdx, list.length)];
+  const idx = kind === "usb" ? S.trackIdx : S.trackIdx;
+  const stateTxt = S.track === "playing" ? "PLAYING" : S.track === "paused" ? "PAUSED" : "RELEASED";
+  const stamp = S.track === "paused"
+    ? `<div class="stamp">一時停止 // PAUSED</div>`
+    : S.track === "released"
+      ? `<div class="stamp">解放 // RELEASED</div>`
+      : "";
+  const pct = S.track === "playing" ? 34 : S.track === "paused" ? 22 : 8;
+  const kicker = kind === "usb" ? "USB MEDIA // 外部記憶再生" : "BLUETOOTH AUDIO // 音楽再生";
+  return `<div class="np">
+    <div class="np-hex">
+      <svg viewBox="0 0 100 106" aria-hidden="true">
+        <polygon class="hexplate" points="50,3 91,26 91,73 50,96 9,73 9,26"/>
+        <path class="hexhatch" d="M20 37 L50 20 L80 37 M20 50 L50 33 L80 50 M20 63 L50 46 L80 63"/>
+        <text class="hexnum" x="50" y="61">${pad(idx + 1, 2)}</text>
+        <text class="hexcode" x="50" y="74">${kind === "usb" ? "EXTERNAL" : "WIRELESS"}</text>
+      </svg>
+      <div class="cap">TRACK SLOT</div>
+    </div>
+    <div class="np-info">
+      <div class="np-kicker">${kicker}</div>
+      <div class="np-title">${tr.t}</div>
+      <div class="np-artist">${tr.jp} <span>// ${tr.a}</span></div>
+      <div class="np-progress">
+        <div class="np-bar"><i style="width:${pct}%"></i></div>
+        <div class="np-time"><span>${S.track === "playing" ? "01:14" : "01:14"}</span><span>04:12</span></div>
+      </div>
+      <div class="np-tags"><span class="tag fill">${stateTxt}</span><span class="tag">${kind === "usb" ? "USB 2.0" : "AVRCP"}</span><span class="tag">${kind === "usb" ? "MP3 320K" : "SBC // 128K"}</span><span class="tag">TRACK ${pad(idx + 1, 2)}/03</span></div>
+    </div>
+    ${stamp}
+  </div>`;
+}
+
+function radioHTML() {
+  const st = STATIONS[wrap(S.radioIdx, STATIONS.length)];
+  return `<div class="radio">
+    <div class="radio-top">
+      <span class="freqband">${st.b}</span>
+      <span class="freqnum">${st.f}</span>
+      <span class="frequnit">${st.b === "FM" ? "MHz" : "kHz"}</span>
+    </div>
+    <div class="radio-station">${st.n} <span>// ${st.jp}</span></div>
+    ${tunerSVG(st)}
+    <div class="radio-tags">
+      <span class="tag fill">${S.radioOn ? "TUNED" : "MUTED"}</span>
+      <span class="tag">RDS</span>
+      <span class="tag">STEREO</span>
+      <span class="tag">PRESET ${pad(wrap(S.radioIdx, STATIONS.length) + 1, 2)}/04</span>
+    </div>
+  </div>`;
+}
+
+function displayTemplate(z) {
+  if (S.source === "radio") {
+    return {
+      en: "RADIO RECEIVER", jp: "受信状態", body: radioHTML(),
+      foot: `SRC: FM/AM // RDS // PRESET ${pad(wrap(S.radioIdx, STATIONS.length) + 1, 2)} // ${S.radioOn ? "TUNED" : "MUTED"}`
+    };
+  }
+  if (S.source === "usb") {
+    return {
+      en: "USB MEDIA", jp: "外部記憶", body: npHTML("usb"),
+      foot: `SRC: USB // FAT32 // TRACK ${pad(S.trackIdx + 1, 2)}/03 // ${S.track.toUpperCase()}`
+    };
+  }
+  if (!S.bt) {
+    return {
+      en: "ACTIVE DISPLAY", jp: "端末待機", body: emptyHTML("NO PHONE", "端末未接続", "PRESS SWITCH TO CONNECT A PHONE"),
+      foot: "SRC: BT // NO DEVICE // WAITING FOR PAIR // SWITCH KEY = DEVICE LIST"
+    };
+  }
+  return {
+    en: "NOW PLAYING", jp: "音楽再生", body: npHTML("bt"),
+    foot: `SRC: BT // AVRCP // TRACK ${pad(S.trackIdx + 1, 2)}/03 // ${S.track.toUpperCase()}`
+  };
+}
+
+function renderDisplay(z) {
+  const t = displayTemplate(z);
+  $("#displayLabel").textContent = t.en;
+  $("#displayJp").textContent = t.jp;
+  $("#displayBody").innerHTML = t.body;
+  $("#displayFoot").textContent = t.foot;
+}
+
+/* ───────── metadata + magi + keys ───────── */
+function renderMeta(z) {
+  $("#metaSpeed").textContent = pad(S.speed) + " km/h";
+  $("#metaVol").textContent = S.vol + "/40";
+  $("#metaSource").textContent = sourceLabel();
+  $("#metaTheme").textContent = themeName();
+  $("#metaZone").textContent = z.toUpperCase();
+  $("#metaCode").textContent = z === "emergency" ? "258-BREACH" : z === "caution" ? "258-CAUT" : "258-LILY";
+  $("#metaMode").textContent = S.screenOff ? "OFF" : S.sheet ? S.sheet.toUpperCase() : S.app ? "APP" : S.aaOpen ? "AA" : "AUTO";
+  $("#zoneName").textContent = z.toUpperCase();
+  $("#zoneThresh").textContent = `CAUTION ${pad(prefs.caution)} // EMERGENCY ${pad(prefs.emergency)}`;
+  $$(".zone-chip").forEach(ch => ch.classList.toggle("on", ch.dataset.zc === z));
+  const state = $("#settingsState");
+  if (state) state.textContent = `ZONE: ${z.toUpperCase()} // THEME: ${themeName()}`;
+}
+
+function renderMagi() {
+  const map = { bt: "#nodeBt", radio: "#nodeRadio", usb: "#nodeUsb" };
+  for (const k in map) {
+    const node = $(map[k]);
+    if (!node) continue;
+    const on = S.source === k && (k !== "bt" || !!S.bt);
+    node.classList.toggle("active", on);
+  }
+}
+
+function renderKeys() {
+  $$(".hex-key").forEach(k => {
+    const a = k.dataset.action;
+    k.classList.toggle("source-on", a === S.source && (a !== "bt" || !!S.bt));
+    k.classList.toggle("accent-on", a === "play" && playing());
+    k.classList.toggle("latched",
+      (a === "switch" && S.btList) ||
+      (a === "more" && S.sheet === "more") ||
+      (a === "phone" && S.phone) ||
+      (a === "auto" && S.aaOpen)
+    );
+  });
+}
+
+function renderReadouts(z) {
+  $("#speedSeg").innerHTML = segSVG(S.speed, 3, "var(--readout)");
+  $("#volSeg").innerHTML = segSVG(S.vol, 2, "var(--readout)");
+  const segs = Math.round(S.speed / 10);
+  let bar = "";
+  for (let i = 0; i < 16; i++) bar += `<i class="${i < segs ? "on" : ""}"></i>`;
+  $("#speedBar").innerHTML = bar;
+  $("#volText").textContent = S.vol + " / 40";
+  $("#knobRot").style.setProperty("--rot", (-135 + S.vol / 40 * 270) + "deg");
+  const active = Math.round(S.vol / 40 * 20);
+  $$("#knobTicks line").forEach(line => {
+    const i = Number(line.dataset.i);
+    const on = i <= active;
+    line.setAttribute("stroke", on ? "var(--ua)" : "var(--c1)");
+    line.setAttribute("opacity", on ? "1" : ".27");
+  });
+  $("#displaySync").textContent = "SYNC 100% // " + clockString();
+}
+
+function buildKnobTicks() {
+  let g = "";
+  for (let i = 0; i <= 20; i++) {
+    const deg = -135 + i * 13.5;
+    const a = (deg - 90) * Math.PI / 180;
+    const r1 = i % 5 === 0 ? 38 : 40, r2 = 46;
+    const x1 = 50 + Math.cos(a) * r1, y1 = 50 + Math.sin(a) * r1;
+    const x2 = 50 + Math.cos(a) * r2, y2 = 50 + Math.sin(a) * r2;
+    g += `<line data-i="${i}" x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="var(--c1)" stroke-width="${i % 5 === 0 ? 1.9 : 1.1}" opacity=".27"/>`;
+  }
+  $("#knobTicks").innerHTML = g;
+}
+function clockString(sec = true) {
+  const d = new Date();
+  return [String(d.getHours()).padStart(2, "0"), String(d.getMinutes()).padStart(2, "0")]
+    .concat(sec ? [String(d.getSeconds()).padStart(2, "0")] : []).join(":");
+}
+function updateClocks() {
+  const d = new Date();
+  const ss = String(d.getSeconds()).padStart(2, "0");
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mm = String(d.getMinutes()).padStart(2, "0");
+  $("#metaClock").textContent = `${hh}:${mm}:${ss}`;
+  $("#displaySync").textContent = `SYNC 100% // ${hh}:${mm}:${ss}`;
+  $("#aaClock").textContent = `${hh}:${mm}`;
+  $("#revClock").textContent = `${hh}:${mm}:${ss}`;
+  if (S.call === "active") {
+    const secs = Math.max(0, Math.floor((Date.now() - S.callStart) / 1000));
+    $("#callTimer").textContent = `${String(Math.floor(secs / 60)).padStart(2, "0")}:${String(secs % 60).padStart(2, "0")}`;
+  }
+}
+// ==JS3==
+
+</script>
 </body>
 </html>
