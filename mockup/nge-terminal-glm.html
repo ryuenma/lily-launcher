@@ -1,0 +1,1787 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LILY-701 | NGE TERMINAL MOCKUP</title>
+<link rel=stylesheet href=https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap>
+<style>
+  :root {
+    --bg: #0a0a12;
+    --fg: #4de89a;
+    --fg2: #f5b400;
+    --data: #258ac3;
+    --crit: #e31c23;
+    --accent: #ff4a1c;
+    --chassis: #3a3448;
+    --button: #b9afcb;
+    --ink: #0a0a12;
+    --f-en: "Oswald", "Rajdhani", sans-serif;
+    --f-jp: "Noto Serif JP", "Yu Mincho", "Hiragino Mincho ProN", serif;
+    --f-mono: "JetBrains Mono", "Consolas", monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #14111d;
+    color: var(--fg);
+    font-family: var(--f-en);
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    min-height: 100vh;
+    align-items: flex-start;
+  }
+
+  /* ============ DEVICE BEZEL ============ */
+  .bezel {
+    width: 1052px; height: 628px;
+    flex-shrink: 0;
+    background: var(--chassis);
+    border: 2px solid #262233;
+    border-radius: 10px;
+    padding: 12px 14px;
+    position: relative;
+  }
+  .bezel-label {
+    position: absolute;
+    bottom: 1px; left: 50%;
+    transform: translateX(-50%);
+    font-size: 7px;
+    letter-spacing: 4px;
+    color: #6b6480;
+  }
+  .bezel-btns {
+    position: absolute;
+    bottom: 2px; right: 36px;
+    display: flex; gap: 5px;
+  }
+  .bezel-btns i {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--button);
+    opacity: .55;
+  }
+
+  .screen {
+    width: 1024px; height: 600px;
+    background: var(--bg);
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    color: var(--fg);
+  }
+  .screen::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(0deg,
+      transparent, transparent 2px,
+      rgba(0,0,0,0.05) 2px, rgba(0,0,0,0.05) 4px);
+    pointer-events: none;
+    z-index: 96;
+  }
+
+  /* honeycomb background */
+  .honeycomb {
+    position: absolute; inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: .07;
+    color: var(--fg);
+  }
+  .screen.caution .honeycomb { opacity: .11; }
+  .screen.emergency .honeycomb { opacity: .15; }
+
+  /* hazard stripes top/bottom */
+  .hz {
+    position: absolute; left: 0; right: 0;
+    height: 10px; z-index: 6;
+    display: none;
+  }
+  .hz-top { top: 0; }
+  .hz-bot { bottom: 0; }
+  .screen.caution .hz, .screen.emergency .hz { display: block; }
+  .screen.caution .hz {
+    background: repeating-linear-gradient(-45deg, var(--fg) 0 12px, #000 12px 24px);
+  }
+  .screen.emergency .hz {
+    background: repeating-linear-gradient(-45deg, var(--crit) 0 12px, #000 12px 24px);
+  }
+
+  /* ============ TICKER ============ */
+  .ticker {
+    height: 16px;
+    background: var(--crit);
+    color: #fff;
+    overflow: hidden;
+    display: none;
+    align-items: center;
+    position: relative;
+    z-index: 20;
+    white-space: nowrap;
+  }
+  .screen.caution .ticker {
+    display: flex;
+    background: var(--fg2);
+    color: #000;
+  }
+  .screen.emergency .ticker {
+    display: flex;
+    background: var(--crit);
+    color: #fff;
+  }
+  .ticker-inner {
+    display: inline-block;
+    animation: tick 26s linear infinite;
+    font-size: 10px;
+    letter-spacing: 3px;
+    font-weight: 700;
+    font-family: var(--f-en);
+  }
+  .ticker-inner b { font-family: var(--f-jp); letter-spacing: 2px; }
+  @keyframes tick {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* ============ HEADER ============ */
+  .header {
+    height: 46px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 12px;
+    border-bottom: 1px solid var(--fg);
+    position: relative;
+    z-index: 10;
+  }
+  .rail {
+    flex: 1;
+    height: 12px;
+    background: repeating-linear-gradient(90deg,
+      var(--fg) 0 3px, transparent 3px, transparent 9px, var(--fg) 9px 12px, transparent 12px, transparent 18px);
+    opacity: .6;
+  }
+  .hbox {
+    border: 2px solid var(--fg);
+    padding: 4px 14px;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    background: rgba(0,0,0,.35);
+  }
+  .hh-en {
+    font-family: var(--f-en);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--fg);
+    white-space: nowrap;
+  }
+  .hh-jp {
+    font-family: var(--f-jp);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--fg2);
+    letter-spacing: 2px;
+    white-space: nowrap;
+  }
+  .seal {
+    width: 46px; height: 42px;
+    clip-path: polygon(30% 0%, 70% 0%, 100% 22%, 100% 78%, 70% 100%, 30% 100%, 0% 78%, 0% 22%);
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .seal::before {
+    content: '';
+    position: absolute; inset: 0;
+    clip-path: polygon(30% 0%, 70% 0%, 100% 22%, 100% 78%, 70% 100%, 30% 100%, 0% 78%, 0% 22%);
+    background: var(--seal-bg, transparent);
+  }
+  /* seal ring: two nested octagons (outer = fg color, inner = fill) */
+  .seal-o {
+    position: absolute; inset: 0;
+    clip-path: polygon(30% 0%, 70% 0%, 100% 22%, 100% 78%, 70% 100%, 30% 100%, 0% 78%, 0% 22%);
+    background: var(--fg);
+    transform: rotate(-4deg);
+  }
+  .seal-i {
+    position: absolute; inset: 2px;
+    clip-path: polygon(30% 0%, 70% 0%, 100% 22%, 100% 78%, 70% 100%, 30% 100%, 0% 78%, 0% 22%);
+    background: var(--seal-fill, var(--bg));
+  }
+  .seal-t {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    line-height: 1;
+  }
+  .seal-t .sj { font-family: var(--f-jp); font-size: 13px; font-weight: 900; display: block; }
+  .seal-t .se { font-family: var(--f-en); font-size: 6px; letter-spacing: 2px; display: block; margin-top: 2px; }
+  .clockbox { text-align: right; margin-left: 4px; flex-shrink: 0; }
+  .clock-lab { font-size: 7px; letter-spacing: 2px; color: var(--fg2); font-family: var(--f-jp); font-weight: 700; }
+  .clock {
+    font-family: var(--f-mono);
+    font-size: 15px; font-weight: 700;
+    color: var(--fg);
+    letter-spacing: 1px;
+  }
+
+  /* ============ STATUS STRIP ============ */
+  .statusline {
+    height: 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 12px;
+    font-size: 9px;
+    letter-spacing: 2px;
+    border-bottom: 1px dashed var(--fg);
+    margin-bottom: 6px;
+    position: relative;
+    z-index: 5;
+    color: var(--fg);
+  }
+  .statusline .sep { opacity: .4; }
+  .statusline .st-jp { font-family: var(--f-jp); font-weight: 700; color: var(--fg2); }
+
+  /* ============ MAIN GRID ============ */
+  .main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 186px 1fr 186px;
+    gap: 10px;
+    padding: 2px 12px 4px;
+    position: relative;
+    z-index: 10;
+    min-height: 0;
+  }
+
+  .sidecol { display: flex; flex-direction: column; gap: 4px; min-height: 0; }
+  .sm-title {
+    font-size: 8px;
+    letter-spacing: 3px;
+    color: var(--fg2);
+    border-bottom: 1px solid var(--fg2);
+    padding-bottom: 2px;
+    margin-bottom: 2px;
+    font-weight: 600;
+  }
+  .mb { border: 1px solid var(--fg); padding: 2px 6px; line-height: 1.25; }
+  .mb .lab {
+    font-size: 7px;
+    letter-spacing: 2px;
+    color: var(--fg2);
+    opacity: .85;
+  }
+  .mb .val {
+    font-family: var(--f-mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--fg);
+  }
+  .mb.lit { background: var(--accent); border-color: var(--accent); color: var(--ink); }
+  .mb.lit .lab { color: var(--ink); opacity: .8; }
+  .mb.lit .val { color: var(--ink); }
+  .vert {
+    margin-top: auto;
+    writing-mode: vertical-rl;
+    font-family: var(--f-jp);
+    font-size: 17px;
+    font-weight: 900;
+    letter-spacing: 6px;
+    color: var(--fg);
+    border-left: 2px solid var(--fg);
+    padding-left: 8px;
+    height: 100px;
+    align-self: flex-start;
+    opacity: .9;
+  }
+  .vert-sub {
+    writing-mode: vertical-rl;
+    font-size: 7px;
+    letter-spacing: 3px;
+    color: var(--fg2);
+    font-family: var(--f-jp);
+    margin-left: 18px;
+  }
+  .vertwrap { display: flex; margin-top: auto; gap: 2px; min-height: 0; }
+
+  .centercol { display: flex; flex-direction: column; gap: 6px; min-height: 0; }
+
+  /* display area */
+  .disp {
+    flex: 1;
+    border: 1px solid var(--fg);
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    position: relative;
+    background: rgba(0,0,0,.25);
+  }
+  .disp-tab {
+    display: flex;
+    align-items: center;
+    background: var(--fg);
+    color: var(--ink);
+    height: 22px;
+    padding: 0 8px;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .disp-tab .t {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+  }
+  .disp-tab .tjp { font-family: var(--f-jp); font-size: 10px; font-weight: 700; letter-spacing: 2px; }
+  .disp-tab .right {
+    margin-left: auto;
+    font-family: var(--f-mono);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    opacity: .85;
+  }
+  .disp-body {
+    flex: 1;
+    padding: 8px 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 0;
+  }
+  .play-title {
+    font-family: var(--f-jp);
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--fg);
+    letter-spacing: 1px;
+  }
+  .play-artist {
+    font-family: var(--f-en);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    color: var(--fg2);
+    margin-top: 2px;
+  }
+  .play-prog {
+    margin-top: 12px;
+    height: 6px;
+    border: 1px solid var(--fg);
+    position: relative;
+  }
+  .play-prog i {
+    position: absolute; inset: 0;
+    background: var(--fg);
+    transform-origin: left;
+    transform: scaleX(0);
+  }
+  .play-meta {
+    margin-top: 8px;
+    display: flex;
+    gap: 18px;
+    font-family: var(--f-mono);
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--fg2);
+    letter-spacing: 1px;
+  }
+  .freq {
+    font-family: var(--f-mono);
+    font-size: 58px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--fg);
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .freq small { font-size: 15px; color: var(--fg2); letter-spacing: 3px; font-family: var(--f-en); font-weight: 700; }
+  .station {
+    font-family: var(--f-jp);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--fg2);
+    margin-top: 6px;
+    letter-spacing: 2px;
+  }
+  .presets { display: flex; gap: 6px; margin-top: 14px; }
+  .preset {
+    border: 1px solid var(--fg);
+    padding: 3px 8px;
+    font-family: var(--f-mono);
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--fg);
+    letter-spacing: 1px;
+  }
+  .preset.on { background: var(--accent); color: var(--ink); border-color: var(--accent); }
+  .empty-big {
+    font-family: var(--f-jp);
+    font-size: 34px;
+    font-weight: 900;
+    letter-spacing: 8px;
+    color: var(--fg2);
+    text-align: center;
+  }
+  .empty-sub {
+    text-align: center;
+    margin-top: 8px;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--fg);
+    opacity: .75;
+  }
+  .empty-jp {
+    text-align: center;
+    margin-top: 4px;
+    font-family: var(--f-jp);
+    font-size: 10px;
+    color: var(--fg2);
+    letter-spacing: 4px;
+  }
+  .aa-idle {
+    align-self: center;
+    text-align: center;
+  }
+
+  /* MAGI diagram */
+  .magi-box {
+    height: 148px;
+    border: 1px solid var(--fg);
+    position: relative;
+    flex-shrink: 0;
+    background: rgba(0,0,0,.25);
+  }
+  .magi-title {
+    position: absolute;
+    top: 0; left: 0;
+    background: var(--fg);
+    color: var(--ink);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    padding: 1px 8px;
+    z-index: 2;
+  }
+  .magi-title b { font-family: var(--f-jp); letter-spacing: 1px; margin-left: 6px; font-weight: 700; }
+  .magi-corner {
+    position: absolute;
+    top: 2px; right: 6px;
+    font-family: var(--f-mono);
+    font-size: 8px;
+    color: var(--fg2);
+    letter-spacing: 1px;
+  }
+  #magi { width: 100%; height: 100%; display: block; }
+
+  /* ============ BOTTOM BAR ============ */
+  .bottom {
+    height: 116px;
+    display: grid;
+    grid-template-columns: 1fr 130px 172px;
+    gap: 8px;
+    padding: 0 12px 12px;
+    position: relative;
+    z-index: 10;
+  }
+  .hexwrap { display: flex; align-items: flex-end; justify-content: center; min-width: 0; }
+  #hexsvg { width: 100%; height: 100%; display: block; }
+
+  .knob-area { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 4px; padding-top: 4px; }
+  .knob {
+    width: 62px; height: 62px;
+    border-radius: 50%;
+    border: 2px solid var(--fg);
+    position: relative;
+    cursor: ns-resize;
+    touch-action: none;
+    background: radial-gradient(circle at center, transparent 58%, var(--fg) 58%, var(--fg) 61%, transparent 61%);
+  }
+  .knob-marks {
+    position: absolute; inset: 0;
+  }
+  .knob-rot {
+    position: absolute; inset: 0;
+  }
+  .knob-rot::before {
+    content: '';
+    position: absolute;
+    top: 3px; left: 50%;
+    transform: translateX(-50%);
+    width: 4px; height: 12px;
+    background: var(--fg2);
+  }
+  .knob-mid {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--f-mono);
+    font-size: 15px; font-weight: 700;
+    color: var(--fg);
+  }
+  .knob-read {
+    font-family: var(--f-mono);
+    font-size: 9px;
+    color: var(--fg2);
+    letter-spacing: 1px;
+    font-weight: 700;
+  }
+  .knob-lab { font-size: 7px; letter-spacing: 3px; color: var(--fg); opacity: .7; }
+
+  .speed-area { display: flex; flex-direction: column; align-items: flex-end; justify-content: flex-start; gap: 2px; padding-top: 2px; }
+  .odo { display: flex; gap: 3px; }
+  .od-digit {
+    width: 30px; height: 46px;
+    border: 1px solid var(--fg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--f-mono);
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--fg);
+    background: rgba(0,0,0,.4);
+  }
+  .od-unit { text-align: right; }
+  .od-kmh { font-family: var(--f-mono); font-size: 12px; color: var(--fg2); letter-spacing: 2px; font-weight: 700; }
+  .od-lab { font-family: var(--f-jp); font-size: 8px; color: var(--fg); opacity: .8; letter-spacing: 2px; }
+  .od-seal {
+    margin-top: 3px;
+    border: 1px solid var(--fg2);
+    color: var(--fg2);
+    font-family: var(--f-jp);
+    font-weight: 700;
+    font-size: 9px;
+    letter-spacing: 2px;
+    padding: 1px 6px;
+    transform: rotate(-3deg);
+  }
+
+  /* ============ OVERLAYS ============ */
+  .ov {
+    position: absolute; inset: 0;
+    display: none;
+    flex-direction: column;
+    z-index: 60;
+  }
+  .ov.on { display: flex; }
+  .ov .stripe {
+    height: 22px;
+    background: repeating-linear-gradient(-45deg, var(--crit) 0 16px, #000 16px 32px);
+    flex-shrink: 0;
+  }
+  .ov-body {
+    flex: 1;
+    background: #050508;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: var(--fg);
+  }
+  .ov-banner {
+    font-family: var(--f-en);
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: 8px;
+    color: var(--fg);
+  }
+  .ov-jp {
+    font-family: var(--f-jp);
+    font-size: 16px;
+    font-weight: 900;
+    letter-spacing: 6px;
+    color: var(--fg2);
+  }
+  .cam-feed {
+    width: 70%; height: 55%;
+    border: 2px solid var(--fg);
+    background:
+      linear-gradient(var(--fg) 1px, transparent 1px) 0 0 / 100% 25%,
+      linear-gradient(90deg, var(--fg) 1px, transparent 1px) 0 0 / 25% 100%;
+    opacity: .12;
+    position: relative;
+  }
+  .cam-center {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 1;
+  }
+  .cam-cross {
+    width: 60px; height: 60px;
+    border: 2px solid var(--fg);
+    position: relative;
+    opacity: .7;
+  }
+  .cam-cross::before, .cam-cross::after {
+    content: '';
+    position: absolute;
+  }
+  .cam-cross::before { left: 50%; top: -8px; bottom: -8px; width: 1px; background: var(--fg); }
+  .cam-cross::after { top: 50%; left: -8px; right: -8px; height: 1px; background: var(--fg); }
+  .cam-label {
+    position: absolute;
+    bottom: 6px; left: 8px;
+    font-family: var(--f-mono);
+    font-size: 9px;
+    color: var(--fg);
+    opacity: .9;
+  }
+  .call-name { font-family: var(--f-en); font-size: 26px; font-weight: 600; letter-spacing: 3px; }
+  .call-num { font-family: var(--f-mono); font-size: 13px; color: var(--fg2); letter-spacing: 2px; }
+  .ov-actions { display: flex; gap: 18px; margin-top: 8px; }
+  .ov-hex {
+    width: 96px; height: 106px;
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    background: var(--fg);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    border: none;
+    flex-direction: column;
+  }
+  .ov-hex .in {
+    width: 90px; height: 100px;
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    background: #0d0d16;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 2px;
+  }
+  .ov-hex:hover .in { background: #1a1a28; }
+  .ov-hex.accept .in { background: var(--accent); }
+  .ov-hex.accept:hover .in { background: var(--crit); }
+  .ov-hex .en { color: var(--fg); font-size: 12px; font-weight: 700; letter-spacing: 1px; }
+  .ov-hex.accept .en { color: var(--ink); }
+  .ov-hex .jp { font-family: var(--f-jp); font-size: 10px; color: var(--fg2); }
+  .ov-hex.accept .jp { color: var(--ink); }
+
+  .ov-note {
+    font-family: var(--f-mono);
+    font-size: 10px;
+    color: var(--fg2);
+    letter-spacing: 2px;
+  }
+
+  /* sheets */
+  .sheet {
+    position: absolute; inset: 0;
+    z-index: 40;
+    display: none;
+    background: rgba(5,5,8,.86);
+    padding: 30px 60px;
+  }
+  .sheet.on { display: flex; }
+  .sheet-panel {
+    flex: 1;
+    border: 2px solid var(--accent);
+    background: #0a0a12;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .sheet-head {
+    display: flex;
+    align-items: center;
+    background: var(--accent);
+    color: var(--ink);
+    height: 34px;
+    padding: 0 12px;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+  .sheet-head .t { font-size: 15px; font-weight: 700; letter-spacing: 4px; }
+  .sheet-head .jp { font-family: var(--f-jp); font-size: 12px; font-weight: 700; letter-spacing: 2px; }
+  .sheet-close {
+    margin-left: auto;
+    font-family: var(--f-en);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--ink);
+    padding: 3px 10px;
+    cursor: pointer;
+  }
+  .sheet-close:hover { background: var(--ink); }
+  .sheet-body { flex: 1; padding: 14px 18px; overflow: hidden; min-height: 0; }
+
+  /* hex tile grid */
+  .tiles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 14px;
+  }
+  .tile {
+    width: 100px; height: 112px;
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    background: var(--fg);
+    cursor: pointer;
+    position: relative;
+  }
+  .tile:nth-child(odd) { transform: translateY(12px); }
+  .tile .in {
+    position: absolute; inset: 2px;
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    background: #10101c;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+  }
+  .tile:hover .in { background: #20203a; }
+  .tile .jp { font-family: var(--f-jp); font-size: 14px; font-weight: 700; color: var(--fg); }
+  .tile .en { font-family: var(--f-en); font-size: 8px; font-weight: 600; letter-spacing: 1px; color: var(--fg2); text-align: center; padding: 0 8px; }
+
+  /* settings rows */
+  .setrow {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 14px;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .setrow .k {
+    border: 1px solid var(--accent);
+    padding: 5px 10px;
+    background: rgba(0,0,0,.4);
+  }
+  .setrow .k .en { font-size: 11px; font-weight: 700; letter-spacing: 2px; color: var(--fg); }
+  .setrow .k .jp { font-family: var(--f-jp); font-size: 10px; color: var(--fg2); margin-left: 8px; }
+  .seg { display: flex; gap: 4px; flex-wrap: wrap; }
+  .seg button {
+    background: transparent;
+    border: 1px solid var(--fg);
+    color: var(--fg);
+    font-family: var(--f-en);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    padding: 4px 12px;
+    cursor: pointer;
+  }
+  .seg button.on { background: var(--fg); color: var(--ink); }
+  .swatches { display: flex; gap: 6px; }
+  .swatches button {
+    width: 26px; height: 26px;
+    border: 1px solid var(--fg);
+    cursor: pointer;
+  }
+  .swatches button.on { outline: 2px solid var(--fg2); outline-offset: 2px; }
+
+  /* screen off */
+  .ov-off {
+    position: absolute; inset: 0;
+    z-index: 70;
+    display: none;
+    background: #000;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .ov-off.on { display: flex; }
+  .ov-off .t { font-family: var(--f-jp); font-size: 18px; font-weight: 700; color: #1a1a24; letter-spacing: 8px; }
+
+  /* toast */
+  .toast {
+    position: absolute;
+    bottom: 126px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 80;
+    border: 1px solid var(--fg2);
+    background: rgba(10,10,18,.95);
+    color: var(--fg);
+    padding: 5px 18px;
+    font-size: 11px;
+    letter-spacing: 2px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .15s;
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+  }
+  .toast.on { opacity: 1; }
+  .toast .tjp { font-family: var(--f-jp); color: var(--fg2); font-weight: 700; }
+
+  /* ============ SIMULATOR ============ */
+  .sim {
+    width: 320px;
+    flex-shrink: 0;
+    background: #101018;
+    border: 1px solid #2c2c40;
+    padding: 12px;
+    font-size: 11px;
+    max-height: 660px;
+    overflow-y: auto;
+    color: #aab;
+  }
+  .sim h2 {
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: #f5b400;
+    border-bottom: 1px solid #2c2c40;
+    padding-bottom: 3px;
+    margin: 14px 0 6px;
+  }
+  .sim h2:first-child { margin-top: 0; }
+  .sim-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+  .sim-row label { flex: 1; font-size: 10px; opacity: .8; }
+  .sim-row .seg button {
+    background: #1a1a26; border: 1px solid #3a3a50; color: #778;
+    padding: 3px 6px; font-size: 9px; cursor: pointer; font-family: var(--f-en);
+  }
+  .sim-row .seg button.on { background: #f5b400; color: #000; border-color: #f5b400; }
+  .sim-row .btns { display: flex; gap: 3px; }
+  .sim-row .btns button {
+    background: #1a1a26; border: 1px solid #3a3a50; color: #778;
+    padding: 3px 8px; font-size: 9px; cursor: pointer; font-family: var(--f-en);
+  }
+  .sim-row .btns button.on { background: #e31c23; color: #fff; border-color: #e31c23; }
+  .sim-row input[type=range] { width: 110px; accent-color: #f5b400; }
+  .sim-row input[type=number] {
+    width: 44px; background: #1a1a26; border: 1px solid #3a3a50;
+    color: #e8e8f0; padding: 2px 4px; font-size: 10px; font-family: var(--f-mono);
+  }
+  .sim-row input[type=color] { width: 32px; height: 22px; background: none; border: 1px solid #3a3a50; }
+  .swatches-sim { display: flex; gap: 4px; }
+  .swatches-sim button { width: 18px; height: 18px; border: 1px solid #3a3a50; cursor: pointer; }
+  .swatches-sim button.on { outline: 2px solid #fff; outline-offset: 1px; }
+  .sim-note { font-size: 9px; color: #556; letter-spacing: 1px; margin-top: 8px; border-top: 1px dashed #2c2c40; padding-top: 6px; line-height: 1.5; }
+
+  /* hex svg buttons */
+  .hex-btn { cursor: pointer; }
+  .hex-btn polygon { fill: none; stroke: var(--fg); stroke-width: 1.6; }
+  .hex-btn .en {
+    font-family: var(--f-en);
+    font-size: 8px; font-weight: 600;
+    fill: var(--fg);
+    text-anchor: middle; letter-spacing: .8px;
+  }
+  .hex-btn .jp {
+    font-family: var(--f-jp);
+    font-size: 7px; font-weight: 700;
+    fill: var(--fg2);
+    text-anchor: middle;
+  }
+  .hex-btn:hover polygon { stroke-width: 3; }
+  .hex-btn:focus { outline: none; }
+  .hex-btn:focus polygon { stroke-width: 3; stroke-dasharray: 3 2; }
+  .hex-btn.latched polygon { fill: var(--accent); stroke: var(--accent); }
+  .hex-btn.latched .en { fill: var(--ink); }
+  .hex-btn.latched .jp { fill: var(--ink); }
+  .hex-btn.disabled { opacity: .3; cursor: default; }
+  .hex-btn.disabled:hover polygon { stroke-width: 1.6; }
+
+  /* MAGI diagram */
+  .mline { stroke: var(--fg); stroke-width: 1; opacity: .35; }
+  .mnode polygon { fill: none; stroke: var(--fg); stroke-width: 2; }
+  .mnode.on polygon { fill: var(--accent); stroke: var(--accent); }
+  .mn-lab {
+    font-family: var(--f-en);
+    font-size: 9px; font-weight: 700;
+    text-anchor: middle;
+    fill: var(--fg);
+  }
+  .mnode.on .mn-lab { fill: var(--ink); }
+  .mn-sub {
+    font-family: var(--f-en);
+    font-size: 6px; letter-spacing: 1px;
+    text-anchor: middle;
+    fill: var(--fg2); opacity: .85;
+  }
+  .mnode.on .mn-sub { fill: var(--ink); opacity: 1; }
+  #magiCore polygon { fill: none; stroke: var(--fg2); stroke-width: 1.5; }
+  .mn-core {
+    font-family: var(--f-en);
+    font-size: 8px; font-weight: 700;
+    text-anchor: middle;
+    fill: var(--fg2);
+  }
+
+  /* emergency seal: inverted fill, knocked-out text */
+  .seal.emg .seal-i { background: var(--crit); }
+  .seal.emg .sj, .seal.emg .se { color: #fff; }
+</style>
+</head>
+<body>
+<!-- ================= DEVICE ================= -->
+<div class="bezel">
+  <div class="screen normal" id="screen">
+    <div class="hz hz-top"></div>
+    <div class="hz hz-bot"></div>
+
+    <!-- honeycomb background (A.T. FIELD) -->
+    <svg class="honeycomb" viewBox="0 0 1024 600" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <pattern id="hexPat" width="55.4" height="96" patternUnits="userSpaceOnUse">
+          <polygon points="27.7,0 55.4,16 55.4,48 27.7,64 0,48 0,16" fill="none" stroke="currentColor" stroke-width="1"/>
+          <polygon points="0,48 27.7,64 27.7,96 0,112 -27.7,96 -27.7,64" fill="none" stroke="currentColor" stroke-width="1"/>
+          <polygon points="55.4,48 83.1,64 83.1,96 55.4,112 27.7,96 27.7,64" fill="none" stroke="currentColor" stroke-width="1"/>
+        </pattern>
+      </defs>
+      <rect width="1024" height="600" fill="url(#hexPat)"/>
+    </svg>
+
+    <!-- ticker panel -->
+    <div class="ticker" id="ticker"><div class="ticker-inner" id="tickerInner"></div></div>
+
+    <!-- header banner -->
+    <header class="header">
+      <div class="rail"></div>
+      <div class="hbox">
+        <span class="hh-en" id="headEn">DIRECT" LINK CONNECTION : "LILY</span>
+        <span class="hh-jp" id="headJp">直接接続</span>
+      </div>
+      <div class="rail"></div>
+      <div class="seal" id="sealTop">
+        <div class="seal-o"></div>
+        <div class="seal-i"></div>
+        <div class="seal-t">
+          <span class="sj" id="sealTopJp">監視中</span>
+          <span class="se" id="sealTopEn">STANDBY</span>
+        </div>
+      </div>
+      <div class="clockbox">
+        <div class="clock-lab">見現時刻表示</div>
+        <div class="clock" id="clock">0:00 AM</div>
+      </div>
+    </header>
+
+    <!-- status strip -->
+    <div class="statusline">
+      <span id="stEn">ALL SYSTEMS NOMINAL</span>
+      <span class="sep">//</span>
+      <span class="st-jp" id="stJp">通常運転</span>
+      <span class="sep">//</span>
+      <span>CH-01</span>
+      <span class="sep">//</span>
+      <span id="stTh">THRESHOLD 060/100</span>
+      <span class="sep">//</span>
+      <span id="stVol">VOL 018/40</span>
+    </div>
+
+    <!-- ============ MAIN GRID ============ -->
+    <div class="main">
+
+      <!-- left metadata side-channel -->
+      <div class="sidecol">
+        <div class="sm-title">SYS // 状況記録</div>
+        <div class="mb"><div class="lab">CODE</div><div class="val" id="vCode">LILY-701</div></div>
+        <div class="mb"><div class="lab">FILE</div><div class="val" id="vFile">MAGI_SYS</div></div>
+        <div class="mb"><div class="lab">MODE</div><div class="val" id="vMode">AUTO</div></div>
+        <div class="mb"><div class="lab">PRIORITY</div><div class="val">AAA</div></div>
+        <div class="mb"><div class="lab">SPEED</div><div class="val" id="vSpeed">000 KM/H</div></div>
+        <div class="mb"><div class="lab">VOL</div><div class="val" id="vVol">018/40</div></div>
+        <div class="vertwrap">
+          <div class="vert" id="vertJp">通常運転</div>
+          <div class="vert-sub">A.T. FIELD<br>監視中</div>
+        </div>
+      </div>
+
+      <!-- center column -->
+      <div class="centercol">
+
+        <!-- main display -->
+        <div class="disp">
+          <div class="disp-tab">
+            <span class="t" id="dispTab">DISPLAY : TAPE</span>
+            <span class="tjp" id="dispTabJp">表示</span>
+            <span class="right" id="dispRight">A.T.F. ACTIVE</span>
+          </div>
+          <div class="disp-body" id="dispBody"></div>
+        </div>
+
+        <!-- MAGI system node diagram -->
+        <div class="magi-box">
+          <div class="magi-title">MAGI SYSTEM<b>提訴決議</b></div>
+          <div class="magi-corner" id="magiCorner">CONCURRENCE : 100%</div>
+          <svg id="magi" viewBox="0 0 620 142" preserveAspectRatio="xMidYMid meet">
+            <line x1="150" y1="34" x2="310" y2="70"  class="mline"/>
+            <line x1="470" y1="34" x2="310" y2="70"  class="mline"/>
+            <line x1="310" y1="112" x2="310" y2="70" class="mline"/>
+            <g id="nodeMel" class="mnode">
+              <polygon points="150,10 170.8,22 170.8,46 150,58 129.2,46 129.2,22"/>
+              <text x="150" y="36" class="mn-lab">BT</text>
+              <text x="150" y="50" class="mn-sub">MELCHIOR</text>
+            </g>
+            <g id="nodeBal" class="mnode">
+              <polygon points="470,10 490.8,22 490.8,46 470,58 449.2,46 449.2,22"/>
+              <text x="470" y="36" class="mn-lab">RADIO</text>
+              <text x="470" y="50" class="mn-sub">BALTHASAR</text>
+            </g>
+            <g id="nodeCas" class="mnode">
+              <polygon points="310,88 330.8,100 330.8,124 310,136 289.2,124 289.2,100"/>
+              <text x="310" y="110" class="mn-lab">USB</text>
+              <text x="310" y="124" class="mn-sub">CASPER</text>
+            </g>
+            <g id="magiCore">
+              <polygon points="310,58 318.6,63 318.6,73 310,78 301.4,73 301.4,63"/>
+              <text x="310" y="71" id="magiGlyph" class="mn-core">A</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <!-- right metadata side-channel -->
+      <div class="sidecol">
+        <div class="sm-title">LINK // 回線状況</div>
+        <div class="mb"><div class="lab">LAYER 3</div><div class="val" id="vLayer3">CONNECTION</div></div>
+        <div class="mb"><div class="lab">LAYER 2</div><div class="val" id="vLayer2">DATA LINK</div></div>
+        <div class="mb"><div class="lab">LAYER 1</div><div class="val" id="vLayer1">PHYSICAL</div></div>
+        <div class="mb" id="bSource"><div class="lab">SOURCE</div><div class="val" id="vSource">BLUETOOTH</div></div>
+        <div class="mb"><div class="lab">THEME</div><div class="val" id="vTheme">DAY</div></div>
+        <div class="mb"><div class="lab">SPEED ZONE</div><div class="val" id="vZone">NORMAL</div></div>
+        <div class="vertwrap">
+          <div class="vert vert-r" id="vertJpR">回路接続</div>
+          <div class="vert-sub">N2 MINE<br>連絡線</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ BOTTOM BAR ============ -->
+    <div class="bottom">
+      <div class="hexwrap">
+        <svg id="hexsvg" viewBox="0 0 330 118" preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
+
+      <div class="knob-area">
+        <div class="knob" id="knob">
+          <div class="knob-rot" id="knobRot"></div>
+          <div class="knob-mid" id="knobVal">18</div>
+        </div>
+        <div class="knob-lab">VOLUME 音量</div>
+        <div class="knob-read" id="knobRead">VOL 018/40</div>
+      </div>
+
+      <div class="speed-area">
+        <div class="odo">
+          <span class="od-digit" id="od0">0</span>
+          <span class="od-digit" id="od1">0</span>
+          <span class="od-digit" id="od2">0</span>
+        </div>
+        <div class="od-unit">
+          <span class="od-kmh">KM/H</span> <span class="od-lab">走行速度</span>
+        </div>
+        <div class="od-seal" id="odSeal">平常監視</div>
+      </div>
+    </div>
+
+    <!-- ============ OVERLAYS ============ -->
+
+    <!-- reverse camera -->
+    <div class="ov" id="ovReverse">
+      <div class="stripe"></div>
+      <div class="ov-body">
+        <div class="ov-banner">REVERSE</div>
+        <div class="ov-jp">後退 : カメラ映像確認中</div>
+        <div class="cam-feed">
+          <div class="cam-center"><div class="cam-cross"></div></div>
+          <div class="cam-label">CAM-01 // REAR 1280x720</div>
+        </div>
+        <div class="ov-note">mcu_backcar_state : ENGAGED</div>
+      </div>
+      <div class="stripe"></div>
+    </div>
+
+    <!-- incoming call -->
+    <div class="ov" id="ovCall">
+      <div class="stripe"></div>
+      <div class="ov-body">
+        <div class="ov-banner">INCOMING CALL</div>
+        <div class="ov-jp">着信中</div>
+        <div class="call-name" id="callName">UNKNOWN</div>
+        <div class="call-num" id="callNum">+81-00-0000-0000</div>
+        <div class="ov-actions">
+          <button class="ov-hex accept" id="callAccept">
+            <span class="in"><span class="en">ACCEPT</span><span class="jp">答える</span></span>
+          </button>
+          <button class="ov-hex" id="callDecline">
+            <span class="in"><span class="en">DECLINE</span><span class="jp">断る</span></span>
+          </button>
+        </div>
+      </div>
+      <div class="stripe"></div>
+    </div>
+
+    <!-- android auto -->
+    <div class="ov" id="ovAA">
+      <div class="stripe"></div>
+      <div class="ov-body">
+        <div class="ov-banner">ANDROID AUTO</div>
+        <div class="ov-jp">外部機器 接続済 : 転送中</div>
+        <div class="call-name" id="aaName">PHONE</div>
+        <div class="ov-note">GOOGLE PROJECTION PROTOCOL : ACTIVE</div>
+        <div class="ov-actions">
+          <button class="ov-hex" id="aaExit">
+            <span class="in"><span class="en">EXIT</span><span class="jp">戻る</span></span>
+          </button>
+        </div>
+      </div>
+      <div class="stripe"></div>
+    </div>
+
+    <!-- more sheet -->
+    <div class="sheet" id="sheetMore">
+      <div class="sheet-panel">
+        <div class="sheet-head">
+          <span class="t">MORE</span><span class="jp">アプリ一覧</span>
+          <button class="sheet-close" id="moreClose">CLOSE 閉じる</button>
+        </div>
+        <div class="sheet-body"><div class="tiles" id="tiles"></div></div>
+      </div>
+    </div>
+
+    <!-- settings sheet -->
+    <div class="sheet" id="sheetSet">
+      <div class="sheet-panel">
+        <div class="sheet-head">
+          <span class="t">SETTINGS</span><span class="jp">設定</span>
+          <button class="sheet-close" id="setClose">CLOSE 閉じる</button>
+        </div>
+        <div class="sheet-body">
+          <div class="setrow">
+            <div class="k"><span class="en">RESUME ON START</span><span class="jp">復帰再生</span></div>
+            <div class="seg" id="setResume"></div>
+          </div>
+          <div class="setrow">
+            <div class="k"><span class="en">AUTO ANDROID AUTO</span><span class="jp">自動接続</span></div>
+            <div class="seg" id="setAA"></div>
+          </div>
+          <div class="setrow">
+            <div class="k"><span class="en">THEME</span><span class="jp">表示色</span></div>
+            <div class="seg" id="setTheme"></div>
+          </div>
+          <div class="setrow">
+            <div class="k"><span class="en">ACCENT</span><span class="jp">単色</span></div>
+            <div class="swatches" id="setAccent"></div>
+          </div>
+          <div class="setrow">
+            <div class="k"><span class="en">SPEED LIMITS</span><span class="jp">速度閾値</span></div>
+            <div class="seg" style="gap:10px;">
+              <span id="setTcWrap">CAUTION <input type="number" id="setTc" min="10" max="200" value="60"></span>
+              <span>EMERGENCY <input type="number" id="setTe" min="20" max="250" value="100"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- screen off -->
+    <div class="ov-off" id="ovOff"><div class="t">画面オフ SCREEN OFF</div></div>
+
+    <!-- toast -->
+    <div class="toast" id="toast">
+      <span id="toastEn"></span><span class="tjp" id="toastJp"></span>
+    </div>
+
+  </div><!-- /screen -->
+</div><!-- /bezel -->
+
+<!-- ================= SIMULATOR ================= -->
+<div class="sim">
+  <h2>CAR SIGNALS 車両信号</h2>
+  <div class="sim-row">
+    <label>Speed km/h</label>
+    <input type="range" id="simSpeed" min="0" max="160" value="0">
+    <span id="simSpeedVal" style="font-family:var(--f-mono);width:24px;color:#fff;">0</span>
+  </div>
+  <div class="sim-row"><label>Headlights</label><div class="seg" id="simNight"></div></div>
+  <div class="sim-row"><label>BT device</label><div class="seg" id="simBt"></div></div>
+  <div class="sim-row"><label>Audio source</label><div class="seg" id="simSource"></div></div>
+  <div class="sim-row"><label>BT track</label><div class="seg" id="simTrack"></div></div>
+  <div class="sim-row"><label>USB phone</label><div class="seg" id="simUsb"></div></div>
+
+  <h2>EVENTS 事象</h2>
+  <div class="sim-row"><div class="btns" id="simEvents"></div></div>
+
+  <h2>THRESHOLDS 速度閾値</h2>
+  <div class="sim-row"><label>Caution km/h</label><input type="number" id="threshCaution" min="10" max="200" value="60"></div>
+  <div class="sim-row"><label>Emergency km/h</label><input type="number" id="threshEmergency" min="20" max="250" value="100"></div>
+
+  <h2>DISPLAY 表示</h2>
+  <div class="sim-row"><label>Accent (NORM zone)</label><div class="swatches-sim" id="simAccent"></div></div>
+
+  <div class="sim-note">
+    Palette shifts are instant. Normal &lt;60 green / caution 60–100 amber / emergency &gt;100 red.
+    Night &amp; graphite themes apply only in normal zone. Reverse &amp; incoming-call
+    overlays override palette priority; AA auto-opens on USB connect unless gated.
+  </div>
+</div>
+
+<script>
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const SVGNS = 'http://www.w3.org/2000/svg';
+
+  /* ================= DATA ================= */
+  const BT_TRACKS = [
+    { title: '残酷な天使のテーゼ', artist: 'Yoko Takahashi', len: 245 },
+    { title: 'FLY ME TO THE MOON', artist: 'Claire Littley', len: 158 },
+    { title: 'Komm, suesser Tod', artist: 'Arianne', len: 463 },
+  ];
+  const USB_TRACKS = [
+    { title: 'CYBER MIX VOL.7', artist: 'N2 DJ TEAM', len: 312 },
+    { title: 'HIGHWAY PHANTOM', artist: 'LELIEL', len: 237 },
+    { title: 'MIDNIGHT OSAKA', artist: 'TOKYO-3 SOUNDS', len: 271 },
+  ];
+  const RADIO_PRESETS = [
+    { f: '76.5', name: 'NHK-FM 東京' },
+    { f: '80.0', name: 'TBS RADIO' },
+    { f: '90.5', name: 'J-WAVE TOKYO' },
+    { f: '93.0', name: 'NACK5 埼玉' },
+  ];
+  const BT_DEVICES = [null, 'GALAXY S23', "MOM'S IPHONE"];
+  const ACCENTS = ['#ff4a1c', '#258ac3', '#2fb35a', '#f5b400', '#e8332a'];
+  const TILE_LABELS = [
+    'ラジオ|RADIO', 'USB音楽|USB MUSIC', 'ビデオ|VIDEO', 'レコーダー|DASHCAM',
+    'イコライザー|SOUND EQ', '外部入力|AUX', 'ファイル|FILES', '車両設定|CAR',
+    'CAN通信|CAN-BUS', 'ハンドルキー|WHEEL KEYS', 'アンドロイド|ANDROID',
+    '画面オフ|SCREEN OFF', 'ホーム設定|HOME SETUP',
+  ];
+
+  /* ================= STATE ================= */
+  const S = {
+    speed: 0, headlights: false, bt: 'GALAXY S23', source: 'bt', track: 'paused',
+    usb: 'none', vol: 18, reverse: false, call: null, callActive: null, callNum: '',
+    aaOpen: false, sheet: null, screenOff: false,
+    btIdx: 0, usbIdx: 0, radioIdx: 0, time: 34, zone: 'normal',
+  };
+  const prefs = { resumeOnStart: true, autoAA: true, theme: 'auto', accent: '#ff4a1c' };
+
+  const cautionTh = () => parseInt($('threshCaution').value) || 60;
+  const emergencyTh = () => parseInt($('threshEmergency').value) || 100;
+  const deviceName = () => S.bt || (S.usb === 'connected' ? 'USB PHONE' : null);
+  const currentTrack = () => S.source === 'bt' ? BT_TRACKS[S.btIdx] : S.source === 'usb' ? USB_TRACKS[S.usbIdx] : null;
+
+  function calcZone() {
+    if (S.speed > emergencyTh()) return 'emergency';
+    if (S.speed > cautionTh()) return 'caution';
+    return 'normal';
+  }
+  function effTheme() {
+    return prefs.theme === 'auto' ? (S.headlights ? 'night' : 'day') : prefs.theme;
+  }
+
+  /* ================= PALETTE ================= */
+  const ZONES = {
+    normal:    { bg: '#0a0a12', fg: '#4de89a', fg2: '#f5b400' },
+    caution:   { bg: '#0a0a12', fg: '#f5b400', fg2: '#ff6a00' },
+    emergency: { bg: '#000000', fg: '#ff4a1c', fg2: '#e31c23' },
+  };
+  const THEMES = {
+    night:    { bg: '#050508', fg: '#3fbf82', fg2: '#8f86a6' },
+    graphite: { bg: '#101216', fg: '#7ecdb8', fg2: '#a0a4ad' },
+  };
+  const HEAD = {
+    normal:    { en: 'DIRECT" LINK CONNECTION : "LILY', jp: '直接接続', sealJp: '監視中', sealEn: 'STANDBY',
+                 stEn: 'ALL SYSTEMS NOMINAL', stJp: '通常運転', vert: '通常運転', vertR: '回路接続', odSeal: '平常監視',
+                 ticker: '' },
+    caution:   { en: 'CAUTION" : SPEED "LIMIT', jp: '注意保持', sealJp: '注意', sealEn: 'CAUTION',
+                 stEn: 'REDUCE SPEED : STAY ALERT', stJp: '減速注意', vert: '減速注意', vertR: '加速禁止', odSeal: '注意走行',
+                 ticker: 'CAUTION : SPEED LIMIT // 注意 : 制限速度 // WARNING : REDUCE SPEED // 減速してください // ' },
+    emergency: { en: '第一種戦闘配置" : "LILY', jp: '非常事態', sealJp: '緊急', sealEn: 'EMERGENCY',
+                 stEn: 'EMERGENCY : STATE RED', stJp: '非常事態発生', vert: '非常事態', vertR: '全車停止', odSeal: '緊急走行',
+                 ticker: 'EMERGENCY : 第一種戦闘配置発令 : LILY SYSTEM // 非常事態発生 // WARNING // 全システム緊急配備 // ' },
+  };
+
+  function applyZone() {
+    const zone = calcZone();
+    $('screen').classList.remove('normal', 'caution', 'emergency');
+    $('screen').classList.add(zone);
+    S.zone = zone;
+
+    const z = ZONES[zone];
+    const h = HEAD[zone];
+    const root = document.documentElement.style;
+    root.setProperty('--bg', z.bg);
+    root.setProperty('--fg', z.fg);
+    root.setProperty('--fg2', z.fg2);
+    root.setProperty('--accent', zone === 'normal' ? prefs.accent : z.fg);
+
+    // theme modifiers apply only in the normal zone (safety palettes win at speed)
+    const et = effTheme();
+    const tm = zone === 'normal' ? THEMES[et] : null;
+    if (tm) {
+      root.setProperty('--bg', tm.bg);
+      root.setProperty('--fg', tm.fg);
+      root.setProperty('--fg2', tm.fg2);
+    }
+
+    $('headEn').textContent = h.en;
+    $('headJp').textContent = h.jp;
+    $('stEn').textContent = h.stEn;
+    $('stJp').textContent = h.stJp;
+    $('vertJp').textContent = h.vert;
+    $('vertJpR').textContent = h.vertR;
+    $('odSeal').textContent = h.odSeal;
+    $('sealTopJp').textContent = h.sealJp;
+    $('sealTopEn').textContent = h.sealEn;
+    $('sealTop').classList.toggle('emg', zone === 'emergency');
+
+    // ticker: hidden in normal, repeating text otherwise (repeat 6x for a seamless 50% loop)
+    const t = h.ticker;
+    $('tickerInner').textContent = t + t + t + t + t + t;
+    $('stTh').textContent = 'THRESHOLD ' + String(cautionTh()).padStart(3, '0') + '/' + String(emergencyTh()).padStart(3, '0');
+  }
+
+  /* ================= GEOMETRY HELPERS ================= */
+  function hexPoints(cx, cy, r) {
+    const w = 0.866 * r;
+    return [[cx, cy - r], [cx + w, cy - 0.5 * r], [cx + w, cy + 0.5 * r],
+            [cx, cy + r], [cx - w, cy + 0.5 * r], [cx - w, cy - 0.5 * r]]
+      .map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+  }
+
+  /* ================= HEX BUTTON GRID ================= */
+  const HEX_BTNS = [
+    { a: 'prev',   x: 32,  y: 30, en: 'PREV',   jp: '戻' },
+    { a: 'play',   x: 90,  y: 30, en: 'PLAY',   jp: '再' },
+    { a: 'next',   x: 148, y: 30, en: 'NEXT',   jp: '進' },
+    { a: 'bt',     x: 206, y: 30, en: 'BT',     jp: '接' },
+    { a: 'radio',  x: 264, y: 30, en: 'RADIO',  jp: '波' },
+    { a: 'usb',    x: 61,  y: 88, en: 'USB',    jp: '録' },
+    { a: 'phone',  x: 119, y: 88, en: 'PHONE',  jp: '通' },
+    { a: 'switch', x: 177, y: 88, en: 'SWITCH', jp: '切' },
+    { a: 'auto',   x: 235, y: 88, en: 'AUTO',   jp: '自' },
+    { a: 'more',   x: 293, y: 88, en: 'MORE',   jp: '展' },
+  ];
+  const hexBtns = {};
+
+  function buildHexGrid() {
+    const svg = $('hexsvg');
+    const R = 28;
+    HEX_BTNS.forEach(d => {
+      const g = document.createElementNS(SVGNS, 'g');
+      g.setAttribute('class', 'hex-btn');
+      g.setAttribute('tabindex', '0');
+      g.setAttribute('role', 'button');
+      g.setAttribute('aria-label', d.en);
+
+      const poly = document.createElementNS(SVGNS, 'polygon');
+      poly.setAttribute('points', hexPoints(d.x, d.y, R));
+      g.appendChild(poly);
+
+      const en = document.createElementNS(SVGNS, 'text');
+      en.setAttribute('class', 'en'); en.setAttribute('x', d.x); en.setAttribute('y', d.y - 1);
+      en.textContent = d.en;
+      g.appendChild(en);
+
+      const jp = document.createElementNS(SVGNS, 'text');
+      jp.setAttribute('class', 'jp'); jp.setAttribute('x', d.x); jp.setAttribute('y', d.y + 13);
+      jp.textContent = d.jp;
+      g.appendChild(jp);
+
+      g.addEventListener('click', () => onAction(d.a));
+      g.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onAction(d.a); }
+      });
+      svg.appendChild(g);
+      hexBtns[d.a] = g;
+    });
+  }
+
+  function updateHexButtons() {
+    HEX_BTNS.forEach(d => {
+      const g = hexBtns[d.a];
+      let latched = false, disabled = false;
+      if (d.a === 'bt') { latched = S.source === 'bt'; disabled = !S.bt; }
+      else if (d.a === 'radio') { latched = S.source === 'radio'; }
+      else if (d.a === 'usb') { latched = S.source === 'usb'; disabled = S.usb === 'none'; }
+      else if (d.a === 'play') { latched = S.track === 'playing' && currentTrack() && (S.source === 'bt' && S.bt || S.source === 'usb'); }
+      else if (d.a === 'auto') { latched = prefs.autoAA; }
+      g.classList.toggle('latched', latched);
+      g.classList.toggle('disabled', disabled);
+    });
+  }
+
+  /* ================= MAGI DIAGRAM ================= */
+  function updateMagi() {
+    const map = { bt: 'nodeMel', radio: 'nodeBal', usb: 'nodeCas' };
+    ['nodeMel', 'nodeBal', 'nodeCas'].forEach(id => {
+      $(id).classList.toggle('on', map[S.source] === id);
+    });
+    const glyph = { bt: 'B', radio: 'R', usb: 'U' };
+    $('magiGlyph').textContent = glyph[S.source] || 'A';
+    const dev = deviceName();
+    $('magiCorner').textContent = dev ? 'PRIORITY DOSSIER : ' + dev : 'CONCURRENCE : 100%';
+  }
+
+  /* ================= MAIN DISPLAY ================= */
+  const fmt = s => { s = Math.max(0, Math.floor(s)); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); };
+
+  function renderDisplay() {
+    const body = $('dispBody');
+    const tab = $('dispTab');
+    const right = $('dispRight');
+    let html = '';
+
+    if (S.callActive) {
+      tab.textContent = 'DISPLAY : CALL';
+      right.textContent = 'LINE OPEN : PRIORITY 1';
+      html = '<div class="play-title">通話中 : ' + S.callActive + '</div>' +
+             '<div class="play-artist">CALL ACTIVE — PRESS PHONE KEY TO END</div>' +
+             '<div class="play-meta"><span>LINE 01</span><span>MONO</span><span>SINKED</span></div>';
+    } else if (S.source === 'radio') {
+      const p = RADIO_PRESETS[S.radioIdx];
+      tab.textContent = 'DISPLAY : RADIO';
+      right.textContent = 'RDS RX : 192KBPS';
+      html = '<div class="freq">' + p.f + '<small>MHz FM</small></div>' +
+             '<div class="station">' + p.name + '</div>' +
+             '<div class="presets">' + RADIO_PRESETS.map((pr, i) =>
+               '<span class="preset' + (i === S.radioIdx ? ' on' : '') + '">' + pr.f + '</span>').join('') + '</div>' +
+             '<div class="play-meta"><span>STEREO</span><span>RDS</span><span>ANT: B7</span></div>';
+    } else if (S.source === 'usb' && S.usb !== 'none') {
+      const t = USB_TRACKS[S.usbIdx];
+      const playing = S.track === 'playing';
+      tab.textContent = 'DISPLAY : USB';
+      right.textContent = 'MASS STORAGE : FAT32';
+      const len = t.len, pct = Math.min(1, S.time / len);
+      html = '<div class="play-title">TRK ' + String(S.usbIdx + 1).padStart(2, '0') + ' — ' + t.title + '</div>' +
+             '<div class="play-artist">' + t.artist + '</div>' +
+             '<div class="play-prog"><i style="transform:scaleX(' + pct + ')"></i></div>' +
+             '<div class="play-meta"><span>TIME ' + fmt(S.time) + '</span><span>LEN ' + fmt(len) + '</span><span>' + (playing ? '▶ PLAYING' : 'PAUSED') + '</span></div>';
+    } else if (S.source === 'bt' && S.bt && S.track !== 'none') {
+      const t = BT_TRACKS[S.btIdx];
+      const playingU = S.track === 'playing';
+      tab.textContent = 'DISPLAY : TAPE';
+      right.textContent = 'A2DP SBC : 328KBPS';
+      const pct = Math.min(1, S.time / t.len);
+      html = '<div class="play-title">「' + t.title + '」</div>' +
+             '<div class="play-artist">' + t.artist + ' — BLUETOOTH ' + S.bt + '</div>' +
+             '<div class="play-prog"><i style="transform:scaleX(' + pct + ')"></i></div>' +
+             '<div class="play-meta"><span>TIME ' + fmt(S.time) + '</span><span>LEN ' + fmt(t.len) + '</span><span>' +
+               (S.track === 'playing' ? '▶ PLAYING' : 'PAUSED') + '</span></div>';
+    } else {
+      tab.textContent = 'DISPLAY : EMPTY';
+      right.textContent = 'A.T.F. ACTIVE';
+      html = '<div class="empty-big">NO SIGNAL</div>' +
+             '<div class="empty-jp">接続待機中</div>' +
+             '<div class="empty-sub">PRESS BT / SWITCH — CONNECT A PHONE</div>';
+    }
+    body.innerHTML = html;
+  }
+
+  /* ================= META / SIDEBARS ================= */
+  function updateMeta() {
+    const sp = String(S.speed).padStart(3, '0');
+    $('vSpeed').textContent = sp + ' KM/H';
+    $('vVol').textContent = String(S.vol).padStart(3, '0') + '/40';
+    $('od0').textContent = sp[0]; $('od1').textContent = sp[1]; $('od2').textContent = sp[2];
+
+    const link = S.source === 'bt' && S.bt ? S.bt : S.source === 'radio' ? 'ANT FM ' + RADIO_PRESETS[S.radioIdx].f :
+                 S.usb !== 'none' ? (S.usb === 'connected' ? 'USB : AA LINK' : 'USB : MASS') : 'STANDBY';
+    $('vLayer3').textContent = link;
+    $('vLayer2').textContent = S.aaOpen || (S.usb === 'connected' && prefs.autoAA) ? 'PROJECTION' : 'DATA LINK';
+    $('vLayer1').textContent = S.reverse ? 'CAM-01 REAR' : 'PHYSICAL I/O';
+    $('vSource').textContent = S.source === 'bt' ? 'BLUETOOTH' : S.source === 'radio' ? 'FM RADIO' : 'USB MEDIA';
+    $('bSource').classList.toggle('lit', true);
+    $('vTheme').textContent = effTheme().toUpperCase() + (S.zone !== 'normal' ? ' *' : '');
+    $('vZone').textContent = S.zone.toUpperCase();
+    $('vMode').textContent = prefs.resumeOnStart ? 'AUTO' : 'MANUAL';
+
+    $('knobVal').textContent = S.vol;
+    $('knobRead').textContent = 'VOL ' + String(S.vol).padStart(3, '0') + '/40';
+    $('stVol').textContent = 'VOL ' + String(S.vol).padStart(3, '0') + '/40';
+    $('knobRot').style.transform = 'rotate(' + (-135 + (S.vol / 40) * 270) + 'deg)';
+  }
+
+  /* ================= OVERLAYS / SHEETS ================= */
+  function updateOverlays() {
+    const rev = $('ovReverse'), cal = $('ovCall'), aa = $('ovAA');
+    rev.classList.toggle('on', S.reverse);
+    cal.classList.toggle('on', !!S.call && !S.reverse);
+    aa.classList.toggle('on', S.aaOpen && S.usb === 'connected' && !S.reverse && !S.call);
+    $('sheetMore').classList.toggle('on', S.sheet === 'more' && !S.reverse && !S.call);
+    $('sheetSet').classList.toggle('on', S.sheet === 'set' && !S.reverse && !S.call);
+    $('ovOff').classList.toggle('on', S.screenOff);
+    if (S.call) { $('callName').textContent = S.call; $('callNum').textContent = S.callNum; }
+    if (S.usb === 'connected') { $('aaName').textContent = S.bt || 'USB PHONE'; }
+  }
+
+  function buildTiles() {
+    const wrap = $('tiles');
+    TILE_LABELS.forEach((lab, i) => {
+      const [jp, en] = lab.split('|');
+      const tile = document.createElement('div');
+      tile.className = 'tile';
+      tile.tabIndex = 0;
+      tile.innerHTML = '<div class="in"><span class="jp">' + jp + '</span><span class="en">' + en + '</span></div>';
+      tile.addEventListener('click', () => tileAction(i, en));
+      tile.addEventListener('keydown', e => { if (e.key === 'Enter') tileAction(i, en); });
+      wrap.appendChild(tile);
+    });
+  }
+
+  function tileAction(i, en) {
+    if (i === 0) { S.source = 'radio'; S.sheet = null; }
+    else if (i === 1) { if (S.usb !== 'none') { S.source = 'usb'; S.sheet = null; } else { toast('USB MUSIC : NO MEDIA', '媒体なし'); return; } }
+    else if (i === 10) { // ANDROID
+      if (S.usb === 'connected') { S.aaOpen = true; S.sheet = null; } else { toast('ANDROID AUTO : NO PHONE', '未接続'); return; }
+    } else if (i === 11) { // SCREEN OFF
+      S.screenOff = true; S.sheet = null; renderAll(); return;
+    } else {
+      toast(en + ' : OPENING', TILE_LABELS[i].split('|')[0] + ' 起動中');
+      S.sheet = null;
+    }
+    renderAll();
+  }
+
+  /* ================= ACTIONS ================= */
+  function toast(en, jp) {
+    $('toastEn').textContent = en;
+    $('toastJp').textContent = jp || '';
+    const t = $('toast');
+    t.classList.add('on');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => t.classList.remove('on'), 2400);
+  }
+
+  function setSource(src, quiet) {
+    if (src === 'bt') {
+      if (!S.bt) { toast('BLUETOOTH : NO DEVICE', '未接続'); return; }
+    } else if (src === 'usb') {
+      if (S.usb === 'none') { toast('USB MEDIA : NOT PLUGGED', '未接続'); return; }
+    }
+    if (S.source !== src) S.time = S.source === 'bt' || S.source === 'usb' ? S.time : 0;
+    S.source = src;
+    renderAll();
+  }
+
+  function cycleSource() {
+    const order = ['bt', 'radio', 'usb'];
+    let i = order.indexOf(S.source);
+    const start = i;
+    do { i = (i + 1) % 3; } while (i !== start &&
+      ((order[i] === 'bt' && !S.bt) || (order[i] === 'usb' && S.usb === 'none')));
+    S.aaOpen = false; S.sheet = null;
+    setSource(order[i]);
+  }
+
+  function stepTrack(dir) {
+    if (S.source === 'radio') { S.radioIdx = (S.radioIdx + dir + RADIO_PRESETS.length) % RADIO_PRESETS.length; }
+    else if (S.source === 'bt' && S.bt && S.track !== 'none') {
+      S.btIdx = (S.btIdx + dir + BT_TRACKS.length) % BT_TRACKS.length; S.time = 0;
+    } else if (S.source === 'usb' && S.usb !== 'none') {
+      S.usbIdx = (S.usbIdx + dir + USB_TRACKS.length) % USB_TRACKS.length; S.time = 0;
+    } else { toast('NO MEDIA', '媒体なし'); return; }
+    renderAll();
+  }
+
+  function togglePlay() {
+    if (S.track === 'none' || !S.bt) { toast('NO SIGNAL', '信号なし'); return; }
+    S.track = S.track === 'playing' ? 'paused' : 'playing';
+    renderAll();
+  }
+
+  function onAction(a) {
+    if (S.screenOff) return;
+    if (a === 'phone') {
+      if (S.callActive) { S.callActive = null; toast('CALL ENDED', '電話終了'); }
+      else toast('PHONE : ' + (deviceName() || 'NO PHONE'), deviceName() ? '通話アプリ起動' : '未接続');
+      renderAll(); return;
+    }
+    if (a === 'prev') stepTrack(-1);
+    else if (a === 'next') stepTrack(1);
+    else if (a === 'play') togglePlay();
+    else if (a === 'bt') setSource('bt');
+    else if (a === 'radio') setSource('radio');
+    else if (a === 'usb') setSource('usb');
+    else if (a === 'switch') cycleSource();
+    else if (a === 'auto') { prefs.autoAA = !prefs.autoAA; toast('AUTO ANDROID AUTO : ' + (prefs.autoAA ? 'ON' : 'OFF'), '自動接続切替'); }
+    else if (a === 'more') { S.sheet = S.sheet === 'more' ? null : 'more'; }
+    renderAll();
+  }
+
+  /* ================= VOLUME KNOB ================= */
+  function setVol(v) {
+    S.vol = Math.max(0, Math.min(40, v));
+    renderAll();
+  }
+  (function knobEvents() {
+    const k = $('knob');
+    k.addEventListener('wheel', e => { e.preventDefault(); setVol(S.vol + (e.deltaY > 0 ? -1 : 1)); }, { passive: false });
+    k.addEventListener('pointerdown', e => {
+      e.preventDefault();
+      k.setPointerCapture(e.pointerId);
+      const y0 = e.clientY, v0 = S.vol;
+      const move = ev => setVol(v0 + Math.round((y0 - ev.clientY) / 3));
+      const up = ev => { k.removeEventListener('pointermove', move); k.removeEventListener('pointerup', up); };
+      k.addEventListener('pointermove', move);
+      k.addEventListener('pointerup', up);
+    });
+  })();
+
+  /* ================= SIMULATOR ================= */
+  function buildSeg(id, options, get, set) {
+    const host = $(id);
+    host.innerHTML = '';
+    options.forEach(([v, label]) => {
+      const b = document.createElement('button');
+      b.textContent = label;
+      b.classList.toggle('on', get() === v);
+      b.addEventListener('click', () => set(v));
+      host.appendChild(b);
+    });
+  }
+
+  function syncSim() {
+    buildSeg('simNight', [[false, 'Off'], [true, 'On']], () => S.headlights,
+      v => { S.headlights = v; renderAll(); });
+
+    buildSeg('simBt', BT_DEVICES.map(d => [d, d || 'None']), () => S.bt,
+      v => {
+        if (v && !S.bt) { // phone connects
+          if (S.track === 'none') S.track = prefs.resumeOnStart ? 'playing' : 'paused';
+          S.time = 0; S.source = 'bt';
+          toast('BT CONNECT : ' + v, '接続完了' + (prefs.resumeOnStart ? ' 再生開始' : ''));
+        } else if (!v && S.bt) { // phone releases
+          S.track = 'none'; S.time = 0;
+        }
+        S.bt = v;
+        renderAll();
+      });
+
+    buildSeg('simSource', [['bt', 'BT'], ['radio', 'RADIO'], ['usb', 'USB']], () => S.source, v => setSource(v));
+
+    buildSeg('simTrack', [['playing', 'Playing'], ['paused', 'Paused'], ['none', 'Released']], () => S.track,
+      v => { if (S.bt) { S.track = v; if (v === 'none') S.time = 0; renderAll(); } });
+
+    buildSeg('simUsb', [['none', 'Unplugged'], ['ready', 'Plugged in'], ['connected', 'AA connected']], () => S.usb,
+      v => {
+        const was = S.usb; S.usb = v;
+        if (v === 'none') { S.aaOpen = false; if (S.source === 'usb') { S.source = S.bt ? 'bt' : 'radio'; } }
+        if (v === 'connected' && was !== 'connected') { // phone plugs in: AA projection
+          if (prefs.autoAA && !S.reverse && !S.call) { S.aaOpen = true; toast('AA AUTO-OPEN', '自動接続'); }
+          else if (S.call || S.reverse) toast('AA GATED : ' + (S.call ? 'CALL' : 'REVERSE'), '接続保留');
+        }
+        renderAll();
+      });
+
+    const ev = $('simEvents'); ev.innerHTML = '';
+    [['REVERSE GEAR', () => {
+        S.reverse = !S.reverse; S.sheet = null;
+        if (S.reverse) { S.aaOpen = false; toast('REVERSE ENGAGED', '後退'); }
+        else if (S.usb === 'connected' && prefs.autoAA && !S.call) { S.aaOpen = true; toast('RESUMING AA', '復帰'); }
+        renderAll();
+      }, S.reverse],
+      ['INCOMING CALL', () => {
+        if (S.call) { S.call = null; toast('CALL DECLINED', '拒否'); }
+        else { const n = deviceName() || 'UNKNOWN'; S.call = n; S.callNum = '+81-90-0000-000' + (Math.floor(Math.random() * 10)); toast('RINGING', '着信'); }
+        renderAll();
+      }, !!S.call]].forEach(([label, fn, active]) => {
+      const b = document.createElement('button');
+      b.textContent = label; b.classList.toggle('on', active);
+      b.addEventListener('click', fn);
+      ev.appendChild(b);
+    });
+
+    ACCENTS.forEach(c => {
+      let b = [...$('simAccent').querySelectorAll('button')].find(x => x.dataset.c === c);
+      if (!b) { b = document.createElement('button'); b.dataset.c = c; b.style.background = c; $('simAccent').appendChild(b); b.addEventListener('click', () => { prefs.accent = c; dispatchAccent(); }); }
+      b.classList.toggle('on', prefs.accent === c);
+    });
+  }
+
+  function dispatchAccent() {
+    // mirror accent into settings sheet swatches (shared builder)
+    [...$('setAccent').querySelectorAll('button')].forEach(b => b.classList.toggle('on', b.dataset.c === prefs.accent));
+    renderAll();
+  }
+
+  function buildSettings() {
+    buildSeg('setResume', [[true, 'ON'], [false, 'OFF']], () => prefs.resumeOnStart,
+      v => { prefs.resumeOnStart = v; toast('RESUME ON START : ' + (v ? 'ON' : 'OFF'), '復帰再生'); syncSim(); renderAll(); });
+    buildSeg('setAA', [[true, 'ON'], [false, 'OFF']], () => prefs.autoAA,
+      v => { prefs.autoAA = v; toast('AUTO AA : ' + (v ? 'ON' : 'OFF'), '自動接続'); syncSim(); renderAll(); });
+    buildSeg('setTheme', [['auto', 'AUTO'], ['day', 'DAY'], ['graphite', 'GRAPHITE'], ['night', 'NIGHT']],
+      () => prefs.theme, v => { prefs.theme = v; renderAll(); });
+    const acc = $('setAccent'); acc.innerHTML = '';
+    ACCENTS.forEach(c => {
+      const b = document.createElement('button');
+      b.style.background = c; b.dataset.c = c;
+      b.classList.toggle('on', prefs.accent === c);
+      b.addEventListener('click', () => { prefs.accent = c; renderAll(); syncSim(); });
+      acc.appendChild(b);
+    });
+    $('setTc').value = cautionTh(); $('setTe').value = emergencyTh();
+  }
+
+  /* ================= TICK LOOP ================= */
+  function tick() {
+    if (S.track === 'playing' && (S.source === 'bt' || S.usb !== 'none')) {
+      const t = currentTrack();
+      if (t) { S.time = S.time + 1 > t.len ? 0 : S.time + 1; }
+      renderAll();
+    }
+  }
+
+  function tickClock() {
+    const d = new Date();
+    let hr = d.getHours() % 12; if (hr === 0) hr = 12;
+    $('clock').textContent = hr + ':' + String(d.getMinutes()).padStart(2, '0') + (d.getHours() < 12 ? ' AM' : ' PM');
+  }
+
+  /* ================= RENDER ALL ================= */
+  function renderAll() {
+    applyZone();
+    renderDisplay();
+    updateMeta();
+    updateMagi();
+    updateHexButtons();
+    updateOverlays();
+    syncSim();
+  }
+
+  /* ================= WIRING ================= */
+  $('simSpeed').addEventListener('input', e => {
+    S.speed = parseInt(e.target.value) || 0;
+    $('simSpeedVal').textContent = S.speed;
+    renderAll();
+  });
+  $('threshCaution').addEventListener('change', renderAll);
+  $('threshEmergency').addEventListener('change', renderAll);
+  $('setTc').addEventListener('change', () => { $('threshCaution').value = $('setTc').value; renderAll(); });
+  $('setTe').addEventListener('change', () => { $('threshEmergency').value = $('setTe').value; renderAll(); });
+  $('moreClose').addEventListener('click', () => { S.sheet = null; renderAll(); });
+  $('setClose').addEventListener('click', () => { S.sheet = null; renderAll(); });
+  $('callAccept').addEventListener('click', () => {
+    S.callActive = S.call; S.call = null; toast('LINE OPEN', '通話開始');
+    if (S.usb === 'connected' && prefs.autoAA && !S.reverse) S.aaOpen = true; // resume gated AA
+    renderAll();
+  });
+  $('callDecline').addEventListener('click', () => {
+    S.call = null; toast('CALL DECLINED', '拒否');
+    if (S.usb === 'connected' && prefs.autoAA && !S.reverse) S.aaOpen = true;
+    renderAll();
+  });
+  $('aaExit').addEventListener('click', () => { S.aaOpen = false; renderAll(); });
+  $('ovOff').addEventListener('click', () => { S.screenOff = false; renderAll(); });
+
+  /* ================= INIT ================= */
+  buildHexGrid();
+  buildTiles();
+  buildSettings();
+  renderAll();
+  setInterval(tick, 1000);
+  tickClock();
+  setInterval(tickClock, 5000);
+</script>
+</body>
+</html>
+
+
+</body>
+</html>
