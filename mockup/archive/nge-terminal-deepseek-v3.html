@@ -1,0 +1,2191 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lily Launcher — NGE Terminal v3 (7" Touch)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+/* ============================================================
+   LILY LAUNCHER — NGE TERMINAL v3
+   Palette is a three-state machine driven by vehicle speed.
+   All shifts are instant: no colour transitions anywhere.
+   ============================================================ */
+
+:root{
+  --font-jp:"Noto Serif JP","Yu Mincho","Hiragino Mincho ProN",serif;
+  --font-en:"Oswald","Noto Serif JP","Arial Narrow",sans-serif;
+  --font-mono:"JetBrains Mono","Noto Serif JP","Consolas",monospace;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{height:100%}
+body{
+  min-height:100vh;background:#07070b;color:#8d93a1;
+  display:flex;align-items:center;justify-content:center;padding:22px;
+  font-family:var(--font-mono);
+  -webkit-font-smoothing:antialiased;
+}
+button{font:inherit;color:inherit;background:none;border:0}
+button:focus-visible,[role="button"]:focus-visible,[tabindex]:focus-visible{
+  outline:2px solid #4de89a;outline-offset:2px;
+}
+.screen button:focus-visible,.screen [role="button"]:focus-visible{
+  outline:2px solid var(--ink);outline-offset:2px;
+}
+
+/* ---------- chassis ---------- */
+
+.rig{display:flex;gap:16px;align-items:flex-start}
+
+.bezel{
+  width:1052px;height:628px;flex:none;padding:14px;border-radius:9px;
+  background:linear-gradient(158deg,#3e3752 0%,#302a40 46%,#241f2f 100%);
+  border:1px solid #514a66;
+  box-shadow:0 3px 0 #120f19;
+  position:relative;
+}
+.bezel::after{
+  content:"";position:absolute;inset:5px;border:1px solid #1c1826;border-radius:6px;pointer-events:none;
+}
+.bezel::before{
+  content:"";position:absolute;left:14px;right:14px;top:7px;height:2px;
+  background:repeating-linear-gradient(90deg,#514a66 0 6px,transparent 6px 14px);
+  opacity:.5;pointer-events:none;
+}
+
+.screen{
+  width:1024px;height:600px;position:relative;overflow:hidden;
+  display:flex;flex-direction:column;
+  background:var(--bg);color:var(--ink);
+  font-family:var(--font-en);
+  border:1px solid #000;
+  isolation:isolate;
+}
+
+/* ---------- theme tokens (normal driving only) ---------- */
+
+.screen[data-theme="night"]{
+  --bg:#06070d;--bg-2:#0a0c14;--surface:#0b0d16;--surface-2:#111423;
+  --line:rgba(77,232,154,.32);--line-2:rgba(77,232,154,.14);
+  --ink:#4de89a;--ink-2:#f5b400;--ink-3:rgba(77,232,154,.64);
+  --hex:rgba(77,232,154,.09);--hex-lit:rgba(77,232,154,.15);
+  --haz-a:#f5b400;--haz-b:#0a0a12;
+}
+.screen[data-theme="day"]{
+  --bg:#e7e3d5;--bg-2:#ded9c7;--surface:#f2eede;--surface-2:#e2ddc9;
+  --line:rgba(16,58,45,.44);--line-2:rgba(16,58,45,.20);
+  --ink:#0f3d2f;--ink-2:#8a5c00;--ink-3:rgba(15,61,47,.74);
+  --hex:rgba(15,61,47,.12);--hex-lit:rgba(15,61,47,.19);
+  --haz-a:#f5b400;--haz-b:#141000;
+}
+.screen[data-theme="graphite"]{
+  --bg:#16181c;--bg-2:#1b1e23;--surface:#1f2228;--surface-2:#272b32;
+  --line:rgba(214,222,219,.30);--line-2:rgba(214,222,219,.13);
+  --ink:#d9e0db;--ink-2:#f5b400;--ink-3:rgba(217,224,219,.55);
+  --hex:rgba(217,224,219,.07);--hex-lit:rgba(217,224,219,.13);
+  --haz-a:#f5b400;--haz-b:#0c0d10;
+}
+
+/* Alarm zones force a dark substrate: an amber-on-paper or red-on-paper
+   caution screen loses the contrast the state machine depends on. */
+.screen[data-zone="caution"]{
+  --bg:#0b0900;--bg-2:#120e00;--surface:#141000;--surface-2:#1c1700;
+  --line:rgba(245,180,0,.42);--line-2:rgba(245,180,0,.18);
+  --ink:#f5b400;--ink-2:#ff8a1e;--ink-3:rgba(245,180,0,.62);
+  --hex:rgba(245,180,0,.12);--hex-lit:rgba(245,180,0,.22);
+  --haz-a:#f5b400;--haz-b:#0b0900;
+}
+.screen[data-zone="emergency"]{
+  --bg:#000000;--bg-2:#0a0203;--surface:#0c0203;--surface-2:#150304;
+  --line:rgba(255,74,28,.46);--line-2:rgba(255,74,28,.18);
+  --ink:#ff4a1c;--ink-2:#ff8a66;--ink-3:rgba(255,74,28,.66);
+  --hex:rgba(255,74,28,.13);--hex-lit:rgba(227,28,35,.26);
+  --haz-a:#e31c23;--haz-b:#000000;
+}
+
+.screen{
+  --accent:#ff4a1c;
+  --hot:var(--accent);
+  --hot-ink:#08090f;
+}
+.screen[data-zone="caution"]{--hot:#f5b400;--hot-ink:#0b0900}
+.screen[data-zone="emergency"]{--hot:#e31c23;--hot-ink:#eaffdf}
+
+/* ---------- substrate ---------- */
+
+.honeycomb{position:absolute;inset:0;width:1024px;height:600px;z-index:0;pointer-events:none}
+.honeycomb polygon{fill:none;stroke:var(--hex);stroke-width:1;vector-effect:non-scaling-stroke}
+.honeycomb polygon.lit{fill:var(--hex-lit);stroke:var(--hex-lit)}
+.screen.lamp-on .honeycomb polygon{stroke:var(--hex-lit)}
+.screen.lamp-on .honeycomb polygon.lit{fill:var(--hex-lit)}
+
+.scanlines{
+  position:absolute;inset:0;z-index:3;pointer-events:none;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.20) 0 1px,transparent 1px 3px);
+  opacity:.30;mix-blend-mode:multiply;
+}
+
+.hazard{
+  position:absolute;left:0;right:0;height:8px;z-index:4;display:none;pointer-events:none;
+  background:repeating-linear-gradient(-45deg,var(--haz-a) 0 9px,var(--haz-b) 9px 18px);
+}
+.hazard.top{top:0}
+.hazard.bottom{bottom:0}
+.screen[data-zone="caution"] .hazard,
+.screen[data-zone="emergency"] .hazard{display:block}
+
+/* ---------- header ---------- */
+
+.hdr{
+  height:60px;flex:none;z-index:2;position:relative;
+  display:grid;grid-template-columns:212px 1fr 216px;align-items:center;gap:10px;
+  padding:0 12px;background:var(--surface);border-bottom:2px solid var(--ink);
+}
+.hdr-time{display:flex;align-items:baseline;gap:6px}
+.hdr-clock{
+  font-family:var(--font-mono);font-size:23px;font-weight:700;letter-spacing:.4px;
+  color:var(--ink);font-variant-numeric:tabular-nums;
+}
+.hdr-time small{
+  font-family:var(--font-jp);font-size:8px;letter-spacing:.5px;color:var(--ink-3);
+  font-weight:700;
+}
+.hdr-date{font-family:var(--font-jp);font-size:9.5px;letter-spacing:1.2px;color:var(--ink-3);margin-top:1px}
+.hdr-c{min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px}
+.hdr-line{display:flex;align-items:center;gap:8px;max-width:100%}
+.h-rail{
+  width:44px;height:9px;flex:none;opacity:.55;
+  background:repeating-linear-gradient(90deg,var(--ink) 0 2px,transparent 2px 5px);
+}
+.hdr-title{
+  display:inline-flex;align-items:baseline;gap:9px;padding:3px 12px 2px;
+  background:var(--hot);color:var(--hot-ink);
+  clip-path:polygon(0 0,calc(100% - 7px) 0,100% 7px,100% 100%,7px 100%,0 calc(100% - 7px));
+  white-space:nowrap;
+}
+.hdr-title .t-jp{font-family:var(--font-jp);font-size:15px;font-weight:900;letter-spacing:2px;line-height:1.1}
+.hdr-title .t-en{font-family:var(--font-en);font-size:11px;font-weight:600;letter-spacing:2.4px;line-height:1.1}
+.hdr-sub{font-size:9.5px;letter-spacing:2.4px;color:var(--ink-3);white-space:nowrap;min-height:11px}
+.hdr-sub.flash{color:var(--hot);letter-spacing:1.8px;font-weight:600}
+.hdr-r{display:flex;align-items:center;justify-content:flex-end;gap:8px}
+.dn{display:flex;align-items:center;gap:5px;border:1px solid var(--line);padding:3px 6px;height:22px}
+.dn-box{width:8px;height:8px;border:1px solid var(--ink);background:transparent}
+.dn-box.night{background:var(--ink)}
+.dn-txt{font-size:7.5px;letter-spacing:1.4px;color:var(--ink-3);white-space:nowrap}
+.hbtn{
+  width:66px;height:44px;flex:none;border:1px solid var(--line);background:transparent;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+  cursor:pointer;color:var(--ink);
+}
+.hbtn span{font-family:var(--font-jp);font-size:12px;font-weight:700;letter-spacing:2px;line-height:1}
+.hbtn b{font-family:var(--font-en);font-size:6.5px;font-weight:500;letter-spacing:1.5px;color:var(--ink-3)}
+.hbtn:hover{background:var(--surface-2);border-color:var(--ink)}
+
+/* ---------- main grid ---------- */
+
+.main{
+  flex:1;min-height:0;display:grid;grid-template-columns:168px minmax(0,1fr) 204px;
+  gap:8px;padding:8px 12px;position:relative;z-index:2;
+}
+
+/* left rail */
+
+.rail{display:flex;flex-direction:column;gap:2px;min-height:0}
+.sec-lbl{
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:7.5px;letter-spacing:2.4px;color:var(--ink-3);
+  border-bottom:1px solid var(--line);padding-bottom:2px;margin:3px 0 2px;
+}
+.sec-lbl:first-child{margin-top:0}
+.kv{
+  display:flex;justify-content:space-between;align-items:baseline;gap:5px;
+  border:1px solid var(--line-2);background:var(--bg-2);padding:2px 5px;min-height:19px;
+}
+.kv span{font-family:var(--font-en);font-size:8px;letter-spacing:1.3px;color:var(--ink-3);white-space:nowrap}
+.kv b{font-family:var(--font-mono);font-size:10.5px;font-weight:700;color:var(--ink);letter-spacing:.2px;white-space:nowrap}
+.stamp{
+  margin-top:auto;border-top:1px solid var(--line);padding-top:5px;
+  display:flex;justify-content:space-between;align-items:flex-end;
+}
+.stamp .jp{font-family:var(--font-jp);font-size:15px;font-weight:700;letter-spacing:3px;color:var(--ink);line-height:1.05}
+.stamp .jp2{font-family:var(--font-jp);font-size:11px;font-weight:700;letter-spacing:2px;color:var(--ink-2)}
+.log{
+  margin-top:4px;border-top:1px solid var(--line-2);padding-top:3px;
+  font-family:var(--font-mono);font-size:7.8px;line-height:1.5;color:var(--ink-3);
+  height:40px;overflow:hidden;
+}
+.log div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* now playing */
+
+.center{display:flex;flex-direction:column;min-height:0}
+.np{
+  flex:1;min-height:0;display:flex;flex-direction:column;position:relative;
+  border:1px solid var(--line);background:var(--surface);
+}
+.np::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:var(--ink);pointer-events:none}
+.np-head{
+  flex:none;display:flex;justify-content:space-between;align-items:center;
+  padding:5px 8px;border-bottom:1px solid var(--line-2);
+  font-size:8px;letter-spacing:2.2px;color:var(--ink-3);
+}
+.np-head .jp{font-family:var(--font-jp);letter-spacing:2px;font-weight:700}
+.chip{
+  font-family:var(--font-en);font-size:8px;font-weight:600;letter-spacing:1.6px;
+  border:1px solid var(--ink);color:var(--ink);padding:1px 6px;
+}
+.chip.on{background:var(--hot);border-color:var(--hot);color:var(--hot-ink)}
+.np-body{flex:1;min-height:0;display:flex;gap:12px;align-items:center;padding:8px 10px}
+.np-art{
+  width:106px;height:106px;flex:none;display:grid;place-items:center;position:relative;
+  background:var(--surface-2);border:1px solid var(--line);
+  clip-path:polygon(28% 0,72% 0,100% 28%,100% 72%,72% 100%,28% 100%,0 72%,0 28%);
+}
+.np-art .g1{font-family:var(--font-mono);font-size:30px;font-weight:700;color:var(--hot);letter-spacing:-1px}
+.np-art .g2{font-family:var(--font-jp);font-size:11px;font-weight:700;color:var(--ink-3);letter-spacing:2px;margin-top:-6px}
+.np-art .idx{position:absolute;bottom:8px;right:10px;font-family:var(--font-mono);font-size:8px;color:var(--ink-3)}
+.np-text{min-width:0;flex:1;display:flex;flex-direction:column;justify-content:center;gap:3px}
+.np-side{
+  width:138px;flex:none;align-self:stretch;display:flex;flex-direction:column;justify-content:center;gap:4px;
+  border-left:1px solid var(--line-2);padding-left:10px;
+}
+.ns-row{display:flex;justify-content:space-between;align-items:baseline;gap:6px;border-bottom:1px dotted var(--line-2);padding-bottom:2px}
+.ns-row span{font-family:var(--font-en);font-size:7px;letter-spacing:1.4px;color:var(--ink-3)}
+.ns-row b{font-family:var(--font-mono);font-size:8.5px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.np-song{
+  font-family:var(--font-jp);font-size:24px;font-weight:700;line-height:1.1;color:var(--ink);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.np-artist{font-family:var(--font-jp);font-size:13px;color:var(--ink-3);letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.np-meta{font-family:var(--font-mono);font-size:9px;letter-spacing:1px;color:var(--ink-3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.np[data-kind="radio"] .np-song{font-family:var(--font-mono);font-size:38px;letter-spacing:1px;line-height:1}
+.np[data-kind="radio"] .np-artist{font-family:var(--font-en);font-size:12px;letter-spacing:2px}
+.np[data-kind="radio"] .np-bar{display:none}
+.np[data-kind="radio"] .np-times{display:none}
+.np[data-kind="empty"] .np-song{color:var(--ink-3);font-size:22px}
+.np-foot{flex:none;padding:0 10px 8px}
+.np-bar{height:8px;background:var(--bg-2);border:1px solid var(--line-2);position:relative;overflow:hidden}
+.np-fill{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--hot)}
+.np-times{
+  display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:8px;
+  color:var(--ink-3);letter-spacing:1px;margin-top:3px;
+}
+
+/* MAGI */
+
+.magi{flex:none;margin-top:8px;border:1px solid var(--line);background:var(--surface);padding:5px 8px 7px}
+.magi-head{display:flex;justify-content:space-between;font-size:7.5px;letter-spacing:2.2px;color:var(--ink-3)}
+.magi-head .jp{font-family:var(--font-jp);font-weight:700;letter-spacing:2px}
+.magi-row{display:flex;gap:10px;margin-top:5px}
+.mnode{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:0}
+.trap{
+  display:block;width:120px;height:50px;padding:2px;
+  background:var(--ink);clip-path:polygon(15% 0,85% 0,100% 100%,0 100%);
+}
+.trap-in{
+  display:grid;place-items:center;width:100%;height:100%;
+  background:var(--surface);color:var(--ink);
+  clip-path:polygon(15% 0,85% 0,100% 100%,0 100%);
+  font-family:var(--font-en);font-size:12px;font-weight:600;letter-spacing:1.4px;
+}
+.mnode.live .trap{background:var(--hot)}
+.mnode.live .trap-in{background:var(--hot);color:var(--hot-ink)}
+.mnode.alert .trap{background:var(--ink)}
+.mnode.alert .trap-in{background:var(--ink);color:var(--bg)}
+.mnode:hover .trap-in{outline:1px solid var(--ink);outline-offset:-4px}
+.magi-sub{font-size:9px;letter-spacing:1.5px;color:var(--ink-3);white-space:nowrap}
+.mnode.alert .magi-sub{color:var(--ink)}
+.magi-jp{font-family:var(--font-jp);font-size:8px;letter-spacing:1.4px;color:var(--ink-3)}
+
+/* right rail */
+
+.speed{border:1px solid var(--line);background:var(--surface);padding:5px 8px 6px;position:relative;flex:none}
+.speed::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--hot)}
+.speed-lbl{display:flex;justify-content:space-between;font-size:7.5px;letter-spacing:2.2px;color:var(--ink-3)}
+.speed-lbl .jp{font-family:var(--font-jp);font-weight:700}
+.speed-num{display:flex;align-items:baseline;gap:4px;line-height:.95;margin-top:1px}
+.speed-num b{
+  font-family:var(--font-mono);font-size:54px;font-weight:700;letter-spacing:-3px;
+  color:var(--ink);font-variant-numeric:tabular-nums;
+}
+.speed-num i{font-family:var(--font-en);font-style:normal;font-size:10px;letter-spacing:1px;color:var(--ink-3)}
+.speed-seg{display:flex;gap:2px;margin-top:4px}
+.speed-seg i{flex:1;height:5px;background:var(--line-2)}
+.speed-seg i.on{background:var(--ink)}
+.speed-zone{display:flex;justify-content:space-between;margin-top:4px;font-size:8.5px;letter-spacing:1.8px;color:var(--ink-3)}
+.speed-zone b{color:var(--ink);font-weight:600}
+
+.tile{
+  display:block;width:100%;text-align:left;margin-top:6px;padding:5px 7px;min-height:66px;flex:none;
+  border:1px solid var(--line);background:var(--surface);cursor:pointer;position:relative;
+}
+.tile:hover{border-color:var(--ink);background:var(--surface-2)}
+.tile-top{display:flex;justify-content:space-between;align-items:center;font-size:7.5px;letter-spacing:1.7px;color:var(--ink-3)}
+.tile-top .jp{font-family:var(--font-jp);font-weight:700;letter-spacing:1.5px}
+.dot{width:6px;height:6px;background:var(--line);border:1px solid var(--ink-3)}
+.tile.on .dot{background:var(--hot);border-color:var(--hot)}
+.tile-val{font-family:var(--font-mono);font-size:12.5px;font-weight:700;color:var(--ink);margin-top:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile-sub{font-size:8.3px;letter-spacing:1.1px;color:var(--ink-3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile[aria-disabled="true"]{
+  cursor:not-allowed;opacity:.55;
+  background:repeating-linear-gradient(-45deg,transparent 0 6px,var(--line-2) 6px 7px),var(--surface);
+}
+.tile[aria-disabled="true"]:hover{border-color:var(--line)}
+
+/* ---------- footer ---------- */
+
+.foot{
+  height:140px;flex:none;z-index:2;position:relative;
+  display:grid;grid-template-columns:minmax(0,1fr) 232px 182px;gap:8px;
+  align-items:center;padding:0 86px 8px;
+  border-top:1px solid var(--line);
+}
+
+.hex-pad{height:100%;min-width:0;display:grid;place-items:center}
+.hex-pad svg{width:100%;height:100%;max-height:128px}
+.hex{cursor:pointer;color:var(--ink)}
+.hex .body{fill:var(--surface-2);stroke:var(--ink);stroke-width:1.4}
+.hex .lbl{font-family:var(--font-en);font-size:9px;font-weight:600;letter-spacing:.8px;fill:var(--ink);text-anchor:middle}
+.hex .jp{font-family:var(--font-jp);font-size:6.5px;font-weight:700;fill:var(--ink-3);text-anchor:middle}
+.hex:hover .body{fill:var(--line-2)}
+.hex.live .body{fill:var(--hot);stroke:var(--hot)}
+.hex.live .lbl{fill:var(--hot-ink)}
+.hex.live .jp{fill:var(--hot-ink)}
+.hex:focus-visible{outline:none}
+.hex:focus-visible .body{stroke-width:3}
+
+.knob-wrap{display:flex;align-items:center;justify-content:center;gap:10px;height:100%}
+.knob-holder{position:relative;width:96px;height:96px;flex:none;display:grid;place-items:center}
+.knob-arc{position:absolute;inset:0;width:96px;height:96px;pointer-events:none}
+.knob-arc circle{fill:none;stroke-width:5;transform:rotate(135deg);transform-origin:48px 48px}
+.knob-arc .bg{stroke:var(--line-2);stroke-dasharray:188.5 251.33}
+.knob-arc .fg{stroke:var(--hot);stroke-dasharray:0 251.33}
+.knob{
+  width:70px;height:70px;border-radius:50%;border:2px solid var(--ink);
+  background:var(--surface-2);display:grid;place-items:center;cursor:grab;
+  touch-action:none;position:relative;
+}
+.knob:active{cursor:grabbing}
+.knob-val{font-family:var(--font-mono);font-size:17px;font-weight:700;color:var(--ink)}
+.knob-tick{
+  position:absolute;top:5px;left:50%;margin-left:-1px;width:2px;height:13px;background:var(--ink);
+  transform-origin:50% 30px;
+}
+.knob-meta{display:flex;flex-direction:column;gap:1px}
+.knob-meta .jp{font-family:var(--font-jp);font-size:17px;font-weight:700;letter-spacing:3px;color:var(--ink)}
+.knob-meta .en{font-family:var(--font-en);font-size:7.5px;letter-spacing:2.6px;color:var(--ink-3)}
+.knob-meta .read{font-family:var(--font-mono);font-size:10px;color:var(--ink-2);margin-top:2px}
+
+.foot-stat{display:grid;grid-template-columns:1fr;gap:2px}
+
+/* ---------- ticker ---------- */
+
+.ticker{
+  flex:none;height:0;overflow:hidden;position:relative;z-index:5;
+  display:flex;align-items:center;background:var(--hot);color:var(--hot-ink);
+  font-family:var(--font-en);font-size:11px;font-weight:600;letter-spacing:2.4px;
+  white-space:nowrap;
+}
+.screen[data-zone="caution"] .ticker,
+.screen[data-zone="emergency"] .ticker{height:22px}
+.ticker-track{display:inline-flex;will-change:transform;animation:ticker 30s linear infinite}
+.ticker-track span{display:inline-block;padding-right:36px}
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ---------- octagonal seals ---------- */
+
+.seal{
+  position:absolute;bottom:20px;width:74px;height:74px;z-index:4;
+  pointer-events:none;color:var(--ink);opacity:.75;
+}
+.seal.bl{left:6px}
+.seal.br{right:6px}
+.seal svg{width:100%;height:100%;display:block}
+.seal .o1{fill:none;stroke:currentColor;stroke-width:1.5}
+.seal .o2{fill:var(--oct-fill,none);stroke:currentColor;stroke-width:.7;stroke-dasharray:2 3;opacity:.85}
+.seal .facets{fill:none;stroke:currentColor;stroke-width:.5;opacity:.45}
+.seal text{fill:currentColor;text-anchor:middle}
+.seal .s1{font-family:var(--font-jp);font-size:16px;font-weight:900}
+.seal .s2{font-family:var(--font-en);font-size:6.5px;letter-spacing:1px;font-weight:600}
+.seal .s3{font-family:var(--font-mono);font-size:5.5px;letter-spacing:.6px;opacity:.8}
+.seal.inv{--oct-fill:var(--hot);color:var(--hot-ink);opacity:1}
+
+/* ---------- warning overlay (emergency) ---------- */
+
+.warn{
+  position:absolute;inset:0;z-index:6;display:none;pointer-events:none;
+  flex-direction:column;align-items:center;justify-content:center;gap:12px;
+}
+.warn.on{display:flex}
+.warn-strip{
+  position:absolute;left:0;right:0;height:18px;
+  background:repeating-linear-gradient(-45deg,var(--haz-a) 0 14px,var(--haz-b) 14px 28px);
+}
+.warn-strip.a{top:0}
+.warn-strip.b{bottom:0}
+.warn-box{
+  display:flex;flex-direction:column;align-items:center;gap:1px;
+  background:var(--hot);color:var(--hot-ink);border:3px solid var(--hot-ink);
+  padding:9px 26px 10px;animation:pulse 1.1s ease-in-out infinite;
+}
+.warn-box .w0{font-family:var(--font-jp);font-size:11px;font-weight:700;letter-spacing:7px;padding-bottom:3px;margin-bottom:3px;border-bottom:1px solid currentColor;width:100%;text-align:center;opacity:.9}
+.warn-box .w1{font-family:var(--font-jp);font-size:34px;font-weight:900;letter-spacing:8px;line-height:1.05}
+.warn-box .w2{font-family:var(--font-en);font-size:13px;font-weight:600;letter-spacing:5px}
+.warn-box .w3{font-family:var(--font-mono);font-size:9px;letter-spacing:1.4px;margin-top:2px;opacity:.9}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+.warn-ack{
+  pointer-events:auto;height:44px;min-width:132px;background:transparent;
+  border:2px solid var(--ink);color:var(--ink);font-family:var(--font-jp);
+  font-size:12px;font-weight:700;letter-spacing:3px;cursor:pointer;
+}
+.warn-ack:hover{background:var(--hot);color:var(--hot-ink);border-color:var(--hot)}
+
+/* ---------- shared overlay shell ---------- */
+
+.ovl{position:absolute;inset:0;display:none;z-index:7;background:rgba(0,0,0,.86)}
+.ovl.on{display:flex}
+.ovl-hd{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:0 12px;height:56px;flex:none;border-bottom:2px solid var(--ink);
+  background:var(--surface);
+}
+.ovl-hd .t{display:flex;align-items:baseline;gap:10px}
+.ovl-hd .t .jp{font-family:var(--font-jp);font-size:18px;font-weight:900;letter-spacing:4px;color:var(--ink)}
+.ovl-hd .t .en{font-family:var(--font-en);font-size:11px;font-weight:600;letter-spacing:3px;color:var(--ink-3)}
+.ovl-close{
+  height:44px;min-width:110px;border:1px solid var(--ink);background:transparent;color:var(--ink);
+  font-family:var(--font-jp);font-size:11px;font-weight:700;letter-spacing:2px;cursor:pointer;
+}
+.ovl-close:hover{background:var(--hot);color:var(--hot-ink);border-color:var(--hot)}
+
+/* reverse camera */
+
+#ovlRev{background:#04060a;flex-direction:column;z-index:9}
+.rev-feed{position:relative;flex:1;overflow:hidden;background:
+  radial-gradient(120% 90% at 50% 8%,#1b2a26 0%,#0a1210 48%,#04070a 100%)}
+.rev-hatch{
+  position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.42) 0 1px,transparent 1px 4px),
+             repeating-linear-gradient(90deg,rgba(120,255,210,.05) 0 1px,transparent 1px 32px);
+  mix-blend-mode:multiply;opacity:.9;
+}
+.rev-guides{position:absolute;inset:0;width:100%;height:100%}
+.rev-hd{
+  position:absolute;top:16px;left:50%;transform:translateX(-50%);
+  display:flex;align-items:baseline;gap:12px;padding:5px 20px;
+  background:#e31c23;color:#fff;
+}
+.rev-hd .jp{font-family:var(--font-jp);font-size:26px;font-weight:900;letter-spacing:8px;line-height:1}
+.rev-hd .en{font-family:var(--font-en);font-size:12px;font-weight:600;letter-spacing:4px}
+.rev-meta{
+  position:absolute;left:16px;bottom:14px;font-family:var(--font-mono);font-size:9px;
+  letter-spacing:1.4px;color:#8ef0c4;
+}
+.rev-meta b{color:#f5b400;font-weight:700}
+.rev-scale{
+  position:absolute;right:16px;bottom:14px;display:flex;flex-direction:column;gap:3px;
+  font-family:var(--font-mono);font-size:9px;color:#8ef0c4;text-align:right;
+}
+.rev-badge{
+  position:absolute;top:16px;left:16px;border:1px solid #8ef0c4;color:#8ef0c4;
+  font-family:var(--font-mono);font-size:8px;letter-spacing:1.6px;padding:3px 7px;
+}
+.rev-badge i{display:inline-block;width:6px;height:6px;background:#e31c23;margin-right:5px;vertical-align:middle}
+
+/* incoming call */
+
+#ovlCall{background:rgba(2,0,0,.92);z-index:10;align-items:center;justify-content:center}
+.call-frame{
+  width:470px;border:2px solid var(--ink);background:var(--surface);
+  display:flex;flex-direction:column;align-items:center;padding:0 0 18px;
+}
+.call-hd{
+  width:100%;background:var(--hot);color:var(--hot-ink);text-align:center;
+  font-family:var(--font-jp);font-size:13px;font-weight:900;letter-spacing:6px;padding:6px 0;
+}
+.call-hd .en{font-family:var(--font-en);font-size:9px;letter-spacing:3px;margin-left:8px}
+.call-name{font-family:var(--font-jp);font-size:32px;font-weight:900;letter-spacing:4px;margin-top:14px}
+.call-num{font-family:var(--font-mono);font-size:13px;letter-spacing:1.6px;color:var(--ink-3);margin-top:3px}
+.call-state{font-family:var(--font-mono);font-size:10px;letter-spacing:2px;color:var(--ink-2);margin-top:8px}
+.call-actions{display:flex;gap:12px;margin-top:16px}
+.call-actions[hidden]{display:none}
+.call-actions button{
+  width:186px;height:56px;border:2px solid var(--ink);font-family:var(--font-jp);
+  font-size:14px;font-weight:700;letter-spacing:3px;cursor:pointer;background:transparent;color:var(--ink);
+}
+.call-actions button .en{display:block;font-family:var(--font-en);font-size:8px;letter-spacing:2.4px;color:var(--ink-3)}
+.call-actions .answer{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.call-actions .answer .en{color:var(--bg);opacity:.75}
+.call-actions .decline{border-color:var(--hot);color:var(--hot)}
+.call-actions .decline .en{color:var(--hot);opacity:.8}
+.call-actions .decline:hover{background:var(--hot);color:var(--hot-ink)}
+.call-actions .decline:hover .en{color:var(--hot-ink);opacity:.8}
+
+/* android auto */
+
+#ovlAA{background:rgba(3,5,8,.94);flex-direction:column;z-index:8}
+.aa-body{flex:1;display:grid;grid-template-columns:1fr 292px;gap:10px;padding:10px;min-height:0}
+.aa-map{border:1px solid var(--line);background:var(--bg-2);position:relative;overflow:hidden}
+.aa-map svg{position:absolute;inset:0;width:100%;height:100%}
+.aa-map .tag{
+  position:absolute;left:10px;bottom:9px;font-family:var(--font-mono);font-size:8.5px;
+  letter-spacing:1.4px;color:var(--ink-3);border:1px solid var(--line);padding:2px 6px;background:var(--bg);
+}
+.aa-side{display:grid;grid-template-rows:1fr 1fr 1fr;gap:8px;min-height:0}
+.aa-tile{
+  border:1px solid var(--line);background:var(--surface);padding:8px 10px;text-align:left;
+  display:flex;flex-direction:column;justify-content:center;gap:2px;cursor:pointer;
+}
+.aa-tile:hover{border-color:var(--ink);background:var(--surface-2)}
+.aa-tile .k{font-family:var(--font-jp);font-size:15px;font-weight:700;letter-spacing:2px;color:var(--ink)}
+.aa-tile .v{font-family:var(--font-mono);font-size:9px;letter-spacing:1.2px;color:var(--ink-3)}
+.aa-dock{
+  flex:none;height:64px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;
+  padding:0 10px 10px;
+}
+.aa-dock button{
+  border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;
+  font-family:var(--font-jp);font-size:11px;font-weight:700;letter-spacing:2px;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.aa-dock button .en{font-family:var(--font-en);font-size:8px;letter-spacing:1.6px;color:var(--ink-3)}
+.aa-dock button:hover{border-color:var(--ink)}
+
+/* ---------- sheets ---------- */
+
+.sheet{position:absolute;inset:0;z-index:8;display:none;background:rgba(0,0,0,.82);align-items:center;justify-content:center}
+.sheet.open{display:flex}
+.sheet-frame{
+  width:944px;max-height:552px;border:2px solid var(--ink);background:var(--surface);
+  display:flex;flex-direction:column;position:relative;
+}
+.sheet-frame::before{
+  content:"";position:absolute;left:-2px;right:-2px;top:-2px;height:4px;
+  background:repeating-linear-gradient(90deg,var(--hot) 0 12px,transparent 12px 24px);
+}
+.sheet-hd{
+  height:52px;flex:none;display:flex;justify-content:space-between;align-items:center;
+  padding:0 12px;border-bottom:1px solid var(--line);
+}
+.sheet-hd .t{display:flex;align-items:baseline;gap:10px}
+.sheet-hd .jp{font-family:var(--font-jp);font-size:17px;font-weight:900;letter-spacing:5px;color:var(--ink)}
+.sheet-hd .en{font-family:var(--font-en);font-size:9px;letter-spacing:2.6px;color:var(--ink-3)}
+.sheet-body{flex:1;min-height:0;overflow-y:auto;padding:12px}
+.tiles13{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+.tile13{
+  min-height:118px;border:1px solid var(--line);background:var(--bg-2);cursor:pointer;
+  display:flex;flex-direction:column;justify-content:space-between;padding:8px;
+  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));
+  text-align:left;
+}
+.tile13:hover{background:var(--surface-2);border-color:var(--ink)}
+.tile13:hover .t-en{color:var(--ink)}
+.tile13 .t-no{font-family:var(--font-mono);font-size:7.5px;color:var(--ink-3);letter-spacing:1px}
+.tile13 .t-jp{font-family:var(--font-jp);font-size:14px;font-weight:700;letter-spacing:1.5px;color:var(--ink);line-height:1.2}
+.tile13 .t-en{font-family:var(--font-en);font-size:8px;letter-spacing:1.6px;color:var(--ink-3)}
+.tile-ghost{
+  min-height:118px;border:1px dashed var(--line-2);background:transparent;
+  display:flex;flex-direction:column;justify-content:space-between;padding:8px;opacity:.55;
+}
+.tile-ghost .t-en{font-family:var(--font-en);font-size:8px;letter-spacing:1.6px;color:var(--ink-3)}
+.tile-ghost .t-jp{font-family:var(--font-jp);font-size:12px;font-weight:700;letter-spacing:2px;color:var(--ink-3)}
+.aa-dock button.on{background:var(--hot);border-color:var(--hot);color:var(--hot-ink)}
+.aa-dock button.on .en{color:var(--hot-ink);opacity:.8}
+
+.set-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.set-row{
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  border:1px solid var(--line-2);background:var(--bg-2);padding:8px 10px;min-height:58px;
+}
+.set-row .lbl b{display:block;font-family:var(--font-jp);font-size:12px;font-weight:700;letter-spacing:2px;color:var(--ink)}
+.set-row .lbl span{display:block;font-family:var(--font-en);font-size:7.5px;letter-spacing:2px;color:var(--ink-3);margin-top:1px}
+.sw{
+  width:64px;height:44px;border:1px solid var(--ink);background:transparent;cursor:pointer;position:relative;flex:none;
+}
+.sw i{position:absolute;top:4px;left:4px;bottom:4px;width:22px;background:var(--line-2);border:1px solid var(--ink-3)}
+.sw[aria-pressed="true"]{background:var(--hot);border-color:var(--hot)}
+.sw[aria-pressed="true"] i{left:auto;right:4px;background:var(--hot-ink);border-color:var(--hot-ink)}
+.set-seg{display:flex;gap:2px;flex-wrap:wrap}
+.set-seg button{
+  min-height:44px;padding:0 8px;border:1px solid var(--line);background:transparent;color:var(--ink-3);
+  font-family:var(--font-en);font-size:8px;letter-spacing:1.2px;cursor:pointer;
+}
+.set-seg button.on{background:var(--hot);border-color:var(--hot);color:var(--hot-ink)}
+.set-seg button:hover{border-color:var(--ink);color:var(--ink)}
+.set-seg button.on:hover{color:var(--hot-ink)}
+.num{
+  width:64px;height:44px;background:var(--bg);border:1px solid var(--ink);color:var(--ink);
+  font-family:var(--font-mono);font-size:15px;font-weight:700;text-align:center;
+}
+.swatches{display:flex;gap:5px}
+.swatch{
+  width:44px;height:44px;border:1px solid var(--line);cursor:pointer;position:relative;
+}
+.swatch.on{border:2px solid var(--ink)}
+.swatch.on::after{content:"";position:absolute;inset:5px;border:2px solid #000;opacity:.55}
+
+/* screen off */
+
+#ovlOff{background:#000;z-index:11;align-items:center;justify-content:center;cursor:pointer}
+.off-hint{
+  text-align:center;font-family:var(--font-jp);font-size:13px;letter-spacing:5px;color:#2a2f3a;
+}
+.off-hint span{display:block;font-family:var(--font-en);font-size:9px;letter-spacing:3px;margin-top:8px;color:#1e222a}
+
+/* toast */
+
+
+
+/* ---------- simulator console ---------- */
+
+.sim{
+  width:340px;height:628px;flex:none;display:flex;flex-direction:column;
+  background:#0c0d11;border:1px solid #2b2e37;font-family:var(--font-mono);font-size:10px;color:#9aa1ad;
+}
+.sim-hd{
+  flex:none;padding:8px 10px 7px;border-bottom:1px solid #2b2e37;background:#111319;
+  display:flex;justify-content:space-between;align-items:flex-start;gap:8px;
+}
+.sim-hd .t b{display:block;font-family:var(--font-en);font-size:14px;font-weight:600;letter-spacing:3px;color:#e6eaf1}
+.sim-hd .t span{display:block;font-family:var(--font-jp);font-size:9.5px;letter-spacing:2px;color:#6f7783;margin-top:1px}
+.sim-hd .lab{
+  border:1px solid #3a3f4b;color:#7d8593;font-size:7px;letter-spacing:1.6px;padding:2px 5px;text-align:right;
+}
+.sim-note{
+  flex:none;padding:4px 10px;background:#150f04;border-bottom:1px solid #2b2e37;
+  color:#c99a1a;font-size:7px;letter-spacing:1.3px;
+}
+.sim-body{flex:1;min-height:0;overflow-y:auto;padding:6px 10px 10px}
+.sim-body::-webkit-scrollbar{width:7px}
+.sim-body::-webkit-scrollbar-thumb{background:#333843}
+.sim-body::-webkit-scrollbar-track{background:#0c0d11}
+.sim-sec{
+  display:flex;justify-content:space-between;align-items:baseline;
+  font-family:var(--font-en);font-size:8px;letter-spacing:2.2px;color:#f5b400;
+  border-bottom:1px solid #23262e;margin:9px 0 5px;padding-bottom:2px;
+}
+.sim-sec:first-child{margin-top:2px}
+.sim-sec span{font-family:var(--font-jp);font-size:7px;letter-spacing:1.5px;color:#6f7783}
+.sim-row{display:grid;grid-template-columns:98px minmax(0,1fr);gap:6px;align-items:center;margin-bottom:4px}
+.sim-row>label{font-size:8px;letter-spacing:.4px;color:#7c848f}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:2px}
+.seg button{
+  background:#171a20;border:1px solid #333843;color:#98a0ab;
+  font-family:var(--font-mono);font-size:7.6px;letter-spacing:0;padding:3px 4px;min-height:24px;cursor:pointer;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.seg button:hover{border-color:#5a616e;color:#cfd5df}
+.seg button.on{background:#f5b400;border-color:#f5b400;color:#111}
+#simAccent button.on{border-color:#fff;box-shadow:inset 0 0 0 2px #0c0d11}
+.seg button sub{font-family:var(--font-jp);font-size:6.5px;letter-spacing:0;opacity:.75}
+.sim-slider{width:100%;accent-color:#f5b400;height:16px}
+.sim-read{font-family:var(--font-mono);font-size:12px;color:#e6eaf1;font-weight:700}
+.sim-num{
+  width:56px;height:24px;background:#161a20;border:1px solid #3a3f4b;color:#e6eaf1;
+  font-family:var(--font-mono);font-size:10px;text-align:center;
+}
+.zband{position:relative;height:12px;display:flex;margin:5px 0 3px;background:#15171d}
+.zband i{display:block;height:100%}
+.zband .zn{background:#4de89a}
+.zband .zc{background:#f5b400}
+.zband .ze{background:#e31c23}
+.zband .needle{position:absolute;top:-3px;bottom:-3px;width:2px;background:#fff;left:0}
+.zband-lbl{display:flex;justify-content:space-between;font-size:7px;color:#6f7783;letter-spacing:.6px}
+.tel{display:grid;grid-template-columns:1fr 1fr;gap:2px 8px}
+.tel div{display:flex;justify-content:space-between;border-bottom:1px dotted #23262e;padding:2px 0}
+.tel span{font-size:7.5px;color:#6f7783;letter-spacing:.8px}
+.tel b{font-size:8px;color:#d6dbe3;font-weight:700;letter-spacing:.4px}
+.sim-foot{display:flex;gap:4px;margin-top:8px}
+.sim-foot button{
+  flex:1;min-height:28px;background:#171a20;border:1px solid #333843;color:#98a0ab;
+  font-family:var(--font-en);font-size:8px;letter-spacing:1.4px;cursor:pointer;
+}
+.sim-foot button:hover{border-color:#f5b400;color:#f5b400}
+</style>
+</head>
+<body>
+<div class="rig">
+
+  <!-- ================= HEAD UNIT ================= -->
+  <div class="bezel">
+    <div class="screen" id="screen" data-theme="night" data-zone="normal" style="--accent:#ff4a1c">
+
+      <svg class="honeycomb" id="honeycomb" viewBox="0 0 1024 600" aria-hidden="true" focusable="false"></svg>
+      <div class="scanlines" aria-hidden="true"></div>
+      <div class="hazard top" aria-hidden="true"></div>
+      <div class="hazard bottom" aria-hidden="true"></div>
+
+      <header class="hdr">
+        <div class="hdr-l">
+          <div class="hdr-time">
+            <span class="hdr-clock" id="clock">--:--:--</span>
+            <small>見現時刻</small>
+          </div>
+          <div class="hdr-date" id="dateLine">令和八年 十一月六日</div>
+        </div>
+        <div class="hdr-c">
+          <div class="hdr-line">
+            <span class="h-rail" aria-hidden="true"></span>
+            <span class="hdr-title"><span class="t-jp" id="hdrJp">通常運転</span><span class="t-en" id="hdrEn">NORMAL</span></span>
+            <span class="h-rail" aria-hidden="true"></span>
+          </div>
+          <div class="hdr-sub" id="hdrSub" role="status" aria-live="polite">DIRECT LINK CONNECTION : LILY</div>
+        </div>
+        <div class="hdr-r">
+          <div class="dn" title="Day / night indicator">
+            <span class="dn-box" id="dnBox"></span>
+            <span class="dn-txt" id="dnTxt">AUTO · NIGHT</span>
+          </div>
+          <button class="hbtn" data-act="sheet:settings" aria-label="Settings 設定">
+            <span>設定</span><b>SETUP</b>
+          </button>
+        </div>
+      </header>
+
+      <main class="main">
+
+        <aside class="rail" aria-label="System telemetry">
+          <div class="sec-lbl"><span>SYS/INFO</span><span>01</span></div>
+          <div class="kv"><span>CODE</span><b>LILY-01</b></div>
+          <div class="kv"><span>FILE</span><b>HOME_SYS</b></div>
+          <div class="kv"><span>EXT</span><b>4096</b></div>
+          <div class="kv"><span>PRIORITY</span><b>AAA</b></div>
+
+          <div class="sec-lbl"><span>LINK</span><span>02</span></div>
+          <div class="kv"><span>SOURCE</span><b id="mSource">BLUETOOTH</b></div>
+          <div class="kv"><span>STATE</span><b id="mMode">PLAYING</b></div>
+          <div class="kv"><span>THEME</span><b id="mTheme">AUTO/NIGHT</b></div>
+          <div class="kv"><span>ZONE</span><b id="mZone">NORMAL</b></div>
+
+          <div class="sec-lbl"><span>VEHICLE</span><span>03</span></div>
+          <div class="kv"><span>速度 SPEED</span><b id="mSpeed">000</b></div>
+          <div class="kv"><span>音量 VOL</span><b id="mVol">042</b></div>
+          <div class="kv"><span>LAMP</span><b id="mLamp">OFF</b></div>
+
+          <div class="sec-lbl"><span>GPS</span><span>04</span></div>
+          <div class="kv"><span>FIX</span><b id="mFix">3D</b></div>
+          <div class="kv"><span>SATS</span><b id="mSats">09</b></div>
+
+          <div class="stamp">
+            <div class="jp">見現時刻表示</div>
+            <div class="jp2">危険</div>
+          </div>
+          <div class="log" id="logList" aria-live="polite"></div>
+        </aside>
+
+        <div class="center">
+        <section class="np" id="np" data-kind="bt" aria-label="Now playing">
+          <div class="np-head">
+            <span><span class="jp" id="npKindJp">音源</span> · <span id="npKind">BLUETOOTH</span></span>
+            <span class="chip on" id="npState">PLAYING</span>
+          </div>
+          <div class="np-body">
+            <div class="np-art" aria-hidden="true">
+              <div>
+                <div class="g1" id="npGlyph">BT</div>
+                <div class="g2" id="npGlyphJp">音</div>
+              </div>
+              <span class="idx" id="npIdx">01</span>
+            </div>
+            <div class="np-text">
+              <div class="np-song" id="npSong">Plastic Love</div>
+              <div class="np-artist" id="npArtist">Mariya Takeuchi</div>
+              <div class="np-meta" id="npMeta">AAC 256 · 44.1 kHz · STEREO</div>
+            </div>
+            <div class="np-side">
+              <div class="ns-row"><span>DEVICE</span><b id="npDev">GALAXY S23</b></div>
+              <div class="ns-row"><span>CODEC</span><b id="npCodec">AAC 256</b></div>
+              <div class="ns-row"><span>RATE</span><b id="npRate">44.1 kHz</b></div>
+              <div class="ns-row"><span>OUT</span><b id="npOut">STEREO</b></div>
+            </div>
+          </div>
+          <div class="np-foot">
+            <div class="np-bar"><div class="np-fill" id="npFill"></div></div>
+            <div class="np-times"><span id="npCur">00:00</span><span id="npLen">00:00</span></div>
+          </div>
+        </section>
+
+        <div class="magi">
+          <div class="magi-head"><span><span class="jp">制御</span> MAGI SYSTEM</span><span id="magiNote">3 NODES ONLINE</span></div>
+          <div class="magi-row">
+            <button class="mnode" id="magiBt" data-act="src:bt" aria-label="Melchior node, Bluetooth source">
+              <span class="trap"><span class="trap-in">MELCHIOR</span></span>
+              <span class="magi-sub" id="magiBtSub">待機 IDLE</span>
+              <span class="magi-jp">Melchior メルキオール</span>
+            </button>
+            <button class="mnode" id="magiRadio" data-act="src:radio" aria-label="Balthasar node, radio source">
+              <span class="trap"><span class="trap-in">BALTHASAR</span></span>
+              <span class="magi-sub" id="magiRadioSub">待機 IDLE</span>
+              <span class="magi-jp">Balthasar バルタザール</span>
+            </button>
+            <button class="mnode" id="magiUsb" data-act="src:usb" aria-label="Casper node, USB source">
+              <span class="trap"><span class="trap-in">CASPER</span></span>
+              <span class="magi-sub" id="magiUsbSub">正常 NORM</span>
+              <span class="magi-jp">Casper カスパー</span>
+            </button>
+          </div>
+        </div>
+        </div>
+
+        <aside class="rail" aria-label="Vehicle status">
+          <div class="speed">
+            <div class="speed-lbl"><span class="jp">速度</span><span>SPEED km/h</span></div>
+            <div class="speed-num"><b id="speedNum">000</b><i>km/h</i></div>
+            <div class="speed-seg" id="speedSeg" aria-hidden="true"></div>
+            <div class="speed-zone"><span id="speedZoneWord">通常 NORMAL</span><b id="speedThresh">60 / 100</b></div>
+          </div>
+
+          <button class="tile" id="tilePhone" data-act="phone:open" aria-label="Open phone app 電話">
+            <div class="tile-top"><span class="jp">電話 PHONE</span><span class="dot" id="phoneDot"></span></div>
+            <div class="tile-val" id="phoneVal">NO DEVICE</div>
+            <div class="tile-sub" id="phoneSub">未接続 · TAP TO OPEN</div>
+          </button>
+
+          <button class="tile" id="tileAA" data-act="aa:open" aria-label="Open Android Auto">
+            <div class="tile-top"><span class="jp">接続 AUTO</span><span class="dot" id="aaDot"></span></div>
+            <div class="tile-val" id="aaVal">STANDBY</div>
+            <div class="tile-sub" id="aaSub">AUTO-LAUNCH ARMED</div>
+          </button>
+        </aside>
+
+      </main>
+
+      <footer class="foot">
+        <div class="hex-pad">
+          <svg viewBox="0 0 352 120" preserveAspectRatio="xMidYMid meet" role="group" aria-label="Transport and source keys">
+            <g class="hex" data-act="prev:1" role="button" tabindex="0" aria-label="Previous track 前" transform="translate(38,33)">
+              <polygon class="body" points="0,-26 22.5,-13 22.5,13 0,26 -22.5,13 -22.5,-13"/>
+              <text class="lbl" y="-2" dominant-baseline="middle">PREV</text>
+              <text class="jp" y="10" dominant-baseline="middle">前</text>
+            </g>
+            <g class="hex" data-act="play:toggle" id="hexPlay" role="button" tabindex="0" aria-label="Play or pause 再生" transform="translate(100,33)">
+              <polygon class="body" points="0,-26 22.5,-13 22.5,13 0,26 -22.5,13 -22.5,-13"/>
+              <text class="lbl" y="-2" dominant-baseline="middle" id="hexPlayLbl">PLAY</text>
+              <text class="jp" y="10" dominant-baseline="middle">再生</text>
+            </g>
+            <g class="hex" data-act="next:1" role="button" tabindex="0" aria-label="Next track 次" transform="translate(162,33)">
+              <polygon class="body" points="0,-26 22.5,-13 22.5,13 0,26 -22.5,13 -22.5,-13"/>
+              <text class="lbl" y="-2" dominant-baseline="middle">NEXT</text>
+              <text class="jp" y="10" dominant-baseline="middle">次</text>
+            </g>
+            <g class="hex" data-act="src:bt" id="hexBt" role="button" tabindex="0" aria-label="Bluetooth source" transform="translate(224,33)">
+              <polygon class="body" points="0,-26 22.5,-13 22.5,13 0,26 -22.5,13 -22.5,-13"/>
+              <text class="lbl" y="-2" dominant-baseline="middle">BT</text>
+              <text class="jp" y="10" dominant-baseline="middle">接続</text>
+            </g>
+            <g class="hex" data-act="src:radio" id="hexRadio" role="button" tabindex="0" aria-label="Radio source ラジオ" transform="translate(286,33)">
+              <polygon class="body" points="0,-26 22.5,-13 22.5,13 0,26 -22.5,13 -22.5,-13"/>
+              <text class="lbl" y="-2" dominant-baseline="middle">RADIO</text>
+              <text class="jp" y="10" dominant-baseline="middle">電波</text>
+            </g>
+            <g class="hex" data-act="src:usb" id="hexUsb" role="button" tabindex="0" aria-label="USB source" transform="translate(69,93)">
+              <polygon class="body" points="0,-26 22.5,-13 22.5,13 0,26 -22.5,13 -22.5,-13"/>
+              <text class="lbl" y="-2" dominant-baseline="middle">USB</text>
+              <text class="jp" y="10" dominant-baseline="middle">記録</text>
+            </g>
+            <g class="hex" data-act="phone:open" role="button" tabindex="0" aria-label="Phone 電話" transform="translate(131,93)">
+              <polygon class="body" points="0,-26 22.5,-13 22.5,13 0,26 -22.5,13 -22.5,-13"/>
+              <text class="lbl" y="-2" dominant-baseline="middle">PHONE</text>
+              <text class="jp" y="10" dominant-baseline="middle">電話</text>
+            </g>
+            <g class="hex" data-act="switch:dev" role="button" tabindex="0" aria-label="Switch paired device 切替" transform="translate(193,93)">
+              <polygon class="body" points="0,-26 22.5,-13 22.5,13 0,26 -22.5,13 -22.5,-13"/>
+              <text class="lbl" y="-2" dominant-baseline="middle">SWITCH</text>
+              <text class="jp" y="10" dominant-baseline="middle">切替</text>
+            </g>
+            <g class="hex" data-act="pref:autoaa" id="hexAuto" role="button" tabindex="0" aria-label="Toggle auto-launch" transform="translate(255,93)">
+              <polygon class="body" points="0,-26 22.5,-13 22.5,13 0,26 -22.5,13 -22.5,-13"/>
+              <text class="lbl" y="-2" dominant-baseline="middle">AUTO</text>
+              <text class="jp" y="10" dominant-baseline="middle">自動</text>
+            </g>
+            <g class="hex" data-act="sheet:more" role="button" tabindex="0" aria-label="More apps 拡張" transform="translate(317,93)">
+              <polygon class="body" points="0,-26 22.5,-13 22.5,13 0,26 -22.5,13 -22.5,-13"/>
+              <text class="lbl" y="-2" dominant-baseline="middle">MORE</text>
+              <text class="jp" y="10" dominant-baseline="middle">拡張</text>
+            </g>
+          </svg>
+        </div>
+
+        <div class="knob-wrap">
+          <div class="knob-holder">
+            <svg class="knob-arc" viewBox="0 0 96 96" aria-hidden="true">
+              <circle class="bg" cx="48" cy="48" r="40"/>
+              <circle class="fg" id="arcFg" cx="48" cy="48" r="40" stroke-dasharray="0 251.33"/>
+            </svg>
+            <div class="knob" id="knob" role="slider" tabindex="0" aria-label="Volume 音量"
+                 aria-valuemin="0" aria-valuemax="100" aria-valuenow="42">
+              <span class="knob-tick" id="knobTick" aria-hidden="true"></span>
+              <span class="knob-val" id="knobVal">42</span>
+            </div>
+          </div>
+          <div class="knob-meta">
+            <div class="jp">音量</div>
+            <div class="en">VOLUME</div>
+            <div class="read" id="knobRead">42 / 100</div>
+          </div>
+        </div>
+
+        <div class="foot-stat">
+          <div class="kv"><span>LAMP</span><b id="statLamp">OFF</b></div>
+          <div class="kv"><span>THEME</span><b id="statTheme">AUTO/NIGHT</b></div>
+          <div class="kv"><span>OUT</span><b id="statOut">STEREO</b></div>
+          <div class="kv"><span>BUS</span><b id="statBus">OK</b></div>
+        </div>
+      </footer>
+
+      <div class="ticker" id="ticker" aria-hidden="true">
+        <div class="ticker-track" id="tickerTrack">
+          <span id="tickerA"></span><span id="tickerB"></span>
+        </div>
+      </div>
+
+      <!-- octagonal warning seals -->
+      <div class="seal bl" id="sealL" data-shape="octagon" aria-hidden="true">
+        <svg viewBox="0 0 100 100">
+          <path class="o1" d="M31 3H69L97 31V69L69 97H31L3 69V31Z"/>
+          <path class="o2" d="M34 8H66L92 34V66L66 92H34L8 66V34Z"/>
+          <path class="facets" d="M31 3L34 8M69 3L66 8M97 31L92 34M97 69L92 66M69 97L66 92M31 97L34 92M3 69L8 66M3 31L8 34"/>
+          <g transform="rotate(-12 50 50)">
+            <text class="s1" x="50" y="47" id="sealL1">危険</text>
+            <text class="s2" x="50" y="62" id="sealL2">DANGER</text>
+            <text class="s3" x="50" y="73" id="sealL3">LV.0</text>
+          </g>
+        </svg>
+      </div>
+      <div class="seal br" id="sealR" data-shape="octagon" aria-hidden="true">
+        <svg viewBox="0 0 100 100">
+          <path class="o1" d="M31 3H69L97 31V69L69 97H31L3 69V31Z"/>
+          <path class="o2" d="M34 8H66L92 34V66L66 92H34L8 66V34Z"/>
+          <path class="facets" d="M31 3L34 8M69 3L66 8M97 31L92 34M97 69L92 66M69 97L66 92M31 97L34 92M3 69L8 66M3 31L8 34"/>
+          <g transform="rotate(-12 50 50)">
+            <text class="s1" x="50" y="44" id="sealR1">通常</text>
+            <text class="s2" x="50" y="59" id="sealR2">NOMINAL</text>
+            <text class="s3" x="50" y="70" id="sealR3">0 km/h</text>
+          </g>
+        </svg>
+      </div>
+
+      <!-- emergency warning overlay -->
+      <div class="warn" id="warn" aria-hidden="true">
+        <div class="warn-strip a"></div>
+        <div class="warn-box">
+          <div class="w0">警告 WARNING</div>
+          <div class="w1">非常事態</div>
+          <div class="w2">EMERGENCY</div>
+          <div class="w3"><span id="warnSpeed">000</span> km/h · THRESHOLD <span id="warnThresh">100</span></div>
+        </div>
+        <button class="warn-ack" data-act="ack:warn" aria-label="Acknowledge warning 確認">確認 ACK</button>
+        <div class="warn-strip b"></div>
+      </div>
+
+      <!-- reverse camera -->
+      <div class="ovl" id="ovlRev" aria-hidden="true">
+        <div class="rev-feed">
+          <svg class="rev-guides" viewBox="0 0 1024 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <g stroke="#8ef0c4" stroke-width="2" fill="none" opacity=".55">
+              <path d="M268 600 L455 286"/>
+              <path d="M756 600 L569 286"/>
+            </g>
+            <g stroke="#f5b400" stroke-width="3" fill="none" opacity=".9">
+              <path d="M236 556 H788"/>
+              <path d="M300 452 H724"/>
+              <path d="M372 372 H652"/>
+            </g>
+            <g stroke="#f5b400" stroke-width="1.5" fill="none" stroke-dasharray="10 12" opacity=".75">
+              <path d="M512 286 V600"/>
+            </g>
+            <path d="M372 600 L470 286 L554 286 L652 600 Z" fill="#0e1a16"/>
+            <path d="M372 600 L470 286" stroke="#2c4a3f" stroke-width="2" fill="none"/>
+            <path d="M652 600 L554 286" stroke="#2c4a3f" stroke-width="2" fill="none"/>
+            <g stroke="#6f8f82" stroke-width="2" stroke-dasharray="26 22" opacity=".5">
+              <path d="M512 590 V300"/>
+            </g>
+            <g fill="#f5b400" font-family="JetBrains Mono, monospace" font-size="13" letter-spacing="1">
+              <text x="800" y="560">0.5 m</text>
+              <text x="736" y="456">1.0 m</text>
+              <text x="664" y="376">2.0 m</text>
+            </g>
+            <g stroke="#8ef0c4" stroke-width="1" fill="none" opacity=".28">
+              <path d="M120 286 H904"/>
+              <path d="M170 232 H854"/>
+            </g>
+          </svg>
+          <div class="rev-hatch"></div>
+          <div class="rev-hd"><span class="jp">後退</span><span class="en">REVERSE</span></div>
+          <div class="rev-badge"><i></i>CAM 01 · NTSC</div>
+          <div class="rev-meta">後退ギア REVERSE GEAR ENGAGED · <b>AUDIO MUTED</b></div>
+        </div>
+      </div>
+
+      <!-- android auto / carplay -->
+      <div class="ovl" id="ovlAA" aria-hidden="true">
+        <div class="ovl-hd">
+          <div class="t"><span class="jp" id="aaTitleJp">接続</span><span class="en" id="aaTitle">ANDROID AUTO</span></div>
+          <button class="ovl-close" data-act="close:aa" aria-label="Close projection">閉じる CLOSE</button>
+        </div>
+        <div class="aa-body">
+          <div class="aa-map">
+            <svg viewBox="0 0 640 420" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+              <g stroke="currentColor" stroke-width="1" opacity=".18" color="#4de89a">
+                <path d="M0 90H640M0 190H640M0 290H640M0 370H640"/>
+                <path d="M90 0V420M230 0V420M380 0V420M520 0V420"/>
+              </g>
+              <g fill="#4de89a" opacity=".07">
+                <rect x="100" y="100" width="120" height="80"/><rect x="260" y="100" width="100" height="80"/>
+                <rect x="110" y="210" width="120" height="60"/><rect x="270" y="200" width="120" height="60"/>
+                <rect x="450" y="100" width="120" height="80"/><rect x="400" y="220" width="150" height="60"/>
+              </g>
+              <g fill="#8ef0c4" font-family="JetBrains Mono, monospace" font-size="11" opacity=".55">
+                <text x="104" y="196">MAGI AVE</text>
+                <text x="264" y="194">LAYER 2</text>
+                <text x="404" y="315">TURN 1.2 km</text>
+              </g>
+              <path d="M70 400 L70 250 L250 250 L250 150 L430 150 L430 60" fill="none" stroke="#ff4a1c" stroke-width="9" opacity=".35"/>
+              <path d="M70 400 L70 250 L250 250 L250 150 L430 150 L430 60" fill="none" stroke="#ff4a1c" stroke-width="5"/>
+              <path d="M70 400 L70 250 L250 250 L250 150 L430 150 L430 60" fill="none" stroke="#fff" stroke-width="1.5" stroke-dasharray="8 10"/>
+              <circle cx="70" cy="400" r="8" fill="#fff"/>
+              <circle cx="70" cy="400" r="14" fill="none" stroke="#ff4a1c" stroke-width="2"/>
+              <circle cx="430" cy="60" r="8" fill="#4de89a"/>
+              <g stroke="#8ef0c4" stroke-width="1.5" fill="none" opacity=".7">
+                <path d="M600 40 V16 M600 16 L593 26 M600 16 L607 26"/>
+              </g>
+              <text x="600" y="56" fill="#8ef0c4" font-family="Oswald, sans-serif" font-size="10" text-anchor="middle" opacity=".7">N</text>
+            </svg>
+            <div class="tag">MAP CACHE · 1.2 km TO NEXT TURN</div>
+          </div>
+          <div class="aa-side">
+            <button class="aa-tile" data-act="app:media"><span class="k">再生 MEDIA</span><span class="v" id="aaMedia">PLASTIC LOVE · 02:11</span></button>
+            <button class="aa-tile" data-act="app:phone"><span class="k">電話 PHONE</span><span class="v" id="aaPhone">GALAXY S23 · LINKED</span></button>
+            <button class="aa-tile" data-act="app:msg"><span class="k">通知 MESSAGES</span><span class="v">3 UNREAD · VOICE READY</span></button>
+          </div>
+        </div>
+        <div class="aa-dock">
+          <button class="on" data-act="app:nav">地図 <span class="en">MAPS</span></button>
+          <button data-act="app:media">音楽 <span class="en">MUSIC</span></button>
+          <button data-act="app:phone">通話 <span class="en">CALLS</span></button>
+          <button data-act="close:aa">戻る <span class="en">BACK</span></button>
+        </div>
+      </div>
+
+      <!-- incoming call -->
+      <div class="ovl" id="ovlCall" aria-hidden="true">
+        <div class="call-frame">
+          <div class="call-hd"><span id="callHdJp">着信</span><span class="en" id="callHdEn">INCOMING CALL</span></div>
+          <div class="call-name" id="callName">MOM</div>
+          <div class="call-num" id="callNum">+81 80 7788 1122</div>
+          <div class="call-state" id="callState">RINGING · 00:00</div>
+          <div class="call-actions" id="callIncoming">
+            <button class="answer" data-act="call:answer" aria-label="Answer call 応答">応答<span class="en">ANSWER</span></button>
+            <button class="decline" data-act="call:decline" aria-label="Decline call 拒否">拒否<span class="en">DECLINE</span></button>
+          </div>
+          <div class="call-actions" id="callActive" hidden>
+            <button class="decline" data-act="call:end">終話<span class="en">END CALL</span></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- more sheet -->
+      <div class="sheet" id="sheetMore" role="dialog" aria-modal="true" aria-label="More modules 拡張機能" aria-hidden="true">
+        <div class="sheet-frame">
+          <div class="sheet-hd">
+            <div class="t"><span class="jp">拡張機能</span><span class="en">MORE · 13 MODULES</span></div>
+            <button class="ovl-close" data-act="close:sheet" aria-label="Close 閉じる">閉じる CLOSE</button>
+          </div>
+          <div class="sheet-body">
+            <div class="tiles13">
+              <button class="tile13" data-act="app:radio"><span class="t-no">01</span><span class="t-jp">ラジオ</span><span class="t-en">RADIO</span></button>
+              <button class="tile13" data-act="app:usb"><span class="t-no">02</span><span class="t-jp">USB音楽</span><span class="t-en">USB MUSIC</span></button>
+              <button class="tile13" data-act="app:video"><span class="t-no">03</span><span class="t-jp">映像</span><span class="t-en">VIDEO</span></button>
+              <button class="tile13" data-act="app:dashcam"><span class="t-no">04</span><span class="t-jp">ドラレコ</span><span class="t-en">DASHCAM</span></button>
+              <button class="tile13" data-act="app:eq"><span class="t-no">05</span><span class="t-jp">音響調整</span><span class="t-en">SOUND EQ</span></button>
+              <button class="tile13" data-act="app:aux"><span class="t-no">06</span><span class="t-jp">外部入力</span><span class="t-en">AUX</span></button>
+              <button class="tile13" data-act="app:files"><span class="t-no">07</span><span class="t-jp">ファイル</span><span class="t-en">FILES</span></button>
+              <button class="tile13" data-act="app:car"><span class="t-no">08</span><span class="t-jp">車両</span><span class="t-en">CAR</span></button>
+              <button class="tile13" data-act="app:can"><span class="t-no">09</span><span class="t-jp">CAN診断</span><span class="t-en">CAN</span></button>
+              <button class="tile13" data-act="app:wheel"><span class="t-no">10</span><span class="t-jp">ステアリング</span><span class="t-en">WHEEL KEYS</span></button>
+              <button class="tile13" data-act="app:android"><span class="t-no">11</span><span class="t-jp">Android設定</span><span class="t-en">ANDROID</span></button>
+              <button class="tile13" data-act="app:off"><span class="t-no">12</span><span class="t-jp">画面消灯</span><span class="t-en">SCREEN OFF</span></button>
+              <button class="tile13" data-act="app:home"><span class="t-no">13</span><span class="t-jp">ホーム設定</span><span class="t-en">HOME SETUP</span></button>
+              <div class="tile-ghost" aria-hidden="true"><span class="t-no">--</span><span class="t-jp">拡張</span><span class="t-en">EXT BUS</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- settings sheet -->
+      <div class="sheet" id="sheetSettings" role="dialog" aria-modal="true" aria-label="Settings 設定" aria-hidden="true">
+        <div class="sheet-frame">
+          <div class="sheet-hd">
+            <div class="t"><span class="jp">設定</span><span class="en">SETTINGS · APPLIED LIVE</span></div>
+            <button class="ovl-close" data-act="close:sheet" aria-label="Close 閉じる">閉じる CLOSE</button>
+          </div>
+          <div class="sheet-body">
+            <div class="set-grid">
+              <div class="set-row">
+                <div class="lbl"><b>起動時に再生</b><span>RESUME ON START</span></div>
+                <button class="sw" id="setResume" data-act="pref:resume" aria-pressed="true" aria-label="Resume on start"><i></i></button>
+              </div>
+              <div class="set-row">
+                <div class="lbl"><b>自動起動</b><span>AUTO-LAUNCH PROJECTION</span></div>
+                <button class="sw" id="setAutoAA" data-act="pref:autoaa" aria-pressed="true" aria-label="Auto-launch Android Auto"><i></i></button>
+              </div>
+              <div class="set-row">
+                <div class="lbl"><b>テーマ</b><span>THEME</span></div>
+                <div class="set-seg" id="setTheme">
+                  <button data-act="theme:auto">AUTO</button>
+                  <button data-act="theme:day">DAY</button>
+                  <button data-act="theme:graphite">GRAPHITE</button>
+                  <button data-act="theme:night">NIGHT</button>
+                </div>
+              </div>
+              <div class="set-row">
+                <div class="lbl"><b>アクセント</b><span>ACCENT</span></div>
+                <div class="swatches" id="setAccent">
+                  <button class="swatch" data-act="accent:#ff4a1c" style="background:#ff4a1c" aria-label="Accent orange"></button>
+                  <button class="swatch" data-act="accent:#f5b400" style="background:#f5b400" aria-label="Accent amber"></button>
+                  <button class="swatch" data-act="accent:#4de89a" style="background:#4de89a" aria-label="Accent green"></button>
+                  <button class="swatch" data-act="accent:#258ac3" style="background:#258ac3" aria-label="Accent cyan"></button>
+                  <button class="swatch" data-act="accent:#b9afcb" style="background:#b9afcb" aria-label="Accent lavender"></button>
+                </div>
+              </div>
+              <div class="set-row">
+                <div class="lbl"><b>注意閾値</b><span>CAUTION THRESHOLD km/h</span></div>
+                <input class="num" type="number" id="setCaution" min="10" max="199" step="1" value="60" aria-label="Caution threshold">
+              </div>
+              <div class="set-row">
+                <div class="lbl"><b>緊急閾値</b><span>EMERGENCY THRESHOLD km/h</span></div>
+                <input class="num" type="number" id="setEmergency" min="11" max="250" step="1" value="100" aria-label="Emergency threshold">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ovl" id="ovlOff" data-act="off:toggle" aria-hidden="true">
+        <div class="off-hint">画面消灯<span>TAP TO WAKE · 画面に触れて復帰</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= SIMULATOR ================= -->
+  <aside class="sim" id="sim" aria-label="Simulator console">
+    <div class="sim-hd">
+      <div class="t"><b>SIMULATOR</b><span>シミュレータ</span></div>
+      <div class="lab">LAB<br>FEED 01</div>
+    </div>
+    <div class="sim-note">NOT PART OF THE HEAD UNIT · 車両信号の注入のみ</div>
+
+    <div class="sim-body">
+
+      <div class="sim-sec">VEHICLE <span>車両</span></div>
+      <div class="sim-row">
+        <label for="simSpeed">Speed km/h</label>
+        <div style="display:flex;align-items:center;gap:6px">
+          <input class="sim-slider" type="range" id="simSpeed" min="0" max="160" step="1" value="0" aria-label="Vehicle speed">
+          <span class="sim-read" id="simSpeedVal">0</span>
+        </div>
+      </div>
+      <div class="sim-row">
+        <label>Caution km/h</label>
+        <input class="sim-num" type="number" id="simCaution" min="10" max="199" step="1" value="60" aria-label="Caution threshold">
+      </div>
+      <div class="sim-row">
+        <label>Emergency km/h</label>
+        <input class="sim-num" type="number" id="simEmergency" min="11" max="250" step="1" value="100" aria-label="Emergency threshold">
+      </div>
+      <div class="zband" aria-hidden="true">
+        <i class="zn" id="zbN"></i><i class="zc" id="zbC"></i><i class="ze" id="zbE"></i>
+        <b class="needle" id="zbNeedle"></b>
+      </div>
+      <div class="zband-lbl"><span>0</span><span id="zbLblC">60</span><span>160</span></div>
+
+      <div class="sim-sec">LIGHT / THEME <span>灯体</span></div>
+      <div class="sim-row">
+        <label>Day / Night</label>
+        <div class="seg">
+          <button data-sim="mode:auto">AUTO</button>
+          <button data-sim="mode:manual">MANUAL</button>
+        </div>
+      </div>
+      <div class="sim-row">
+        <label>Theme</label>
+        <div class="seg">
+          <button data-sim="theme:day">DAY</button>
+          <button data-sim="theme:graphite">GRAPHITE</button>
+          <button data-sim="theme:night">NIGHT</button>
+        </div>
+      </div>
+      <div class="sim-row">
+        <label>Headlights</label>
+        <div class="seg">
+          <button data-sim="lights:off">OFF</button>
+          <button data-sim="lights:on">ON</button>
+        </div>
+      </div>
+
+      <div class="sim-sec">CONNECT <span>接続</span></div>
+      <div class="sim-row">
+        <label>BT device</label>
+        <div class="seg">
+          <button data-sim="phone:none">None</button>
+          <button data-sim="phone:galaxy">Galaxy S23</button>
+          <button data-sim="phone:mom">Mom's iPhone</button>
+        </div>
+      </div>
+      <div class="sim-row">
+        <label>Audio source</label>
+        <div class="seg">
+          <button data-sim="source:bt">Bluetooth</button>
+          <button data-sim="source:radio">Radio</button>
+          <button data-sim="source:usb">USB</button>
+        </div>
+      </div>
+      <div class="sim-row">
+        <label>BT track</label>
+        <div class="seg">
+          <button data-sim="track:playing">Playing</button>
+          <button data-sim="track:paused">Paused</button>
+          <button data-sim="track:released">Released</button>
+        </div>
+      </div>
+      <div class="sim-row">
+        <label>USB phone</label>
+        <div class="seg">
+          <button data-sim="usb:unplugged">Unplugged</button>
+          <button data-sim="usb:plugged">Plugged in</button>
+          <button data-sim="usb:aa">AA connected</button>
+        </div>
+      </div>
+
+      <div class="sim-sec">EVENTS <span>事象</span></div>
+      <div class="sim-row">
+        <label>Inject</label>
+        <div class="seg">
+          <button data-sim="reverse:toggle" id="simRev">Reverse gear</button>
+          <button data-sim="call:toggle" id="simCall">Incoming call</button>
+        </div>
+      </div>
+
+      <div class="sim-sec">DISPLAY <span>表示</span></div>
+      <div class="sim-row">
+        <label>Accent</label>
+        <div class="seg" id="simAccent">
+          <button data-sim="accent:#ff4a1c" style="background:#ff4a1c;border-color:#ff4a1c" aria-label="Accent orange"></button>
+          <button data-sim="accent:#f5b400" style="background:#f5b400;border-color:#f5b400" aria-label="Accent amber"></button>
+          <button data-sim="accent:#4de89a" style="background:#4de89a;border-color:#4de89a" aria-label="Accent green"></button>
+          <button data-sim="accent:#258ac3" style="background:#258ac3;border-color:#258ac3" aria-label="Accent cyan"></button>
+          <button data-sim="accent:#b9afcb" style="background:#b9afcb;border-color:#b9afcb" aria-label="Accent lavender"></button>
+        </div>
+      </div>
+
+      <div class="sim-sec">TELEMETRY <span>観測</span></div>
+      <div class="tel">
+        <div><span>ZONE</span><b id="telZone">NORMAL</b></div>
+        <div><span>THEME</span><b id="telTheme">NIGHT</b></div>
+        <div><span>SOURCE</span><b id="telSource">BT</b></div>
+        <div><span>STATE</span><b id="telTrack">PLAYING</b></div>
+        <div><span>SPEED</span><b id="telSpeed">000</b></div>
+        <div><span>VOL</span><b id="telVol">042</b></div>
+        <div><span>PHONE</span><b id="telPhone">GALAXY</b></div>
+        <div><span>MODE</span><b id="telMode">AUTO</b></div>
+      </div>
+
+      <div class="sim-foot">
+        <button data-sim="reset:all">RESET STATE</button>
+        <button data-sim="call:end">END CALL</button>
+      </div>
+    </div>
+  </aside>
+</div>
+<script>
+(function(){
+  'use strict';
+
+  const $ = (id) => document.getElementById(id);
+  const all = (sel) => Array.prototype.slice.call(document.querySelectorAll(sel));
+
+  /* ---------------- data ---------------- */
+
+  const DEVICES = { none:'none', galaxy:'Galaxy S23', mom:"Mom's iPhone" };
+  const CONTACTS = {
+    'Galaxy S23':   { name:'MISATO K.', num:'+81 90 3344 5566' },
+    "Mom's iPhone": { name:'MOM',       num:'+81 80 7788 1122' }
+  };
+  const LABEL = { bt:'BLUETOOTH', radio:'FM RADIO', usb:'USB MUSIC' };
+  const SHORT = { bt:'BT', radio:'FM', usb:'USB' };
+  const ZONE_JP = { normal:'通常', caution:'注意', emergency:'非常事態' };
+
+  const TRACKS = {
+    bt: [
+      { title:'Plastic Love',          artist:'Mariya Takeuchi', len:292, codec:'AAC 256' },
+      { title:'A Cruel Angel\'s Thesis', artist:'Yoko Takahashi', len:245, codec:'AAC 256' },
+      { title:'Midnight Pretenders',   artist:'Tomoko Aran',     len:305, codec:'AAC 256' }
+    ],
+    usb: [
+      { title:'Ride the Tiger',        artist:'Yellow Magic Orchestra', len:262, codec:'FLAC 44.1' },
+      { title:'Behind the Mask',       artist:'Yellow Magic Orchestra', len:214, codec:'FLAC 44.1' },
+      { title:'Technopolis',           artist:'Yellow Magic Orchestra', len:249, codec:'FLAC 44.1' }
+    ]
+  };
+
+  const STATIONS = [
+    { freq:'81.3', name:'J-WAVE',  prog:'STEP IN THE SQUARE' },
+    { freq:'80.0', name:'TOKYO FM', prog:'JET STREAM' },
+    { freq:'82.5', name:'NHK-FM',  prog:'夜の音楽室' }
+  ];
+
+  const TICKER = {
+    caution:   '注意 CAUTION ｜ 速度制限超過 SPEED THRESHOLD EXCEEDED ｜ 減速せよ REDUCE VELOCITY ｜ 車間距離を保て MAINTAIN DISTANCE ｜ ',
+    emergency: '非常事態 EMERGENCY ｜ 第一種戦闘配置 BATTLE STATIONS ｜ 直ちに減速 DECELERATE IMMEDIATELY ｜ 危険 DANGER ｜ '
+  };
+
+  const JP_STATE = {
+    'PLAYING':'再生 PLAYING', 'PAUSED':'停止 PAUSED', 'RELEASED':'解放 RELEASED',
+    'ON AIR':'放送 ON AIR', 'MUTED':'消音 MUTED', 'IDLE':'待機 IDLE'
+  };
+
+  const APPS = {
+    radio:'RADIO', usb:'USB MUSIC', video:'VIDEO', dashcam:'DASHCAM', eq:'SOUND EQ',
+    aux:'AUX', files:'FILES', car:'CAR', can:'CAN', wheel:'WHEEL KEYS',
+    android:'ANDROID', off:'SCREEN OFF', home:'HOME SETUP'
+  };
+
+  /* ---------------- state ---------------- */
+
+  const S = {
+    speed: 0, vol: 42,
+    source: 'bt', phone: 'Galaxy S23', track: 'playing',
+    usb: 'unplugged',
+    idx: { bt:0, usb:0, radio:0 },
+    pos: { bt:71, usb:18, radio:0 },
+    reverse: false, call: null, callSec: 0,
+    aaOpen: false, aaPending: false,
+    sheet: null, screenOff: false,
+    warnAck: false, headlights: false,
+    msg: '', msgT: 0,
+    log: []
+  };
+
+  const P = {
+    resumeOnStart: true, autoAA: true, accent: '#ff4a1c',
+    theme: 'auto', caution: 60, emergency: 100
+  };
+
+  let lastTicker = null;
+  let lastTheme = null;
+  let toastTimer = null;
+
+  /* ---------------- utils ---------------- */
+
+  function pad(n, w){
+    let s = String(Math.max(0, Math.round(n)));
+    while (s.length < (w || 2)) s = '0' + s;
+    return s;
+  }
+  function fmt(sec){
+    sec = Math.max(0, Math.round(sec));
+    return pad(Math.floor(sec / 60)) + ':' + pad(sec % 60);
+  }
+  function esc(s){
+    return String(s).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
+  }
+  function say(msg){
+    S.msg = msg;
+    S.msgT = Date.now() + 2400;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { S.msg = ''; render(); }, 2400);
+  }
+  function logEvent(msg){
+    const d = new Date();
+    S.log.unshift(pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds()) + ' ' + msg);
+    if (S.log.length > 4) S.log.length = 4;
+  }
+
+  /* ---------------- zone / theme ---------------- */
+
+  function zone(){
+    if (S.speed >= P.emergency) return 'emergency';
+    if (S.speed >= P.caution) return 'caution';
+    return 'normal';
+  }
+  function theme(){
+    if (P.theme !== 'auto') return P.theme;
+    const h = new Date().getHours();
+    return (h >= 17 || h < 5) ? 'night' : 'day';
+  }
+
+  /* ---------------- honeycomb ---------------- */
+
+  function buildHoneycomb(){
+    const svg = $('honeycomb');
+    const NS = 'http://www.w3.org/2000/svg';
+    const R = 36;
+    const w = Math.sqrt(3) * R;      // flat-to-flat width of a pointy-top hex
+    const stepY = 1.5 * R;           // row pitch
+    const cols = Math.ceil(1024 / w) + 1;
+    const rows = Math.ceil(600 / stepY) + 1;
+    for (let r = 0; r < rows; r++){
+      for (let c = 0; c < cols; c++){
+        const cx = c * w + (r % 2 ? w / 2 : 0) - w / 2;
+        const cy = r * stepY - stepY / 2;
+        const pts = [];
+        for (let i = 0; i < 6; i++){
+          const a = (Math.PI / 3) * i - Math.PI / 2;   // start at -90°: vertex on top
+          pts.push((cx + R * Math.cos(a)).toFixed(1) + ',' + (cy + R * Math.sin(a)).toFixed(1));
+        }
+        const poly = document.createElementNS(NS, 'polygon');
+        poly.setAttribute('points', pts.join(' '));
+        if ((r * 7 + c) % 13 === 0) poly.setAttribute('class', 'lit');
+        svg.appendChild(poly);
+      }
+    }
+  }
+
+  function buildSegments(){
+    const box = $('speedSeg');
+    for (let i = 0; i < 20; i++) box.appendChild(document.createElement('i'));
+  }
+
+  /* ---------------- media model ---------------- */
+
+  function mediaReady(){
+    if (S.source === 'radio') return true;
+    if (S.source === 'usb') return S.usb !== 'unplugged';
+    return S.phone !== 'none';
+  }
+
+  function nowData(){
+    if (S.source === 'radio'){
+      const st = STATIONS[S.idx.radio];
+      return {
+        kind:'radio', glyph:'FM', jp:'波', idx:pad(S.idx.radio + 1),
+        song:'FM ' + st.freq, artist:st.name,
+        meta:'MHz · ' + st.prog + ' · RDS',
+        state: S.track === 'paused' ? 'MUTED' : 'ON AIR',
+        pct:100, cur:0, len:0
+      };
+    }
+    if (S.source === 'bt'){
+      if (S.phone === 'none') return {
+        kind:'empty', glyph:'BT', jp:'接続', idx:'--',
+        song:'NO SIGNAL', artist:'PAIR A DEVICE · 接続待ち',
+        meta:'BLUETOOTH 0/1 · WAITING', state:'IDLE', pct:0, cur:0, len:0
+      };
+      const t = TRACKS.bt[S.idx.bt];
+      return {
+        kind:'bt', glyph:'BT', jp:'音', idx:pad(S.idx.bt + 1),
+        song:t.title, artist:t.artist,
+        meta:t.codec + ' · 44.1 kHz · ' + (S.track === 'playing' ? 'STREAMING' : 'HELD'),
+        state: S.track === 'released' ? 'RELEASED' : (S.track === 'playing' ? 'PLAYING' : 'PAUSED'),
+        pct: Math.min(100, S.pos.bt / t.len * 100), cur:S.pos.bt, len:t.len
+      };
+    }
+    if (S.usb === 'unplugged') return {
+      kind:'empty', glyph:'USB', jp:'記録', idx:'--',
+      song:'NO MEDIA', artist:'INSERT USB DRIVE · 未接続',
+      meta:'USB HOST · NO DEVICE', state:'IDLE', pct:0, cur:0, len:0
+    };
+    const u = TRACKS.usb[S.idx.usb];
+    return {
+      kind:'usb', glyph:'USB', jp:'記録', idx:pad(S.idx.usb + 1),
+      song:u.title, artist:u.artist,
+      meta:u.codec + ' · USB HOST · ' + (S.track === 'playing' ? 'STREAMING' : 'HELD'),
+      state: S.track === 'released' ? 'RELEASED' : (S.track === 'playing' ? 'PLAYING' : 'PAUSED'),
+      pct: Math.min(100, S.pos.usb / u.len * 100), cur:S.pos.usb, len:u.len
+    };
+  }
+
+  function stateWord(){
+    if (!mediaReady()) return 'NO LINK';
+    if (S.track === 'released') return 'RELEASED';
+    return S.track === 'playing' ? 'PLAYING' : 'PAUSED';
+  }
+
+  /* ---------------- render sections ---------------- */
+
+  function renderHeader(z, th){
+    const T = {
+      normal:    ['通常運転', 'NORMAL', 'DIRECT LINK CONNECTION : LILY'],
+      caution:   ['注意', 'CAUTION', 'SPEED THRESHOLD EXCEEDED · 速度制限'],
+      emergency: ['非常事態', 'EMERGENCY', '第一種戦闘配置 · ALL SYSTEMS ALERT']
+    }[z];
+    $('hdrJp').textContent = T[0];
+    $('hdrEn').textContent = T[1];
+    const msg = (S.msg && Date.now() < S.msgT) ? S.msg : '';
+    $('hdrSub').textContent = msg || T[2];
+    $('hdrSub').classList.toggle('flash', !!msg);
+    $('dnBox').classList.toggle('night', th === 'night');
+    $('dnTxt').textContent = (P.theme === 'auto' ? 'AUTO' : 'MANUAL') + ' · ' + th.toUpperCase();
+  }
+
+  function renderRail(z, th){
+    $('mSource').textContent = LABEL[S.source];
+    $('mMode').textContent = stateWord();
+    $('mTheme').textContent = (P.theme === 'auto' ? 'AUTO' : 'MANUAL') + '/' + th.toUpperCase();
+    $('mZone').textContent = z.toUpperCase();
+    $('mSpeed').textContent = pad(S.speed, 3);
+    $('mLamp').textContent = S.headlights ? 'ON' : 'OFF';
+    $('mFix').textContent = S.speed > 0 ? '3D' : '2D';
+    $('mSats').textContent = S.speed > 0 ? String(9 + (S.speed % 3)) : '09';
+    $('logList').innerHTML = S.log.map(l => '<div>' + esc(l) + '</div>').join('');
+  }
+
+  function renderNowPlaying(){
+    const d = nowData();
+    $('np').dataset.kind = d.kind;
+    $('npKind').textContent = LABEL[S.source];
+    $('npKindJp').textContent = d.kind === 'empty' ? '待機' : '音源';
+    $('npGlyph').textContent = d.glyph;
+    $('npGlyphJp').textContent = d.jp;
+    $('npIdx').textContent = d.idx;
+    $('npSong').textContent = d.song;
+    $('npArtist').textContent = d.artist;
+    $('npMeta').textContent = d.meta;
+    $('npState').textContent = JP_STATE[d.state] || d.state;
+    $('npState').classList.toggle('on', d.state === 'PLAYING' || d.state === 'ON AIR');
+    $('npFill').style.width = d.pct.toFixed(1) + '%';
+    $('npCur').textContent = fmt(d.cur);
+    $('npLen').textContent = d.len ? fmt(d.len) : '--:--';
+
+    const side = S.source === 'radio'
+      ? ['TUNER', 'FM', 'MODE', 'STEREO', 'RDS', 'ON', 'SIG', '4/5']
+      : S.source === 'usb'
+        ? ['DEVICE', 'USB HOST', 'CODEC', S.usb === 'unplugged' ? '—' : 'FLAC', 'RATE', '44.1 kHz', 'OUT', 'STEREO']
+        : ['DEVICE', S.phone === 'none' ? '—' : S.phone.toUpperCase(), 'CODEC', 'AAC 256', 'RATE', '44.1 kHz', 'OUT', 'STEREO'];
+    $('npDev').textContent = side[1];
+    $('npCodec').textContent = side[3];
+    $('npRate').textContent = side[5];
+    $('npOut').textContent = side[7];
+  }
+
+  function paintProgress(){
+    const d = nowData();
+    $('npFill').style.width = d.pct.toFixed(1) + '%';
+    $('npCur').textContent = fmt(d.cur);
+    $('npLen').textContent = d.len ? fmt(d.len) : '--:--';
+  }
+
+  function renderMagi(z){
+    const btOn = S.source === 'bt' && S.phone !== 'none';
+    const rdOn = S.source === 'radio';
+    const usbOn = S.source === 'usb' && S.usb !== 'unplugged';
+
+    $('magiBt').classList.toggle('live', btOn);
+    $('magiRadio').classList.toggle('live', rdOn);
+    $('magiUsb').classList.toggle('live', usbOn);
+
+    $('magiBtSub').textContent = S.phone === 'none' ? '待機 IDLE' : (btOn ? '同期 SYNC' : '接続 LINK');
+    $('magiRadioSub').textContent = rdOn ? '観測中 SCAN' : '待機 IDLE';
+
+    let casper = '正常 NORM', alert = false;
+    if (z === 'emergency'){ casper = '警告 WARN'; alert = true; }
+    else if (S.call){ casper = '通話 CALL'; alert = true; }
+    else if (S.usb === 'aa'){ casper = '接続 LINK'; }
+    $('magiUsbSub').textContent = casper;
+    $('magiUsb').classList.toggle('alert', alert);
+
+    $('magiNote').textContent = S.reverse ? 'REVERSE HOLD'
+      : S.call ? 'CALL HOLD'
+      : (S.aaOpen ? 'PROJECTION UP' : '3 NODES ONLINE');
+  }
+
+  function renderVolume(){
+    $('knobVal').textContent = S.vol;
+    $('knobRead').textContent = pad(S.vol, 2) + ' / 100';
+    $('knob').setAttribute('aria-valuenow', String(S.vol));
+    $('arcFg').setAttribute('stroke-dasharray', (188.5 * S.vol / 100).toFixed(1) + ' 251.33');
+    $('knobTick').style.transform = 'rotate(' + (S.vol / 100 * 270 - 135).toFixed(1) + 'deg)';
+    $('mVol').textContent = pad(S.vol, 3);
+    $('statOut').textContent = S.vol === 0 ? 'MUTED' : 'STEREO';
+  }
+
+  function renderRight(z, th){
+    $('speedNum').textContent = pad(S.speed, 3);
+    $('speedZoneWord').textContent = ZONE_JP[z] + ' ' + z.toUpperCase();
+    $('speedThresh').textContent = P.caution + ' / ' + P.emergency;
+
+    const segs = $('speedSeg').children;
+    const lit = Math.round(S.speed / 160 * segs.length);
+    for (let i = 0; i < segs.length; i++) segs[i].classList.toggle('on', i < lit);
+
+    const hasPhone = S.phone !== 'none';
+    $('tilePhone').classList.toggle('on', hasPhone);
+    $('phoneVal').textContent = hasPhone ? S.phone.toUpperCase() : 'NO DEVICE';
+    $('phoneSub').textContent = hasPhone
+      ? (S.track === 'playing' ? '再生中 · TAP TO OPEN' : '接続済 · TAP TO OPEN')
+      : '未接続 · TAP TO OPEN';
+
+    const blocked = S.reverse || S.call;
+    const ready = hasPhone || S.usb === 'aa';
+    const ios = S.phone === "Mom's iPhone";
+    $('tileAA').setAttribute('aria-disabled', blocked ? 'true' : 'false');
+    $('tileAA').setAttribute('aria-label', ios ? 'Open CarPlay 接続' : 'Open Android Auto 接続');
+    $('aaVal').textContent = S.aaOpen ? 'PROJECTING'
+      : blocked ? (S.call ? 'BLOCKED · CALL' : 'BLOCKED · REV')
+      : ready ? 'STANDBY' : 'NO PHONE';
+    $('aaSub').textContent = S.aaOpen ? '表示中 · TAP TO EXPAND'
+      : P.autoAA ? 'AUTO-LAUNCH ARMED' : 'AUTO-LAUNCH OFF';
+
+    $('aaTitle').textContent = ios ? 'CARPLAY' : 'ANDROID AUTO';
+    $('aaMedia').textContent = (nowData().song + ' · ' + fmt(S.pos[S.source] || 0)).toUpperCase();
+    $('aaPhone').textContent = (hasPhone ? S.phone : 'NO DEVICE').toUpperCase() + ' · ' + (hasPhone ? 'LINKED' : 'OFFLINE');
+  }
+
+  function renderKeys(){
+    $('hexBt').classList.toggle('live', S.source === 'bt');
+    $('hexRadio').classList.toggle('live', S.source === 'radio');
+    $('hexUsb').classList.toggle('live', S.source === 'usb');
+    $('hexPlay').classList.toggle('live', S.track === 'playing' && mediaReady());
+    $('hexPlayLbl').textContent = 'PLAY';
+    $('hexAuto').classList.toggle('live', P.autoAA);
+  }
+
+  function renderFoot(z, th){
+    renderVolume();
+    renderKeys();
+    $('statLamp').textContent = S.headlights ? 'ON' : 'OFF';
+    $('statTheme').textContent = (P.theme === 'auto' ? 'AUTO' : 'MANUAL') + '/' + th.toUpperCase();
+    $('statBus').textContent = S.reverse ? 'REV' : S.call ? 'CALL' : S.aaOpen ? 'AA' : 'OK';
+    $('ticker').style.background = '';
+  }
+
+  function renderSeals(z){
+    const sev = z === 'normal' ? 0 : z === 'caution' ? 1 : 2;
+    const left = ['危険', 'DANGER', 'LV.' + sev];
+    const right = [
+      ['通常', 'NOMINAL', '0 km/h'],
+      ['注意', 'CAUTION', 'LV.1'],
+      ['非常事態', 'EMERGENCY', 'LV.2']
+    ][sev];
+    $('sealL1').textContent = left[0];
+    $('sealL2').textContent = left[1];
+    $('sealL3').textContent = left[2];
+    $('sealR1').textContent = right[0];
+    $('sealR2').textContent = right[1];
+    $('sealR3').textContent = S.speed + ' km/h';
+    $('sealL').classList.toggle('inv', z === 'emergency');
+    $('sealR').classList.toggle('inv', z === 'emergency');
+  }
+
+  function renderOverlays(z){
+    if (z !== 'emergency' && S.warnAck) S.warnAck = false;
+    const warnOn = z === 'emergency' && !S.warnAck;
+    $('warn').classList.toggle('on', warnOn);
+    $('warn').setAttribute('aria-hidden', String(!warnOn));
+    $('warnSpeed').textContent = pad(S.speed, 3);
+    $('warnThresh').textContent = P.emergency;
+
+    $('ovlRev').classList.toggle('on', S.reverse);
+    $('ovlRev').setAttribute('aria-hidden', String(!S.reverse));
+    $('ovlAA').classList.toggle('on', S.aaOpen);
+    $('ovlAA').setAttribute('aria-hidden', String(!S.aaOpen));
+    $('ovlOff').classList.toggle('on', S.screenOff);
+    $('ovlOff').setAttribute('aria-hidden', String(!S.screenOff));
+
+    const callOn = !!S.call;
+    $('ovlCall').classList.toggle('on', callOn);
+    $('ovlCall').setAttribute('aria-hidden', String(!callOn));
+    if (!callOn){
+      $('callState').textContent = 'RINGING · 00:00';
+    }
+    if (callOn){
+      const c = CONTACTS[S.phone] || { name:'UNKNOWN', num:'+81 00 0000 0000' };
+      $('callName').textContent = c.name;
+      $('callNum').textContent = c.num;
+      $('callHdJp').textContent = S.call === 'active' ? '通話' : '着信';
+      $('callHdEn').textContent = S.call === 'active' ? 'CALL IN PROGRESS' : 'INCOMING CALL';
+      $('callState').textContent = (S.call === 'active' ? '通話中 ACTIVE' : 'RINGING') + ' · ' + fmt(S.callSec);
+      $('callIncoming').hidden = S.call !== 'incoming';
+      $('callActive').hidden = S.call !== 'active';
+    }
+  }
+
+  function renderSheets(){
+    const more = S.sheet === 'more';
+    const set = S.sheet === 'settings';
+    $('sheetMore').classList.toggle('open', more);
+    $('sheetMore').setAttribute('aria-hidden', String(!more));
+    $('sheetSettings').classList.toggle('open', set);
+    $('sheetSettings').setAttribute('aria-hidden', String(!set));
+
+    $('setResume').setAttribute('aria-pressed', String(P.resumeOnStart));
+    $('setAutoAA').setAttribute('aria-pressed', String(P.autoAA));
+    all('#setTheme button').forEach(b => b.classList.toggle('on', b.dataset.act === 'theme:' + P.theme));
+    all('#setAccent .swatch').forEach(b => b.classList.toggle('on', b.dataset.act === 'accent:' + P.accent));
+
+    if (document.activeElement !== $('setCaution')) $('setCaution').value = P.caution;
+    if (document.activeElement !== $('setEmergency')) $('setEmergency').value = P.emergency;
+    if (document.activeElement !== $('simCaution')) $('simCaution').value = P.caution;
+    if (document.activeElement !== $('simEmergency')) $('simEmergency').value = P.emergency;
+  }
+
+  function simOn(key, val){
+    switch (key){
+      case 'mode':    return val === 'manual' ? P.theme !== 'auto' : P.theme === 'auto';
+      case 'theme':   return P.theme === val;
+      case 'lights':  return S.headlights === (val === 'on');
+      case 'phone':   return S.phone === (DEVICES[val] || 'none');
+      case 'source':  return S.source === val;
+      case 'track':   return S.track === val;
+      case 'usb':     return S.usb === val;
+      case 'accent':  return P.accent.toLowerCase() === String(val).toLowerCase();
+      case 'reverse': return S.reverse;
+      case 'call':    return !!S.call;
+    }
+    return false;
+  }
+
+  function renderSim(z, th){
+    if (document.activeElement !== $('simSpeed')) $('simSpeed').value = S.speed;
+    $('simSpeedVal').textContent = S.speed;
+
+    all('[data-sim]').forEach(n => {
+      const parts = n.dataset.sim.split(':');
+      const on = simOn(parts[0], parts.slice(1).join(':'));
+      n.classList.toggle('on', !!on);
+      if (n.tagName === 'BUTTON') n.setAttribute('aria-pressed', String(!!on));
+    });
+
+    const c = Math.min(P.caution, 160);
+    const e = Math.min(P.emergency, 160);
+    $('zbN').style.width = (c / 160 * 100) + '%';
+    $('zbC').style.width = (Math.max(0, e - c) / 160 * 100) + '%';
+    $('zbE').style.width = (Math.max(0, 160 - e) / 160 * 100) + '%';
+    $('zbNeedle').style.left = (S.speed / 160 * 100) + '%';
+    $('zbLblC').textContent = P.caution;
+
+    $('telZone').textContent = z.toUpperCase();
+    $('telTheme').textContent = th.toUpperCase();
+    $('telSource').textContent = SHORT[S.source];
+    $('telTrack').textContent = stateWord();
+    $('telSpeed').textContent = pad(S.speed, 3);
+    $('telVol').textContent = pad(S.vol, 3);
+    $('telPhone').textContent = S.phone === 'none' ? 'NONE' : S.phone === 'Galaxy S23' ? 'GALAXY' : 'MOM';
+    $('telMode').textContent = P.theme === 'auto' ? 'AUTO' : 'MANUAL';
+  }
+
+  /* ---------------- main render ---------------- */
+
+  function reconcileAA(){
+    if (S.aaPending && !S.reverse && !S.call && P.autoAA && !S.aaOpen && S.phone !== 'none' && !S.screenOff){
+      S.aaPending = false;
+      S.aaOpen = true;
+      logEvent('AA OPEN · DEFERRED');
+    }
+  }
+
+  function render(){
+    reconcileAA();
+    const z = zone();
+    const th = theme();
+    const sc = $('screen');
+
+    sc.dataset.zone = z;
+    sc.dataset.theme = th;
+    sc.classList.toggle('lamp-on', S.headlights);
+    sc.style.setProperty('--accent', P.accent);
+
+    if (z !== lastTicker){
+      lastTicker = z;
+      const txt = TICKER[z] || '';
+      $('tickerA').textContent = txt;
+      $('tickerB').textContent = txt;
+    }
+
+    renderHeader(z, th);
+    renderRail(z, th);
+    renderNowPlaying();
+    renderMagi(z);
+    renderRight(z, th);
+    renderFoot(z, th);
+    renderSeals(z);
+    renderOverlays(z);
+    renderSheets();
+    renderSim(z, th);
+    lastTheme = th;
+  }
+
+  /* ---------------- actions ---------------- */
+
+  function setSource(src){
+    S.source = src;
+    if (src === 'radio') S.track = 'playing';
+    else if (src === 'usb') S.track = S.usb === 'unplugged' ? 'released' : 'playing';
+    else S.track = S.phone === 'none' ? 'released' : 'playing';
+    say('SOURCE · ' + LABEL[src]);
+    logEvent('SRC ' + SHORT[src]);
+  }
+
+  function togglePlay(){
+    if (S.track === 'playing'){ S.track = 'paused'; say('再生停止 · PAUSED'); logEvent('PAUSE'); }
+    else { S.track = 'playing'; say('再生 · PLAY'); logEvent('PLAY'); }
+  }
+
+  function step(dir){
+    if (S.source === 'radio'){
+      S.idx.radio = (S.idx.radio + dir + STATIONS.length) % STATIONS.length;
+      say('TUNED · FM ' + STATIONS[S.idx.radio].freq);
+      logEvent('TUNE ' + STATIONS[S.idx.radio].freq);
+      return;
+    }
+    if (S.source === 'bt' && S.phone === 'none'){ say('NO DEVICE · 未接続'); return; }
+    const list = TRACKS[S.source];
+    if (!list) return;
+    S.idx[S.source] = (S.idx[S.source] + dir + list.length) % list.length;
+    S.pos[S.source] = 0;
+    S.track = 'playing';
+    say((dir > 0 ? 'NEXT · ' : 'PREV · ') + list[S.idx[S.source]].title);
+    logEvent((dir > 0 ? 'NEXT ' : 'PREV ') + pad(S.idx[S.source] + 1));
+  }
+
+  function requestAA(reason){
+    if (!P.autoAA){ say('AUTO-LAUNCH OFF · 自動起動オフ'); logEvent('AA SKIP · AUTO OFF'); return; }
+    if (S.reverse || S.call){
+      S.aaPending = true;
+      say('AA HELD · 後退/通話中 BLOCKED');
+      logEvent('AA DEFER · ' + (S.reverse ? 'REV' : 'CALL'));
+      return;
+    }
+    S.aaOpen = true;
+    say('ANDROID AUTO · 接続確立');
+    logEvent('AA OPEN · ' + String(reason || '').toUpperCase());
+  }
+
+  function connectPhone(key){
+    const dev = DEVICES[key] || 'none';
+    const prev = S.phone;
+    S.phone = dev;
+
+    if (dev === 'none'){
+      S.track = 'released';
+      S.pos.bt = 0;
+      S.aaOpen = false;
+      S.aaPending = false;
+      say('PHONE LINK LOST · 切断');
+      logEvent('BT LOST');
+      return;
+    }
+    if (prev === dev) return;
+
+    logEvent('BT ' + (dev === 'Galaxy S23' ? 'GALAXY' : 'MOM'));
+    if (prev === 'none'){
+      if (P.resumeOnStart){ S.track = 'playing'; S.pos.bt = 0; }
+      requestAA('connect');
+    }
+  }
+
+  function setUsb(v){
+    const prev = S.usb;
+    S.usb = v;
+    if (v === 'aa'){
+      if (S.phone === 'none') S.phone = 'Galaxy S23';
+      requestAA('usb');
+    }
+    if (v === 'unplugged' && prev === 'aa'){
+      S.aaOpen = false;
+      S.aaPending = false;
+    }
+    if (S.source === 'usb') S.track = v === 'unplugged' ? 'released' : 'playing';
+    logEvent('USB ' + v.toUpperCase());
+  }
+
+  function setReverse(on){
+    S.reverse = on;
+    if (on){
+      S.sheet = null;
+      say('REVERSE · 後退カメラ');
+      logEvent('REV ON');
+    } else {
+      say('REVERSE RELEASED · 解除');
+      logEvent('REV OFF');
+    }
+  }
+
+  function startCall(){
+    S.call = 'incoming';
+    S.callSec = 0;
+    S.sheet = null;
+    const c = CONTACTS[S.phone];
+    say('INCOMING CALL · 着信');
+    logEvent('CALL IN · ' + (c ? c.name : 'UNKNOWN'));
+  }
+  function answerCall(){
+    S.call = 'active';
+    S.callSec = 0;
+    say('CALL ACTIVE · 通話中');
+    logEvent('CALL ANSWER');
+  }
+  function endCall(){
+    const was = S.call;
+    S.call = null;
+    S.callSec = 0;
+    say(was === 'active' ? 'CALL ENDED · 終話' : 'CALL DECLINED · 拒否');
+    logEvent(was === 'active' ? 'CALL END' : 'CALL DECLINE');
+  }
+
+  function cyclePhone(){
+    const order = ['none', 'Galaxy S23', "Mom's iPhone"];
+    const i = order.indexOf(S.phone);
+    const next = order[(i + 1) % order.length];
+    if (next === 'none'){ connectPhone('none'); }
+    else { connectPhone(next === 'Galaxy S23' ? 'galaxy' : 'mom'); }
+    say('PAIRED DEVICE · ' + (next === 'none' ? 'NONE' : next.toUpperCase()));
+  }
+
+  function appAction(name){
+    if (name === 'radio'){ setSource('radio'); S.sheet = null; return; }
+    if (name === 'usb'){ setSource('usb'); S.sheet = null; return; }
+    if (name === 'off'){ S.sheet = null; S.screenOff = true; return; }
+    if (name === 'home'){ S.sheet = null; say('HOME LAYOUT · 変更なし'); logEvent('HOME SETUP'); return; }
+    if (name === 'video'){ S.sheet = null; say('VIDEO · 走行中は映像ロック'); logEvent('VIDEO LOCK'); return; }
+    say('LAUNCH · ' + (APPS[name] || name.toUpperCase()));
+    logEvent('APP ' + (APPS[name] || name.toUpperCase()));
+    S.sheet = null;
+  }
+
+  function headAction(verb, arg){
+    switch (verb){
+      case 'src': setSource(arg); break;
+      case 'play': togglePlay(); break;
+      case 'prev': step(-1); break;
+      case 'next': step(1); break;
+      case 'phone': say('STOCK PHONE APP · 電話アプリ起動'); logEvent('PHONE APP'); break;
+      case 'switch': cyclePhone(); break;
+      case 'aa':
+        if (S.reverse){ say('AA BLOCKED · 後退カメラ作動中'); logEvent('AA BLOCK · REV'); }
+        else if (S.call){ say('AA BLOCKED · 通話中'); logEvent('AA BLOCK · CALL'); }
+        else if (S.phone === 'none' && S.usb !== 'aa'){ say('AA · NO PHONE CONNECTED'); }
+        else { S.aaOpen = true; say('ANDROID AUTO · 接続'); logEvent('AA OPEN · MANUAL'); }
+        break;
+      case 'sheet': S.sheet = arg; break;
+      case 'close':
+        if (arg === 'sheet') S.sheet = null;
+        else if (arg === 'aa') S.aaOpen = false;
+        break;
+      case 'pref':
+        if (arg === 'resume'){ P.resumeOnStart = !P.resumeOnStart; say('RESUME ON START · ' + (P.resumeOnStart ? 'ON' : 'OFF')); }
+        else if (arg === 'autoaa'){
+          P.autoAA = !P.autoAA;
+          say('AUTO-LAUNCH · ' + (P.autoAA ? 'ON' : 'OFF'));
+          logEvent('AA AUTO ' + (P.autoAA ? 'ON' : 'OFF'));
+        }
+        break;
+      case 'theme': P.theme = arg; say('THEME · ' + arg.toUpperCase()); break;
+      case 'accent': P.accent = arg; say('ACCENT · ' + arg.toUpperCase()); break;
+      case 'call':
+        if (arg === 'answer') answerCall();
+        else endCall();
+        break;
+      case 'ack': S.warnAck = true; logEvent('WARN ACK'); say('WARNING ACKNOWLEDGED · 確認'); break;
+      case 'off': S.screenOff = !S.screenOff; break;
+      case 'app': appAction(arg); break;
+    }
+    render();
+  }
+
+  function simAction(key, val){
+    switch (key){
+      case 'mode':
+        if (val === 'auto') P.theme = 'auto';
+        else if (P.theme === 'auto') P.theme = theme();
+        say('THEME MODE · ' + val.toUpperCase());
+        break;
+      case 'theme': P.theme = val; say('THEME · ' + val.toUpperCase()); break;
+      case 'lights': S.headlights = (val === 'on'); logEvent('LAMP ' + (S.headlights ? 'ON' : 'OFF')); break;
+      case 'phone': connectPhone(val); break;
+      case 'source': setSource(val); break;
+      case 'track':
+        S.track = val;
+        if (val === 'released') S.pos[S.source] = 0;
+        say('TRACK · ' + val.toUpperCase());
+        logEvent('TRACK ' + val.toUpperCase());
+        break;
+      case 'usb': setUsb(val); break;
+      case 'reverse': setReverse(!S.reverse); break;
+      case 'call':
+        if (val === 'end' || S.call) endCall();
+        else startCall();
+        break;
+      case 'accent': P.accent = val; say('ACCENT · ' + val.toUpperCase()); break;
+      case 'reset': resetAll(); break;
+    }
+    render();
+  }
+
+  function resetAll(){
+    Object.assign(S, {
+      speed: 0, vol: 42, source: 'bt', phone: 'Galaxy S23', track: 'playing',
+      usb: 'unplugged', reverse: false, call: null, callSec: 0,
+      aaOpen: false, aaPending: false, sheet: null, screenOff: false,
+      warnAck: false, headlights: false
+    });
+    S.idx = { bt:0, usb:0, radio:0 };
+    S.pos = { bt:71, usb:18, radio:0 };
+    Object.assign(P, {
+      resumeOnStart: true, autoAA: true, accent: '#ff4a1c',
+      theme: 'auto', caution: 60, emergency: 100
+    });
+    S.log = [];
+    lastTicker = null;
+    logEvent('STATE RESET');
+    say('STATE RESET · 初期化');
+  }
+
+  /* ---------------- thresholds ---------------- */
+
+  function setCaution(v){
+    let n = parseInt(v, 10);
+    if (isNaN(n)) n = P.caution;
+    n = Math.max(10, Math.min(199, n));
+    if (n >= P.emergency) n = P.emergency - 1;
+    if (n < 10){ n = 10; P.emergency = Math.max(11, P.emergency); }
+    P.caution = n;
+    logEvent('CAUTION ' + n);
+  }
+
+  function setEmergency(v){
+    let n = parseInt(v, 10);
+    if (isNaN(n)) n = P.emergency;
+    n = Math.max(11, Math.min(250, n));
+    if (n <= P.caution) n = P.caution + 1;
+    P.emergency = n;
+    logEvent('EMERG ' + n);
+  }
+
+  /* ---------------- volume knob ---------------- */
+
+  function setVol(v){
+    S.vol = Math.max(0, Math.min(100, Math.round(v)));
+    renderVolume();
+  }
+
+  function knobFromPoint(clientX, clientY){
+    const r = $('knob').getBoundingClientRect();
+    const dx = clientX - (r.left + r.width / 2);
+    const dy = clientY - (r.top + r.height / 2);
+    // Screen-space angle of the touch: 0° at 3 o'clock, +90° at 6 o'clock.
+    // The usable sweep is 270°: it starts at 135° (7:30) and runs clockwise to 405° (4:30).
+    const ang = (Math.atan2(dy, dx) * 180 / Math.PI + 360) % 360;
+    const rel = (ang - 135 + 360) % 360;
+    let v;
+    if (rel <= 270) v = rel / 270 * 100;
+    else v = rel < 315 ? 100 : 0;   // dead zone under the knob snaps to the nearer end
+    setVol(v);
+  }
+
+  /* ---------------- clock / playback head ---------------- */
+
+  function tick(){
+    const d = new Date();
+    $('clock').textContent = pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+    $('dateLine').textContent = '令和' + (d.getFullYear() - 2018) + '年 ' + (d.getMonth() + 1) + '月'
+      + d.getDate() + '日 (' + '日月火水木金土'.charAt(d.getDay()) + ')';
+
+    if (S.track === 'playing' && !S.screenOff && !S.reverse && (S.source === 'bt' || S.source === 'usb')){
+      const list = TRACKS[S.source];
+      const t = list[S.idx[S.source]];
+      S.pos[S.source] += 1;
+      if (S.pos[S.source] >= t.len){
+        S.pos[S.source] = 0;
+        S.idx[S.source] = (S.idx[S.source] + 1) % list.length;
+        renderNowPlaying();
+      } else {
+        paintProgress();
+      }
+    }
+    if (S.call === 'active'){
+      S.callSec += 1;
+      $('callState').textContent = '通話中 ACTIVE · ' + fmt(S.callSec);
+    }
+
+    const th = theme();
+    if (lastTheme !== null && th !== lastTheme) render();
+  }
+
+  /* ---------------- binding ---------------- */
+
+  function bind(){
+    const screen = $('screen');
+
+    screen.addEventListener('click', (e) => {
+      const el = e.target.closest('[data-act]');
+      if (!el || !screen.contains(el)) return;
+      const parts = el.dataset.act.split(':');
+      headAction(parts[0], parts.slice(1).join(':'));
+    });
+
+    screen.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') return;
+      const el = e.target.closest('[data-act]');
+      if (!el) return;
+      e.preventDefault();
+      const parts = el.dataset.act.split(':');
+      headAction(parts[0], parts.slice(1).join(':'));
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape'){
+        if (S.screenOff){ S.screenOff = false; render(); return; }
+        if (S.sheet){ S.sheet = null; render(); return; }
+        if (S.aaOpen){ S.aaOpen = false; render(); }
+      }
+    });
+
+    const knob = $('knob');
+    knob.addEventListener('pointerdown', (e) => {
+      try { knob.setPointerCapture(e.pointerId); } catch (_){}
+      knobFromPoint(e.clientX, e.clientY);
+      e.preventDefault();
+    });
+    knob.addEventListener('pointermove', (e) => {
+      if (knob.hasPointerCapture && knob.hasPointerCapture(e.pointerId)) knobFromPoint(e.clientX, e.clientY);
+    });
+    knob.addEventListener('pointerup', (e) => {
+      try { knob.releasePointerCapture(e.pointerId); } catch (_){}
+    });
+    knob.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowUp' || e.key === 'ArrowRight'){ e.preventDefault(); setVol(S.vol + 2); }
+      else if (e.key === 'ArrowDown' || e.key === 'ArrowLeft'){ e.preventDefault(); setVol(S.vol - 2); }
+      else if (e.key === 'Home'){ e.preventDefault(); setVol(0); }
+      else if (e.key === 'End'){ e.preventDefault(); setVol(100); }
+    });
+    knob.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      setVol(S.vol + (e.deltaY < 0 ? 2 : -2));
+    }, { passive:false });
+
+    $('sim').addEventListener('click', (e) => {
+      const b = e.target.closest('button[data-sim]');
+      if (!b) return;
+      const parts = b.dataset.sim.split(':');
+      simAction(parts[0], parts.slice(1).join(':'));
+    });
+
+    $('simSpeed').addEventListener('input', (e) => {
+      S.speed = parseInt(e.target.value, 10) || 0;
+      render();
+    });
+
+    $('simCaution').addEventListener('change', (e) => { setCaution(e.target.value); render(); });
+    $('simEmergency').addEventListener('change', (e) => { setEmergency(e.target.value); render(); });
+    $('setCaution').addEventListener('change', (e) => { setCaution(e.target.value); render(); });
+    $('setEmergency').addEventListener('change', (e) => { setEmergency(e.target.value); render(); });
+  }
+
+  /* ---------------- boot ---------------- */
+
+  buildHoneycomb();
+  buildSegments();
+  bind();
+  logEvent('SYS BOOT · LILY-01');
+  logEvent('BT LINK · GALAXY');
+  render();
+  tick();
+  setInterval(tick, 1000);
+})();
+</script>
+</body>
+</html>
