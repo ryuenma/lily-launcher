@@ -22,3 +22,4 @@ apks/
 backup/
 *.log
 logcat*
+.archify/
