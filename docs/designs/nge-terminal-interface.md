@@ -10,11 +10,11 @@
 
 This design adapts the Lily launcher's UI from its Teenage Engineering EP-series aesthetic to a Neon Genesis Evangelion (NGE) terminal interface design language, with a dynamic color palette that shifts based on vehicle speed. All upstream features and workflows are retained; only the visual layer and layout are reworked.
 
-The design is driven by six NGE terminal interface reference images, analyzed for color system, typography, layout patterns, and alarm-state visual language. The resulting UI uses a hexagonal tessellation, boxed banner headers, triangular node diagrams, hazard stripes, and inverted-fill critical states — all mapped to the launcher's existing feature set.
+The design is driven by 14 NGE terminal interface reference images (6 original + 8 additional), analyzed via opencode-cli-free (glm-5.3-flash-free). Key findings: NGE uses **zero glow** (flat solid fill), **Mincho serif** (Noto Serif JP) for Japanese kanji warnings, **pointy-top hexagons** as the primary geometric element, and **bilingual JP/EN** text throughout. Hazard stripes, octagonal warning seals, ticker panels, and MAGI node diagrams are core layout elements.
 
 ## The Problem
 
-The current Lily launcher uses a Teenage Engineering EP-series aesthetic (silver body, black display band, square pads, orange knob). While functional and well-crafted, it lacks the urgent, authoritative, machine-like presence that a terminal interface provides. The user wants a UI that feels like a NERV command center — where information density, color-coded alert states, and hexagonal geometry communicate system status at a glance.
+The current Lily launcher uses a Teenage Engineering EP-series aesthetic (silver body, black display band, square pads, orange knob). While functional, it lacks the urgent, authoritative, machine-like presence of a terminal interface. The user wants a UI that feels like a NERV command center — where information density, color-coded alert states, and hexagonal geometry communicate system status at a glance.
 
 Additionally, the launcher has no awareness of vehicle speed. The color palette is static regardless of driving conditions. The user wants the palette to shift based on speed: calm greens below 60 km/h, caution yellows between 60-100 km/h, and emergency reds above 100 km/h.
 
@@ -30,18 +30,18 @@ Additionally, the launcher has no awareness of vehicle speed. The color palette 
 ## Non-Goals
 
 *   No changes to AIDL services, broadcast receivers, or vendor integrations
-*   No new permissions or system settings changes
+*   No new permissions beyond GPS access
 *   No audio/sound additions (NwdAudioService constraint)
 *   No internet permission
 *   No changes to the install/rollback scripts
 
 ## Open Questions
 
-*   **Q1**: Rajdhani (Google Fonts, OFL) for Latin + Noto Sans CJK JP for CJK — acceptable font licensing?
+*   **Q1**: Font licensing — Noto Serif JP (OFL) + Oswald (OFL) + JetBrains Mono (OFL) — all OFL-licensed, free to use. Resolved.
 *   **Q2**: Speed thresholds (60/100 km/h) configurable in settings — confirmed by user
-*   **Q3**: Accelerometer for early transition detection — use as supplement to GPS, or skip?
+*   **Q3**: Accelerometer for early transition detection — recommended as supplement to GPS
 *   **Q4**: Hex grid via SVG — confirmed by user
-*   **Q5**: How closely should mockup match final app? (App uses baked images + Canvas)
+*   **Q5**: Mockup fidelity — mockup is design spec; app uses baked images + Canvas
 
 ## Critical User Journeys (CUJs)
 
@@ -49,25 +49,25 @@ Additionally, the launcher has no awareness of vehicle speed. The color palette 
 
 *   **Given**: Vehicle speed below 60 km/h, GPS fix available
 *   **When**: User presses Home or launcher is active
-*   **Then**: UI renders in green/yellow/blue palette on black background. Hex grid buttons in green outline. No hazard stripes. Speed readout shows current km/h. All source keys (BT/RADIO/USB) functional.
+*   **Then**: UI renders in green/yellow/blue palette on black background. Honeycomb hex grid background (A.T. Field, ~240 hexes). No hazard stripes. JP kanji labels (見現時刻表示, 危険). Speed readout shows current km/h. All source keys (BT/RADIO/USB) functional. Header: "DIRECT LINK CONNECTION : LILY"
 
 ### CUJ 2: Highway Driving (60-100 km/h)
 
 *   **Given**: Vehicle speed between 60-100 km/h
 *   **When**: Speed crosses 60 km/h threshold
-*   **Then**: Palette instantly shifts to yellow/black. Hazard stripes appear on top/bottom. Warning octagon seals render. Header changes to "CAUTION: SPEED LIMIT". All functionality retained.
+*   **Then**: Palette instantly shifts to yellow/black. Yellow hazard stripes appear (top/bottom). Octagonal CAUTION seal (clip-path). Header changes to "CAUTION : SPEED LIMIT". Ticker panel shows repeating CAUTION text. All functionality retained.
 
 ### CUJ 3: High-Speed Driving (> 100 km/h)
 
 *   **Given**: Vehicle speed above 100 km/h
 *   **When**: Speed crosses 100 km/h threshold
-*   **Then**: Palette instantly shifts to black/red. Full hazard stripes (red/black). Header changes to "EMERGENCY: SELF DESTRUCTION". Inverted fills on critical elements. Hex cells turn red. All functionality retained.
+*   **Then**: Palette instantly shifts to black/red. Red hazard stripes (red/black). Octagonal EMERGENCY seal. Header changes to "第一種戦闘配置 : LILY". Ticker panel shows repeating EMERGENCY text. Hex grid cells turn red. All functionality retained.
 
 ### CUJ 4: Source Switching
 
 *   **Given**: Launcher is active, any speed zone
 *   **When**: User presses BT/RADIO/USB hex key
-*   **Then**: Source switches without opening an app. Node diagram updates (active node fills). Display area updates with source-specific content. Palette remains speed-based.
+*   **Then**: Source switches without opening an app. MAGI node diagram updates (active node fills). Display area updates with source-specific content. Palette remains speed-based.
 
 ### CUJ 5: Reverse Camera Overlay
 
@@ -109,9 +109,12 @@ updateSpeedZone():
 applyPalette(zone):
   set CSS variables (--bg, --text, --accent, etc.)
   toggle hazard stripes
-  update header text
+  update header text (JP kanji)
+  update ticker panel (show/hide, color)
   update node diagram fills
   update hex button colors
+  update octagonal seal
+  update JP kanji labels
 ```
 
 Thresholds stored in SharedPreferences, configurable via Settings sheet.
@@ -120,11 +123,21 @@ Thresholds stored in SharedPreferences, configurable via Settings sheet.
 
 ```
 mockup/nge-terminal.html
-├── CSS: NGE terminal styling (hex grid, banners, metadata, glow)
+├── CSS: NGE terminal styling
+│   ├── Honeycomb background (SVG pattern, ~240 hexes, A.T. Field)
+│   ├── Pointy-top hexagon buttons (SVG, 10 buttons)
+│   ├── MAGI node diagram (3 hexes in triangle: Melchior/Balthasar/Casper)
+│   ├── Hazard stripes (top/bottom, red or yellow)
+│   ├── Octagonal warning seals (clip-path, corner)
+│   ├── Ticker panel (repeating text, emergency/caution only)
+│   ├── Metadata side-channels (codes, layers, protocols)
+│   ├── JP kanji labels (見現時刻表示, 危険, 提訴決議, 非常事態)
+│   └── No glow (flat fill only)
+├── Fonts: Noto Serif JP (Mincho) + Oswald (condensed) + JetBrains Mono
 ├── State: S (speed, source, track, night, etc.) + prefs
 ├── Palette: applyPalette() based on speed zone
 ├── Render: display content, node diagram, hex buttons, metadata
-└── Simulator: speed slider, source toggles, threshold inputs
+└── Simulator: speed slider, source toggles, threshold inputs, accent picker
 ```
 
 ### App Architecture (Kotlin)
@@ -141,7 +154,7 @@ The existing app uses View + Canvas with baked images. Changes needed:
 Hexagonal buttons rendered as SVG `<polygon>` elements with text labels. SVG is used instead of Canvas to reduce rendering overhead and allow CSS styling. Each hex has:
 - `fill`: none (outline) or filled (active/latched)
 - `stroke`: current color (changes with palette)
-- `text`: button label
+- `text`: button label in condensed grotesque (Oswald)
 
 ---
 
@@ -150,20 +163,20 @@ Hexagonal buttons rendered as SVG `<polygon>` elements with text labels. SVG is 
 ### Alternative A: Keep TE Aesthetic, Add Speed Palette Only
 
 *   **Pros**: Minimal visual change, lower risk
-*   **Cons**: Doesn't address the user's desire for a terminal interface; the TE aesthetic doesn't support alarm-state visual language as naturally
+*   **Cons**: Doesn't address the user's desire for a terminal interface
 *   **Reason for Rejection**: User explicitly wants NGE terminal interface
 
 ### Alternative B: Full Canvas Rewrite with Dynamic Palette
 
-*   **Pros**: Complete control over rendering, can do glow effects in Canvas
-*   **Cons**: Higher development effort, risks breaking existing performance targets
-*   **Reason for Rejection**: SVG + CSS is sufficient for the hex grid; Canvas reserved for complex animations (tape deck)
+*   **Pros**: Complete control over rendering
+*   **Cons**: Higher development effort, risks breaking performance targets
+*   **Reason for Rejection**: SVG + CSS is sufficient for hex grid; Canvas reserved for complex animations (tape deck)
 
 ### Alternative C: Use GPS Only (No Accelerometer)
 
 *   **Pros**: Simpler implementation, GPS speed is reliable
 *   **Cons**: No early transition detection; palette only updates at GPS fix rate (~1 Hz)
-*   **Reason for Rejection**: Not rejected — this is the primary approach. Accelerometer is a supplement, not a replacement.
+*   **Reason for Rejection**: Not rejected — primary approach. Accelerometer is supplement.
 
 ---
 
@@ -183,12 +196,12 @@ Hexagonal buttons rendered as SVG `<polygon>` elements with text labels. SVG is 
 #### 1. `mockup/nge-terminal.html` (Created)
 
 *   **Type / Scope**: HTML/CSS/JS mockup
-*   **Proposed Changes**: Complete NGE terminal interface mockup with dynamic palette, hex grid, node diagram, simulator panel. Already created and committed.
+*   **Proposed Changes**: Complete NGE terminal interface mockup with dynamic palette, hex grid, node diagram, simulator panel, ticker, octagonal seals, JP kanji labels. Committed.
 
 #### 2. `docs/design-brief-nge-terminal.md` (Created)
 
 *   **Type / Scope**: Design specification
-*   **Proposed Changes**: Full design brief with reference analysis, palette system, hardware capabilities, layout mapping. Already created and committed.
+*   **Proposed Changes**: Full design brief with reference analysis (14 images), palette system, hardware capabilities, layout mapping. Committed.
 
 #### 3. `launcher/app/src/main/.../HomeActivity.kt` (Modify)
 
@@ -222,6 +235,7 @@ Hexagonal buttons rendered as SVG `<polygon>` elements with text labels. SVG is 
 *   **Speed simulation**: Use mockup simulator to verify palette transitions
 *   **Performance**: Verify RAM < 25MB, Home return < 200ms
 *   **Accessibility**: Tab navigation through hex grid, focus indicators visible
+*   **Antislop**: Re-run antislop audit after implementation
 
 ---
 
@@ -231,7 +245,9 @@ Hexagonal buttons rendered as SVG `<polygon>` elements with text labels. SVG is 
 *   Mockup: `mockup/nge-terminal.html`
 *   Integration notes: `docs/INTEGRATION.md`
 *   Test plan: `docs/TESTING.md`
-*   NGE reference images: 6 screenshots (analyzed via opencode)
+*   NGE reference: `terminal-interface-design` skill (14 images analyzed)
+*   NGE design language: `references/nge-design-language.md`
+*   Antislop audit: PASS (no findings)
 
 ## Future Improvements
 
