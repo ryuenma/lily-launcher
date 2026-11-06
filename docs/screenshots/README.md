@@ -41,3 +41,20 @@ we can capture off-headunit. Full BT / Radio / USB / AA behaviours require the r
 - `autoAA` true/false — auto-open zlink on AA connect
 - `theme` auto/dark — auto follows headlights (night), dark forces graphite
 - `accent` #FF5A1F / #258AC3 / #2FB35A / #F5B400 / #E8332A
+
+## Mockup simulator captures (all states)
+
+Rendered from `mockup/index.html` via its simulator panel (Edge headless, 1052×628). These show every UI state the app can be in; the on-device captures above only cover the empty state.
+
+| File | State |
+|---|---|
+| `mockup-tape-day.png` | TAPE: BT music playing, day theme (silver) |
+| `mockup-tape-night.png` | TAPE: BT music playing, night theme (graphite, headlights on) |
+| `mockup-radio.png` | RADIO: FM station, seek needle, frequency readout |
+| `mockup-usb.png` | USB: USB music playing, title/artist |
+| `mockup-aa-connected.png` | Android Auto connected (zlink) |
+| `mockup-reverse.png` | Reverse gear overlay (camera on top) |
+| `mockup-incoming-call.png` | Incoming call overlay |
+| `mockup-more-sheet.png` | "More" sheet (13 app tiles) |
+| `mockup-settings-sheet.png` | Settings sheet (resumeOnStart, autoAA, theme, accent) |
+| `mockup-empty.png` | Empty: no BT, no track, pads dimmed 45% |
