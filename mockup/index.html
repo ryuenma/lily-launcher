@@ -8,12 +8,12 @@
   <style>
     /* ───────────── Page (mockup viewer, not part of the launcher) ───────────── */
     :root {
-      --page: #0c0c0e;
-      --panel: #151518;
-      --line: #26262b;
-      --ptext: #e8e8ec;
-      --ptext2: #8d8d96;
-      --pacc: #FF5A1F
+      --page: #0a0a12;
+      --panel: #0a0a12;
+      --line: #3a3448;
+      --ptext: #b9afcb;
+      --ptext2: #888;
+      --pacc: #ff4a1c
     }
 
     * {
@@ -30,7 +30,7 @@
     body {
       background: var(--page);
       color: var(--ptext);
-      font: 14px/1.4 "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font: 14px/1.4 "Oswald", "Noto Serif JP", sans-serif;
       -webkit-font-smoothing: antialiased
     }
 
@@ -297,61 +297,61 @@
 
     /* Day: bright polished aluminium, near-white with pure-black ink so it stays crisp in direct sun */
     .device[data-theme=light] {
-      --body: #e6e9ee;
-      --body-hi: #ffffff;
-      --body-sh: #c9cdd4;
-      --plate: #f3f5f8;
-      --plate-hi: #ffffff;
-      --plate-sh: #d4d8de;
-      --ink: #000000;
-      --ink2: #121418;
-      --ink3: #33363d;
-      --padg: #f4f6f9;
-      --padg2: #dcdfe5;
-      --padg-ink: #000000;
-      --padg-edge: #8a8f98;
-      --padg-hi: rgba(255, 255, 255, .98);
-      --grille: #4b4e54;
-      --hole: #151619;
-      --screw: #c8cbd2;
-      --knob-well: inset 0 4px 14px 2px rgba(0, 0, 0, .4), inset 0 0 0 1px rgba(0, 0, 0, .35), inset 0 -2px 4px rgba(255, 255, 255, .9);
+      --body: #0a0a12;
+      --body-hi: #1a1a2a;
+      --body-sh: #050508;
+      --plate: #12121e;
+      --plate-hi: #1e1e30;
+      --plate-sh: #080810;
+      --ink: #b9afcb;
+      --ink2: #888;
+      --ink3: #555;
+      --padg: #1a1a2a;
+      --padg2: #0f0f1a;
+      --padg-ink: #b9afcb;
+      --padg-edge: #3a3448;
+      --padg-hi: rgba(255, 255, 255, .1);
+      --grille: #3a3448;
+      --hole: #050508;
+      --screw: #3a3448;
+      --knob-well: inset 0 4px 14px 2px rgba(0, 0, 0, .6), inset 0 0 0 1px rgba(0, 0, 0, .5), inset 0 -2px 4px rgba(255, 255, 255, .1);
     }
 
     /* Space Gray / Gunmetal (anodised aluminium) */
     .device[data-theme=dark] {
-      --body: #222428;
-      --body-hi: #31343a;
-      --body-sh: #16171a;
-      --plate: #2a2c32;
-      --plate-hi: #3a3d45;
-      --plate-sh: #1c1e22;
-      --ink: #f4f5f8;
-      --ink2: #ccd0d8;
-      --ink3: #8c919d;
-      --padg: #3d4047;
-      --padg2: #2a2c32;
-      --padg-ink: #f2f4f7;
-      --padg-edge: #151619;
-      --padg-hi: rgba(255, 255, 255, .2);
-      --grille: #141517;
-      --hole: #070708;
-      --screw: #4a4d55;
+      --body: #0a0a12;
+      --body-hi: #1a1a2a;
+      --body-sh: #050508;
+      --plate: #12121e;
+      --plate-hi: #1e1e30;
+      --plate-sh: #080810;
+      --ink: #b9afcb;
+      --ink2: #888;
+      --ink3: #555;
+      --padg: #1a1a2a;
+      --padg2: #0f0f1a;
+      --padg-ink: #b9afcb;
+      --padg-edge: #3a3448;
+      --padg-hi: rgba(255, 255, 255, .1);
+      --grille: #3a3448;
+      --hole: #050508;
+      --screw: #3a3448;
       --knob-well: inset 0 4px 16px 2px rgba(0, 0, 0, .7), inset 0 0 0 1px rgba(0, 0, 0, .65), inset 0 -1px 2px rgba(255, 255, 255, .1);
     }
 
     .device[data-theme=dark][data-night="1"] {
-      --body: #18191c;
-      --body-hi: #23252a;
-      --body-sh: #101113;
-      --plate: #202226;
-      --plate-hi: #2d3036;
-      --plate-sh: #151619;
-      --ink: #dcdfe4;
-      --ink2: #b2b6bf;
-      --ink3: #767b85;
-      --padg: #32353b;
-      --padg2: #24262b;
-      --padg-ink: #dcdfe4;
+      --body: #050508;
+      --body-hi: #0f0f1a;
+      --body-sh: #000000;
+      --plate: #0a0a12;
+      --plate-hi: #141420;
+      --plate-sh: #030306;
+      --ink: #888;
+      --ink2: #666;
+      --ink3: #444;
+      --padg: #1a1a2a;
+      --padg2: #0f0f1a;
+      --padg-ink: #888;
       --acc: color-mix(in srgb, var(--accent) 80%, #000);
     }
 
