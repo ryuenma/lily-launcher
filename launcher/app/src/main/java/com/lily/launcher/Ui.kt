@@ -1,8 +1,6 @@
 package com.lily.launcher
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.BlurMaskFilter
 import android.graphics.Canvas
 import android.graphics.Color
@@ -15,7 +13,6 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import org.json.JSONObject
-import java.io.IOException
 
 /**
  * Everything baked from the mockup by tools/bake.mjs: where each image goes, element rects,
@@ -23,7 +20,6 @@ import java.io.IOException
  */
 class Ui(private val ctx: Context, initialTheme: String) {
     private val json = JSONObject(ctx.assets.open("ui/layout.json").bufferedReader().use { it.readText() })
-    private val img = json.getJSONObject("img")
     private val rects = json.getJSONObject("rect")
     val meta: JSONObject = json.getJSONObject("meta")
     /**
@@ -76,9 +72,6 @@ class Ui(private val ctx: Context, initialTheme: String) {
     private var pending: String? = null
     private var first = true
     private val main = Handler(Looper.getMainLooper())
-    private val files = ctx.assets.list("ui").orEmpty().toHashSet()
-    private val cache = HashMap<String, Bitmap>()
-    private val placed = HashMap<String, Placed>()
     private val rectCache = HashMap<String, RectF>()
     private val specs = HashMap<String, TextSpec>()
 
@@ -91,78 +84,16 @@ class Ui(private val ctx: Context, initialTheme: String) {
         if (t == theme) { pending = null; return }
         if (t == pending) return
         pending = t
-        Thread {
-            val fresh = decodeAll { _, at -> at == t }
-            main.post {
-                if (pending != t) return@post
-                pending = null; theme = t
-                cache.keys.removeAll { '@' in it }; cache.putAll(fresh)
-                placed.clear(); specs.clear()
-                ready()
-            }
-        }.start()
-    }
-
-    /**
-     * Decodes the images [want] picks (base name, theme or "") on all cores. Hardware bitmaps: decoded straight
-     * into GPU memory, so nothing is uploaded on the first frame and nothing sits on the Java heap.
-     * Off the main thread only; a file that fails just loads lazily later.
-     */
-    private fun decodeAll(want: (String, String) -> Boolean): Map<String, Bitmap> {
-        val out = java.util.concurrent.ConcurrentHashMap<String, Bitmap>()
-        try {
-            files.filter { it.endsWith(".png") }.map { it.removeSuffix(".png") }
-                .filter { want(it.substringBefore('@'), it.substringAfter('@', "")) }
-                .parallelStream().forEach { n -> decode(n)?.let { out[n] = it } }
-        } catch (e: Throwable) { Log.w(Car.TAG, "preload", e) }
-        return out
-    }
-
-    private fun isSheet(base: String) = SHEET.any { base.startsWith(it) }
-
-    /** Before the first frame: every image the home screen can show in this theme, all key states, this accent only. */
-    fun preloadHome(accent: String) {
-        val acc = accent.drop(1).uppercase()
-        cache.putAll(decodeAll { base, at ->
-            (at.isEmpty() || at == theme) && !isSheet(base) && (!base.startsWith("pad_play_") || base.endsWith("_$acc"))
-        })
-    }
-
-    /** After the first frame: the More / Settings sheets, so opening them never waits on decoding. */
-    fun preloadSheets() {
-        val t = theme
-        Thread {
-            val m = decodeAll { base, at -> (at.isEmpty() || at == t) && isSheet(base) }
-            main.post { if (theme == t) m.forEach { (k, v) -> cache.putIfAbsent(k, v) } }
-        }.apply { priority = Thread.MIN_PRIORITY }.start()
+        main.post {
+            if (pending != t) return@post
+            pending = null; theme = t
+            specs.clear()
+            ready()
+        }
     }
 
     fun rect(name: String): RectF = rectCache.getOrPut(name) { rects.getJSONObject(name).toRect() }
     fun metaRect(name: String): RectF = rectCache.getOrPut("meta/$name") { meta.getJSONObject(name).toRect() }
-
-    class Placed(val bmp: Bitmap, val dst: RectF)
-
-    /** Image slot [slot] drawn from file [file] (themed file `file@theme.png` wins over `file.png`). Shared: don't mutate. */
-    fun image(slot: String, file: String = slot, themeAs: String = theme): Placed? {
-        val key = "$slot|$file@$themeAs"
-        placed[key]?.let { return it }
-        val p = img.optJSONObject(slot) ?: return null
-        val bmp = load("$file@$themeAs") ?: load(file) ?: return null
-        return Placed(bmp, p.toRect()).also { placed[key] = it }
-    }
-
-    private fun load(f: String): Bitmap? = cache[f] ?: decode(f)?.also { cache[f] = it }
-
-    private fun decode(f: String): Bitmap? {
-        if ("$f.png" !in files) return null
-        val opts = BitmapFactory.Options().apply {
-            inScaled = false
-            inPreferredConfig = if (isEmulator()) Bitmap.Config.ARGB_8888 else Bitmap.Config.HARDWARE
-        }
-        return try {
-            ctx.assets.open("ui/$f.png").use { BitmapFactory.decodeStream(it, null, opts) }
-        } catch (e: IOException) { null } catch (e: OutOfMemoryError) { null }
-    }
 
     /** [scale] < 1 is a smaller copy of the measured style (long song titles shrink to fit). */
     fun text(key: String, scale: Float = 1f): TextSpec = specs.getOrPut(if (scale == 1f) key else "$key@$scale") {
@@ -203,7 +134,6 @@ class Ui(private val ctx: Context, initialTheme: String) {
     companion object {
         private const val OSWALD = "Oswald.ttf"
         private const val NOTO = "NotoSerifJP.ttf"
-        private val SHEET = listOf("more_bg", "set_bg", "mi_", "opt_", "done_", "led_opt")
         fun isEmulator(): Boolean {
             val hw = android.os.Build.HARDWARE.lowercase()
             return hw.contains("ranchu") || hw.contains("goldfish") || hw.contains("qemu")
