@@ -13,7 +13,8 @@ import android.widget.FrameLayout
  */
 @SuppressLint("ViewConstructor")
 class Stage(ctx: Context, val ui: Ui, val car: Car) : FrameLayout(ctx) {
-    val home = HomeView(ctx, ui, car) { sheet.open(SheetView.Kind.MORE) }
+    val home = HomeView(ctx, ui, car, { sheet.open(SheetView.Kind.MORE) },
+                                      { sheet.open(SheetView.Kind.SETTINGS) })
     val deck = DeckView(ctx, ui, car)
     val knob = KnobView(ctx, ui, car, { home.acc }) { home.onVolume() }
     val sheet = SheetView(ctx, ui, car) { render() }

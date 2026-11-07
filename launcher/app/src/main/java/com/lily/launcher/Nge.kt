@@ -33,22 +33,28 @@ object Nge {
     val stage = RectF(170f, main.top, 808f, main.bottom)
     val magi = RectF(808f, main.top, W, main.bottom)
 
-    /** Deck row: 372 keypad · 132 knob · speed plate to the right edge. */
-    val keypad = RectF(10f, deck.top + 8f, 382f, deck.bottom - 12f)
+    /** Deck row: 372×150 keypad · 132 knob · speed plate to the right edge (`.deck` padding 8px 10px). */
+    val keypad = RectF(10f, deck.top + 10.5f, 382f, deck.top + 160.5f)
     val knobArea = RectF(392f, deck.top + 14f, 524f, deck.bottom - 8f)
     val knob = RectF(406f, deck.top + 22f, 510f, deck.top + 126f)
     val speed = RectF(534f, deck.top + 8f, 1014f, deck.bottom - 10f)
 
-    // ── hex pads: 66×76 pointy-top, 57px pitch, two interlocking rows (6 + 4) ──
-    const val HEX_W = 66f
-    const val HEX_H = 76f
-    const val HEX_PITCH = 57f
+    // ── hex pads: the mockup's `#keypad` svg, viewBox 0 0 364 138 in a 372×150 CSS box ──
+    // The element keeps its aspect ratio (SVG `preserveAspectRatio` defaults to xMidYMid meet), so the
+    // viewBox is scaled uniformly by KEY_SCALE and letterboxed 4.48px top and bottom. Every number in
+    // hexCenters is the mockup's own coordinate × KEY_SCALE, so the two layouts cannot drift apart.
+    // Row 1 is six hexes at y=40, row 2 is five at y=97 — staggered by half a pitch (57 vs 28.5).
+    const val KEY_SCALE = 372f / 364f                                // 1.02198
+    private const val KEY_VB_TOP = (150f - 138f * KEY_SCALE) / 2f    // 4.4835 letterbox
+    const val HEX_W = 65.82f * KEY_SCALE                             // polygon 2 × 32.91 → 67.27
+    const val HEX_H = 76f * KEY_SCALE                                // polygon 2 × 38 → 77.67
+    const val HEX_PITCH = 57f * KEY_SCALE                            // 58.25
 
-    val hexCenters: List<Pair<Float, Float>> = ArrayList<Pair<Float, Float>>(10).apply {
-        val cx0 = keypad.centerX()
-        val cy0 = keypad.centerY() - HEX_PITCH / 2f
-        for (i in 0 until 6) add(cx0 + (i - 2.5f) * HEX_PITCH to cy0)
-        for (i in 0 until 4) add(cx0 + (i - 1.5f) * HEX_PITCH to cy0 + HEX_PITCH)
+    val hexCenters: List<Pair<Float, Float>> = ArrayList<Pair<Float, Float>>(11).apply {
+        val ox = keypad.left
+        val oy = keypad.top + KEY_VB_TOP
+        for (i in 0 until 6) add((ox + (41f + i * 57f) * KEY_SCALE) to (oy + 40f * KEY_SCALE))
+        for (i in 0 until 5) add((ox + (69f + i * 57f) * KEY_SCALE) to (oy + 97f * KEY_SCALE))
     }
 
     /** Point-in-hexagon test (bounding boxes overlap at the interlocking edges). */

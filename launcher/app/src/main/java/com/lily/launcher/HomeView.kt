@@ -24,7 +24,7 @@ import java.util.Locale
  */
 @SuppressLint("ViewConstructor")
 class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
-               private val onMore: () -> Unit) : View(ctx) {
+               private val onMore: () -> Unit, private val onSetup: () -> Unit) : View(ctx) {
 
     private val type = NgeType(ui)
     private val fill = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -616,15 +616,24 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
         drawSpeedPlate(c)
     }
 
-    private enum class T { PREV, PLAY, NEXT, BT, RADIO, USB, PHONE, SWITCH, AUTO, MORE, LCD }
+    private enum class T { PREV, PLAY, NEXT, BT, RADIO, USB, PHONE, SWITCH, AUTO, SETUP, MORE, LCD }
 
-    private val pads = listOf(T.PREV, T.PLAY, T.NEXT, T.BT, T.RADIO, T.USB, T.PHONE, T.SWITCH, T.AUTO, T.MORE)
+    private val pads = listOf(T.PREV, T.PLAY, T.NEXT, T.BT, T.RADIO, T.USB,
+                              T.PHONE, T.SWITCH, T.AUTO, T.SETUP, T.MORE)
 
+    /**
+     * Positions come from [Nge.hexCenters] — the mockup's own `#keypad` viewBox mapped into the
+     * 372×150 keypad box — so hex size, pitch and the half-pitch stagger live in one place. Text sits
+     * where the CSS puts it: `.lab` 8.5px on baseline +12, `.jp` 6.4px on +21, both × [Nge.KEY_SCALE].
+     */
     private fun drawKeypad(c: Canvas) {
-        val labels = arrayOf("PREV", "PLAY", "NEXT", "BT", "RADIO", "USB", "PHONE", "SWITCH", "AUTO", "MORE")
-        val jp = arrayOf("前曲", "再生", "次曲", "無線", "受信", "記憶", "通話", "切替", "自動", "拡張")
-        val lab = type.paint(8.5f, track = 1.2f, align = Paint.Align.CENTER, weight = 600)
-        val jpP = type.paint(6.4f, jp = true, track = .6f, align = Paint.Align.CENTER, weight = 700)
+        val labels = arrayOf("PREV", "PLAY", "NEXT", "BT", "RADIO", "USB",
+                             "PHONE", "SWITCH", "AUTO", "SETUP", "MORE")
+        val jp = arrayOf("前曲", "再生", "次曲", "無線", "受信", "記憶",
+                         "通話", "切替", "自動", "設定", "拡張")
+        val s = Nge.KEY_SCALE
+        val lab = type.paint(8.5f * s, track = 1.2f * s, align = Paint.Align.CENTER, weight = 600)
+        val jpP = type.paint(6.4f * s, jp = true, track = .6f * s, align = Paint.Align.CENTER, weight = 700)
         val okCol = ui.zoneColor("ok")
 
         pads.forEachIndexed { i, t ->
@@ -647,7 +656,7 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
                 else -> Color.BLACK
             }
             c.drawPath(path, fill)
-            line.strokeWidth = if (latched || lit) 1.5f else 1.2f
+            line.strokeWidth = 1.5f * s                     // .hex .face{stroke-width:1.5}
             line.color = when {
                 latched -> acc
                 lit -> okCol
@@ -656,90 +665,116 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
             c.drawPath(path, line)
 
             val fg = if (latched || lit) Color.BLACK else ink()
-            drawIcon(c, t, cx, y - 10f, fg, lit)
-            c.text(lab, if (t == T.PLAY && car.playing) "PAUSE" else labels[i], cx, y + 14f, fg)
-            c.text(jpP, jp[i], cx, y + 23f, if (latched || lit) withAlpha(Color.BLACK, .6f) else withAlpha(ink(), .5f))
+            drawIcon(c, t, cx, y - 10f * s, fg, lit)        // .ico transform="translate(0,-10)"
+            c.text(lab, if (t == T.PLAY && car.playing) "PAUSE" else labels[i], cx, y + 12f * s, fg)
+            c.text(jpP, jp[i], cx, y + 21f * s, if (latched || lit) withAlpha(Color.BLACK, .6f) else withAlpha(ink(), .5f))
         }
     }
 
+    /**
+     * Icons are the mockup's `#keypad .hex .ico` path data verbatim, drawn in viewBox units on a
+     * canvas scaled by [Nge.KEY_SCALE]: the numbers below read straight across from the HTML, and the
+     * CTM scales the 1.5px strokes and the 13px `AA` glyph exactly as the browser does. Stroke caps are
+     * square per `.hex .ico path{stroke-linecap:square}`; solid shapes keep the fill paint.
+     */
     private fun drawIcon(c: Canvas, t: T, cx: Float, cy: Float, col: Int, lit: Boolean) {
-        line.strokeWidth = 1.6f
+        val s = Nge.KEY_SCALE
+        c.save()
+        c.translate(cx, cy)
+        c.scale(s, s)
+        line.strokeWidth = 1.5f
+        line.strokeCap = Paint.Cap.SQUARE
         line.color = col
         fill.color = col
         when (t) {
-            T.PREV, T.NEXT -> {
-                val d = if (t == T.PREV) 1f else -1f
+            T.PREV -> {
                 path.reset()
-                path.moveTo(cx + 2f * d, cy - 7f); path.lineTo(cx - 5f * d, cy); path.lineTo(cx + 2f * d, cy + 7f); path.close()
-                path2.reset()
-                path2.moveTo(cx + 9f * d, cy - 7f); path2.lineTo(cx + 2f * d, cy); path2.lineTo(cx + 9f * d, cy + 7f); path2.close()
+                path.moveTo(-2f, -7f); path.lineTo(-10f, 0f); path.lineTo(-2f, 7f); path.close()
+                path.moveTo(8f, -7f); path.lineTo(0f, 0f); path.lineTo(8f, 7f); path.close()
                 c.drawPath(path, fill)
-                c.drawPath(path2, fill)
             }
-            T.PLAY -> if (lit) {
-                c.drawRect(cx - 6f, cy - 8f, cx - 2f, cy + 8f, fill)
-                c.drawRect(cx + 2f, cy - 8f, cx + 6f, cy + 8f, fill)
+            T.PLAY -> if (lit) {                                    // .playing → .pause-ico
+                c.drawRect(-6f, -8f, -2f, 8f, fill)
+                c.drawRect(2f, -8f, 6f, 8f, fill)
             } else {
                 path.reset()
-                path.moveTo(cx - 5f, cy - 8f); path.lineTo(cx + 8f, cy); path.lineTo(cx - 5f, cy + 8f); path.close()
+                path.moveTo(-5f, -8f); path.lineTo(9f, 0f); path.lineTo(-5f, 8f); path.close()
+                c.drawPath(path, fill)
+            }
+            T.NEXT -> {
+                path.reset()
+                path.moveTo(-9f, -7f); path.lineTo(-1f, 0f); path.lineTo(-9f, 7f); path.close()
+                path.moveTo(1f, -7f); path.lineTo(9f, 0f); path.lineTo(1f, 7f); path.close()
                 c.drawPath(path, fill)
             }
             T.BT -> {
                 path.reset()
-                path.moveTo(cx - 4f, cy - 7f); path.lineTo(cx + 4f, cy); path.lineTo(cx - 4f, cy + 7f)
-                path.moveTo(cx - 4f, cy - 7f); path.lineTo(cx + 2f, cy - 3f)
-                path.moveTo(cx - 4f, cy + 7f); path.lineTo(cx + 2f, cy + 3f)
-                path.moveTo(cx - 8f, cy); path.lineTo(cx + 4f, cy)
+                path.moveTo(-4f, -7f); path.lineTo(4f, 0f); path.lineTo(-4f, 7f)
+                path.moveTo(-4f, -7f); path.lineTo(2f, -3f)
+                path.moveTo(-4f, 7f); path.lineTo(2f, 3f)
+                path.moveTo(-8f, 0f); path.lineTo(4f, 0f)
                 c.drawPath(path, line)
             }
             T.RADIO -> {
-                tmp.set(cx - 9f, cy - 6f, cx + 9f, cy + 12f)
-                c.drawArc(tmp, 200f, 140f, false, line)
-                tmp.set(cx - 4f, cy - 1f, cx + 4f, cy + 7f)
-                c.drawArc(tmp, 200f, 140f, false, line)
-                c.drawCircle(cx, cy + 5f, 1.6f, fill)
+                // A11,11 (−8,4)→(8,4) and A6,6 (−4,0)→(4,0): centre below the chord, 223.3°/93.3° and 228.2°/83.6°
+                tmp.set(-11f, .55f, 11f, 22.55f)
+                c.drawArc(tmp, 223.34f, 93.32f, false, line)
+                tmp.set(-6f, -1.53f, 6f, 10.47f)
+                c.drawArc(tmp, 228.19f, 83.62f, false, line)
+                c.drawCircle(0f, 5f, 1.6f, fill)
             }
             T.USB -> {
                 path.reset()
-                path.moveTo(cx, cy + 8f); path.lineTo(cx, cy - 8f)
-                path.moveTo(cx, cy - 8f); path.lineTo(cx - 3f, cy - 4f)
-                path.moveTo(cx, cy - 8f); path.lineTo(cx + 3f, cy - 4f)
-                path.moveTo(cx, cy - 1f); path.lineTo(cx - 4f, cy - 4f)
-                path.moveTo(cx, cy - 1f); path.lineTo(cx + 4f, cy - 4f)
+                path.moveTo(0f, 8f); path.lineTo(0f, -8f)
+                path.moveTo(0f, -8f); path.lineTo(-3f, -4f)
+                path.moveTo(0f, -8f); path.lineTo(3f, -4f)
+                path.moveTo(0f, -1f); path.lineTo(-4f, -4f)
+                path.moveTo(0f, -1f); path.lineTo(4f, -4f)
                 c.drawPath(path, line)
-                c.drawCircle(cx, cy + 8f, 2f, fill)
+                c.drawCircle(0f, 8f, 2f, fill)
             }
             T.PHONE -> {
                 path.reset()
-                path.moveTo(cx - 6f, cy - 6f)
-                path.lineTo(cx - 3f, cy - 8f)
-                path.lineTo(cx, cy - 3f)
-                path.lineTo(cx - 2f, cy - 1f)
-                path.quadTo(cx + 1f, cy + 3f, cx + 4f, cy + 5f)
-                path.lineTo(cx + 6f, cy + 3f)
-                path.lineTo(cx + 9f, cy + 6f)
-                path.lineTo(cx + 7f, cy + 8f)
-                path.quadTo(cx - 6f, cy + 8f, cx - 6f, cy - 6f)
+                path.moveTo(-6f, -6f); path.lineTo(-3f, -8f); path.lineTo(0f, -3f); path.lineTo(-2f, -1f)
+                tmp.set(-3.135f, -16.865f, 18.865f, 5.135f)          // A11,11 → centre (7.865,−5.865)
+                path.arcTo(tmp, 153.75f, -37.5f, false)              // … 37.5° counter-clockwise to (3,4)
+                path.lineTo(5f, 2f); path.lineTo(9f, 5f); path.lineTo(7f, 8f)
+                path.cubicTo(1f, 9f, -7f, 1f, -6f, -6f)              // C1,9 −7,1 −6,−6
                 path.close()
                 c.drawPath(path, line)
             }
             T.SWITCH -> {
                 path.reset()
-                path.moveTo(cx - 8f, cy - 4f); path.lineTo(cx + 7f, cy - 4f); path.lineTo(cx + 4f, cy - 7f)
-                path.moveTo(cx + 8f, cy + 4f); path.lineTo(cx - 7f, cy + 4f); path.lineTo(cx - 4f, cy + 7f)
+                path.moveTo(-8f, -4f); path.lineTo(7f, -4f); path.lineTo(4f, -7f)
+                path.moveTo(8f, 4f); path.lineTo(-7f, 4f); path.lineTo(-4f, 7f)
                 c.drawPath(path, line)
             }
             T.AUTO -> {
                 val p = type.paint(13f, align = Paint.Align.CENTER, weight = 700)
-                c.text(p, "AA", cx, cy + 5f, col)
+                c.text(p, "AA", 0f, 5f, col)
+            }
+            T.SETUP -> {
+                path.reset()
+                path.moveTo(-8f, -5f); path.lineTo(-2f, -5f)
+                path.moveTo(2f, -5f); path.lineTo(8f, -5f)
+                path.moveTo(-8f, 1f); path.lineTo(2f, 1f)
+                path.moveTo(5f, 1f); path.lineTo(8f, 1f)
+                path.moveTo(-8f, 6f); path.lineTo(-3f, 6f)
+                path.moveTo(0f, 6f); path.lineTo(8f, 6f)
+                c.drawPath(path, line)
+                c.drawCircle(0f, -5f, 1.8f, fill)
+                c.drawCircle(3.5f, 1f, 1.8f, fill)
+                c.drawCircle(-1.5f, 6f, 1.8f, fill)
             }
             T.MORE -> {
-                c.drawCircle(cx - 6f, cy, 2f, fill)
-                c.drawCircle(cx, cy, 2f, fill)
-                c.drawCircle(cx + 6f, cy, 2f, fill)
+                c.drawCircle(-6f, 0f, 2f, fill)
+                c.drawCircle(0f, 0f, 2f, fill)
+                c.drawCircle(6f, 0f, 2f, fill)
             }
             T.LCD -> Unit
         }
+        line.strokeCap = Paint.Cap.BUTT
+        c.restore()
     }
 
     // ── speed plate: 116px odometer · octagonal zone seal · 24-segment ladder ──
@@ -871,7 +906,9 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
     override fun onDetachedFromWindow() { removeCallbacks(ticker); super.onDetachedFromWindow() }
 
     private fun hit(x: Float, y: Float): T? {
-        for (i in pads.indices) if (Nge.inHex(i, x, y)) return pads[i]
+        // Hexes overlap ~9px at the row seams and the later pad paints on top (as later SVG siblings do),
+        // so walk the list backwards to hit the pad that is actually visible there.
+        for (i in pads.indices.reversed()) if (Nge.inHex(i, x, y)) return pads[i]
         if (Nge.magiTrap(0).contains(x, y)) return T.BT
         if (Nge.magiTrap(1).contains(x, y)) return T.RADIO
         if (Nge.magiTrap(2).contains(x, y)) return T.USB
@@ -907,6 +944,7 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
         T.RADIO -> car.selectSource(Src.RADIO)
         T.USB -> car.selectSource(Src.USB)
         T.MORE -> onMore()
+        T.SETUP -> onSetup()
         T.LCD -> car.launch(when (car.source) {
             Src.RADIO -> Car.RADIO_UI
             Src.USB -> Car.USB_MUSIC_UI
