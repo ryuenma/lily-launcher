@@ -72,12 +72,52 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
     }
 
     override fun onDraw(c: Canvas) {
-        img(c, "bg")
+        // NGE background: flat dark fill + honeycomb pattern
+        fill.color = ui.zoneColor("bg")
+        c.drawRect(0f, 0f, Stage.W.toFloat(), Stage.H.toFloat(), fill)
+        drawHoneycomb(c)
         drawTabs(c)
         drawPlate(c)
         drawDisplay(c)
         drawPads(c)
         drawZoneOverlays(c)
+    }
+
+    // ── honeycomb background (A.T. Field) ──
+    private fun drawHoneycomb(c: Canvas) {
+        val hexSize = 24f
+        val hexH = hexSize * 1.732f
+        val color = ui.zoneColor("text2")
+        fill.style = Paint.Style.STROKE
+        fill.strokeWidth = 0.5f
+        fill.color = color
+        fill.alpha = 30
+        var row = 0
+        var y = 0f
+        while (y < Stage.H) {
+            val offset = if (row % 2 == 0) 0f else hexSize * 0.75f
+            var x = offset
+            while (x < Stage.W) {
+                drawHex(c, x, y, hexSize * 0.6f)
+                x += hexSize * 1.5f
+            }
+            y += hexH * 0.5f
+            row++
+        }
+        fill.alpha = 255
+        fill.style = Paint.Style.FILL
+    }
+
+    private fun drawHex(c: Canvas, cx: Float, cy: Float, r: Float) {
+        val path = Path()
+        for (i in 0 until 6) {
+            val angle = Math.PI / 3 * i - Math.PI / 6
+            val x = cx + r * Math.cos(angle).toFloat()
+            val y = cy + r * Math.sin(angle).toFloat()
+            if (i == 0) path.moveTo(x, y) else path.lineTo(x, y)
+        }
+        path.close()
+        c.drawPath(path, fill)
     }
 
     // ── speed-zone overlays (no layout shift) ──
