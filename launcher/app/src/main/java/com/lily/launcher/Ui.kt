@@ -65,13 +65,13 @@ class Ui(private val ctx: Context, initialTheme: String) {
             .getOrDefault(Typeface.SERIF)
     }
 
-    /** Noto Serif Display (NERV title) at [weight] (700–900), variable font. */
+    /** Oswald (NERV EN title) at [weight] (200–700), variable font. */
     fun title(weight: Int): Typeface = titleCache.getOrPut(weight) {
         runCatching {
-            val w = weight.coerceIn(700, 900)
-            val font = Font.Builder(ctx.assets, "fonts/NotoSerifDisplay.ttf").setFontVariationSettings("'wght' $w").build()
+            val w = weight.coerceIn(200, 700)
+            val font = Font.Builder(ctx.assets, "fonts/Oswald.ttf").setFontVariationSettings("'wght' $w").build()
             Typeface.CustomFallbackBuilder(FontFamily.Builder(font).build()).build()
-        }.getOrDefault(Typeface.SERIF)
+        }.getOrDefault(Typeface.SANS_SERIF)
     }
 
     /** Saira Extra Condensed (warning stamps) at [weight]. */
