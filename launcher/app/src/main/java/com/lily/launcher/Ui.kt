@@ -45,21 +45,23 @@ class Ui(private val ctx: Context, initialTheme: String) {
     fun latin(weight: Int): Typeface = latinCache.getOrPut(weight) {
         val w = weight.coerceIn(200, 700)
         runCatching {
-            Typeface.CustomFallbackBuilder(family(OSWALD, w))
-                .addCustomFallback(family(NOTO, jpWeight(weight)))
+            Typeface.CustomFallbackBuilder(family("Oswald.ttf", w))
+                .addCustomFallback(family("NotoSerifJP.ttf", jpWeight(weight)))
                 .build()
         }.getOrElse { e ->
             Log.w(Car.TAG, "latin@$w: falling back to the default instance", e)
-            Typeface.createFromAsset(ctx.assets, "fonts/$OSWALD")
+            runCatching { Typeface.createFromAsset(ctx.assets, "fonts/Oswald.ttf") }
+                .getOrDefault(Typeface.SANS_SERIF)
         }
     }
 
     /** Noto Serif JP (Mincho) at [weight] (200–900). */
     fun jp(weight: Int): Typeface = jpCache.getOrPut(jpWeight(weight)) {
-        runCatching { Typeface.CustomFallbackBuilder(family(NOTO, jpWeight(weight))).build() }
+        runCatching { Typeface.CustomFallbackBuilder(family("NotoSerifJP.ttf", jpWeight(weight))).build() }
             .getOrElse { e ->
                 Log.w(Car.TAG, "jp@${jpWeight(weight)}: falling back to the default instance", e)
-                Typeface.createFromAsset(ctx.assets, "fonts/$NOTO")
+                runCatching { Typeface.createFromAsset(ctx.assets, "fonts/NotoSerifJP.ttf") }
+                    .getOrDefault(Typeface.SERIF)
             }
     }
 
