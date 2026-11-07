@@ -100,7 +100,7 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
         val pulse = (Math.sin(SystemClock.uptimeMillis() / 300.0) * 0.3 + 0.7).toFloat()
         fill.style = Paint.Style.FILL
         fill.color = color
-        fill.alpha = (pulse * 40).toInt()
+        fill.alpha = (pulse * 80).toInt()
         c.drawRect(0f, 0f, Nge.W.toFloat(), Nge.H.toFloat(), fill)
         fill.alpha = 255
         postInvalidateDelayed(50)

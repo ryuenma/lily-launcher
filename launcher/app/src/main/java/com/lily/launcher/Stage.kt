@@ -2,6 +2,7 @@ package com.lily.launcher
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.view.View
 import android.widget.FrameLayout
 
 /**
@@ -37,6 +38,7 @@ class Stage(ctx: Context, val ui: Ui, val car: Car) : FrameLayout(ctx) {
     fun render() {
         ui.speedZone = car.speedZone      // Ui.zoneColor() reads this every draw
         home.restyle()
+        deck.visibility = if (home.view3() == HomeView.View3.TAPE || car.speedZone != SpeedZone.NORMAL) View.VISIBLE else View.INVISIBLE
         deck.playing = car.playing
         home.invalidate()
         deck.invalidate()
