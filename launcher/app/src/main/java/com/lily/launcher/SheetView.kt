@@ -154,11 +154,11 @@ class SheetView(ctx: Context, private val ui: Ui, private val car: Car,
         footer(c, r, pressed?.let { "SELECT // 選択" } ?: "READY // 待機")
 
         val tw = 106f
-        val th = 120f
+        val th = 100f
         val gx = 8f
         val gy = 4f
         val x0 = r.left + (r.width() - (5 * tw + 4 * gx)) / 2f
-        val y0 = r.top + 46f + 28f
+        val y0 = r.top + 46f + 24f
         more.forEachIndexed { i, m ->
             val col = i % 5
             val row = i / 5
@@ -170,11 +170,11 @@ class SheetView(ctx: Context, private val ui: Ui, private val car: Car,
 
     private fun tile(c: Canvas, x: Float, y: Float, w: Float, h: Float, i: Int, label: String, jp: String) {
         val cx = x + w / 2f
-        val cy = y + 51f
+        val cy = y + 40f
         val down = pressed == "tile:$i"
         val shift = if (down) 2f else 0f
 
-        Nge.hexPath(path, cx, cy + shift, 45f, 51f)
+        Nge.hexPath(path, cx, cy + shift, 40f, 45f)
         fill.color = if (down) withAlpha(accent(), .22f) else Color.BLACK
         c.drawPath(path, fill)
         line.strokeWidth = if (down) 2f else 1.5f
@@ -185,9 +185,9 @@ class SheetView(ctx: Context, private val ui: Ui, private val car: Car,
         tileIcon(c, i, cx, cy + shift, col)
 
         val lp = type.paint(8f, track = 1.2f, align = Paint.Align.CENTER)
-        c.text(lp, label, cx, y + 112f + shift, col)
+        c.text(lp, label, cx, y + 92f + shift, col)
         val jpP = type.paint(7f, track = 1f, align = Paint.Align.CENTER)
-        c.text(jpP, jp, cx, y + 126f + shift, if (down) withAlpha(accent(), .8f) else withAlpha(ink(), .45f))
+        c.text(jpP, jp, cx, y + 104f + shift, if (down) withAlpha(accent(), .8f) else withAlpha(ink(), .45f))
 
         hot.add(Hot("tile:$i", RectF(x, y, x + w, y + h)))
     }
