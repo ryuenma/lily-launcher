@@ -9,7 +9,7 @@
 
 ## 1. Terms (glossary)
 
-*   **A.T. Field** — decorative honeycomb hex-grid background pattern (~240 hexes) in the mockup; a visual reference only, not a functional component. In the native app the honeycomb is drawn on Canvas.
+*   **A.T. Field** — decorative honeycomb hex-grid background pattern (~240 hexes (SVG pattern in mockup)) in the mockup; a visual reference only, not a functional component. In the native app the honeycomb is drawn on Canvas.
 *   **MAGI** — three trapezoid indicators representing the audio sources: **Melchior = BT**, **Balthasar = RADIO**, **Casper = USB** (left-to-right layout order).
 *   **LAMP** — headlights status indicator in the status rail (ON/OFF), sourced from `mcu_light_state` if available, else reflects time-based night mode.
 *   **S** — mockup-only central state object (speed, source, track, night, dayNightMode, usb, bt, reverse, call, …). In the app these live in `Car.kt` fields + `HomeActivity` state, not a single object.
@@ -20,7 +20,7 @@
 *   **Drift** — mockup-only concept: the simulator tests that day/night switches at 17:00/05:00 even if the real clock differs; the app uses the system clock directly.
 *   **R-13** — antislop rule: zero glow (no text-shadow/box-shadow for glow; flat solid fill only).
 *   **Metadata side-channels** — status-rail readouts (codes, layers, protocols) shown alongside the main display; content defined in the canonical mockup.
-*   **MORE sheet (13 tiles)** — Radio, USB Music, Video, Dashcam, Sound EQ, AUX, Files, Car, CAN, Wheel keys, Android, Screen off, Home setup.
+*   **MORE sheet (15 tiles)** — Radio, USB Music, Video, Dashcam, Sound EQ, AUX, Files, Car, CAN, Wheel keys, Android, Screen off, Home setup.
 *   **Accent picker (5 colors)** — selectable accent color applied to latched/active elements; values defined in the canonical mockup.
 
 ---
@@ -31,7 +31,7 @@ This design adapts the Lily launcher's UI from its Teenage Engineering EP-series
 
 The design is driven by 14 NGE terminal interface reference images (6 original + 8 additional), analyzed via opencode-cli-free (glm-5.3-flash-free). Key findings: NGE uses **zero glow** (flat solid fill), **Mincho serif** (Noto Serif JP) for Japanese kanji warnings, **pointy-top hexagons** as the primary geometric element, and **bilingual JP/EN** text throughout.
 
-**v4 update (design target = DeepSeek v4 simulator):** 7" 2DIN headunit (1024×600, 18mm thumb). Touch targets enlarged (hexes 66×76, knob 104, sheet buttons ≥44, speed readout 116px). Day/night mode is time-based (17:00 night, 05:00 morning), toggleable (AUTO/MANUAL) with clock-drift override. Warning animations overlay on top of existing UI (no layout shift). Speed indicator enlarged to 116px odometer with 24-seg ladder. Volume knob enlarged to 104px with lavender ring. MAGI system uses 3 trapezoid indicators (196×44). 13-tile MORE sheet. More animations (pulse, ticker marquee, marching stripes, spectrum). Canonical mockup: `mockup/nge-terminal-deepseek-v4.html`.
+**v4 update (design target = DeepSeek v4 simulator):** 7" 2DIN headunit (1024×600, 18mm thumb). Touch targets enlarged (hexes 66×76, knob 104, sheet buttons ≥44, speed readout 116px). Day/night mode is time-based (17:00 night, 05:00 morning), toggleable (AUTO/MANUAL) with clock-drift override. Warning animations overlay on top of existing UI (no layout shift). Speed indicator enlarged to 116px odometer with 24-seg ladder. Volume knob enlarged to 104px with lavender ring. MAGI system uses 3 trapezoid indicators (196×44). 15-tile MORE sheet (13 + Magisk + Restart). More animations (pulse, ticker marquee, marching stripes, spectrum). Canonical mockup: `mockup/nge-terminal-deepseek-v4.html`.
 
 **Platform note (B-01):** SVG/CSS applies to the mockup only. The native app renders hexagons via Canvas path drawing with Paint colors driven by the zone enum (see §8.5). The "SVG lighter than Canvas" claim is mockup-scoped and is not carried into the app.
 
@@ -52,7 +52,7 @@ Additionally, the launcher has no awareness of vehicle speed. The color palette 
 *   Retain all upstream features and workflows (BT/RADIO/USB source switching, volume, Android Auto, reverse camera, calls, settings).
 *   Use Canvas path drawing for hexagonal button grids in the native app (SVG is mockup-only).
 *   Make speed thresholds configurable by the user.
-*   Optimize for 7" 2DIN touch screen (1024×600, 18mm thumb targets).
+*   Optimize for 7" 2DIN touch screen (1024×600, 18mm thumb targets (≈113px at 160dpi)).
 *   Time-based day/night mode (17:00 night, 05:00 morning), toggleable.
 *   Maintain performance targets (responsive; Home return target < 200ms; RAM budget 22MB — runtime resource usage is the priority, not APK size).
 
@@ -75,7 +75,7 @@ Additionally, the launcher has no awareness of vehicle speed. The color palette 
 *   **Q2**: Speed thresholds (60/100 km/h) configurable in settings — confirmed by user.
 *   **Q3**: Accelerometer for early transition detection — implemented in v1 as an optional supplement (GPS remains authoritative).
 *   **Q4**: Hex grid via Canvas path drawing in the app (SVG in mockup) — confirmed.
-*   **Q5**: Mockup fidelity — mockup is design spec; app uses Canvas drawing. Acceptance: side-by-side diff at 1024×600 for the 6 CUJs.
+*   **Q5**: Mockup fidelity — mockup is design spec; app uses Canvas drawing. Acceptance: side-by-side diff at 1024×600 for the 9 CUJs.
 *   **Q6**: Day/night mode toggleable (AUTO/MANUAL), time-based (17:00 night, 05:00 morning), not headlight-based.
 
 ---
@@ -86,7 +86,7 @@ Additionally, the launcher has no awareness of vehicle speed. The color palette 
 
 *   **Given**: Vehicle speed below 60 km/h, GPS fix available.
 *   **When**: User presses Home or launcher is active.
-*   **Then**: UI renders in normal palette on black background. Honeycomb hex grid background (A.T. Field, ~240 hexes). No hazard stripes. JP kanji labels (見現時刻表示, 危険). Speed readout (116px, prominent). All source keys (BT/RADIO/USB) functional. Header: "DIRECT LINK CONNECTION : LILY". Day/night based on time (17:00–05:00 = night).
+*   **Then**: UI renders in normal palette on black background. Honeycomb hex grid background (A.T. Field, ~240 hexes (SVG pattern in mockup)). No hazard stripes. JP kanji labels (見現時刻表示, 危険). Speed readout (116px, prominent). All source keys (BT/RADIO/USB) functional. Header: "DIRECT LINK CONNECTION : LILY". Day/night based on time (17:00–05:00 = night).
 
 ### CUJ 2: Highway Driving (60–100 km/h)
 
@@ -201,13 +201,13 @@ Time-based: night 17:00, morning 05:00. AUTO mode follows the system clock. MANU
 *   MAGI trapezoids: Canvas `drawPath` with clip; active = filled with accent, inactive = outline.
 *   Hazard stripes: overlay drawn on top of existing UI (no layout shift).
 *   Octagonal seals: Canvas path or clip.
-*   Honeycomb background: Canvas pattern (~240 hexes).
+*   Honeycomb background: Canvas pattern (~240 hexes (SVG pattern in mockup)).
 *   Knob: Canvas arc + ticks; rotation driven by volume.
 *   Fonts: Noto Serif JP (Mincho) + Oswald (condensed) + JetBrains Mono, loaded as Android resources (subsetted for size, but runtime resource usage is the priority).
 
 ### 8.6 Mockup Architecture (HTML/CSS/JS)
 
-Canonical mockup: `mockup/nge-terminal-deepseek-v4.html` (84 KB, single file). Pixel layout, DOM nesting, and pseudocode live in the mockup; the design doc describes behavior and contracts only. See the mockup for: 32px status rail, 42px banner, 338px main (152px telemetry rail · 18px kanji band · 638px stage · 216px MAGI stack), 18px ticker, 170px deck (11-hex honeycomb, 104px knob, 452px speed plate), 116px speed readout, 24-seg ladder, 13-tile MORE sheet, 5-color accent picker, simulated clock for drift testing.
+Canonical mockup: `mockup/nge-terminal-deepseek-v4.html` (84 KB, single file). Pixel layout, DOM nesting, and pseudocode live in the mockup; the design doc describes behavior and contracts only. See the mockup for: 32px status rail, 42px banner, 338px main (152px telemetry rail · 18px kanji band · 638px stage · 216px MAGI stack), 18px ticker, 170px deck (11-hex honeycomb, 104px knob, 480px speed plate), 116px speed readout, 24-seg ladder, 15-tile MORE sheet (13 + Magisk + Restart), 5-color accent picker, simulated clock for drift testing.
 
 *   Fonts: Noto Serif JP (Mincho) + Oswald (condensed) + JetBrains Mono.
 *   State: `S` (speed, source, track, night, dayNightMode, usb, bt, reverse, call, …) + prefs.
@@ -233,7 +233,7 @@ Hexagonal buttons rendered as SVG `<polygon>` elements with text labels in the H
 
 ### 8.9 MAGI Node Diagram
 
-Three trapezoid indicators (196×44) arranged horizontally, representing BT/RADIO/USB source keys. Each trapezoid: `clip-path: polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%)`. Active state: filled with accent color, black text. Inactive state: outline only, current color text. Label below: Melchior/Balthasar/Casper (JP Mincho). Mapping: Melchior=BT, Balthasar=RADIO, Casper=USB.
+Three trapezoid indicators (196×44) arranged vertically (y=139/199/259), representing BT/RADIO/USB source keys. Each trapezoid: `clip-path: polygon(9% 0%, 91% 0%, 100% 100%, 0% 100%)`. Active state: filled with accent color, black text. Inactive state: outline only, current color text. Label below: Melchior/Balthasar/Casper (JP Mincho). Mapping: Melchior=BT, Balthasar=RADIO, Casper=USB.
 
 ---
 
@@ -281,9 +281,9 @@ Measurable differentiator: Canvas keeps Home return < 200ms and RAM < 22MB witho
 
 ## 10. Non-Functional Requirements
 
-*   **Performance**: Responsive; Home return < 200ms (measured via systrace/profiler). RAM < 25MB. Runtime resource usage is the priority (not APK size). Canvas paint-swap + invalidate is negligible CPU; D+4 animation set must be profiled on device.
+*   **Performance**: Responsive; Home return < 200ms (measured via systrace/profiler). RAM < 22MB. Runtime resource usage is the priority (not APK size). Canvas paint-swap + invalidate is negligible CPU; D+4 animation set must be profiled on device.
 *   **Resilience**: GPS unavailable (tunnel) → revert to normal zone after 3 s staleness TTL. Accelerometer absent → GPS-only, no crash. GPS permission denied → speed 0 / normal zone, no nag loop.
-*   **Accessibility**: Hex buttons keyboard-navigable (Tab/Enter). Focus indicators required. Touch targets ≥ 44px hit-area (WCAG 2.5.5); 18mm visual ≈ 86px at 160 dpi. Authoritative touch target: 66×76 (per v4 mockup).
+*   **Accessibility**: Hex buttons keyboard-navigable (Tab/Enter). Focus indicators required. Touch targets ≥ 44px hit-area (WCAG 2.5.5); 18mm visual ≈ 113px at 160 dpi. Authoritative touch target: 66×76 (per v4 mockup).
 *   **Theme consistency**: Speed-based palette and time-based day/night work together per the precedence table (§8.3). Day/night modulates only the normal zone.
 
 ---
@@ -300,7 +300,7 @@ Measurable differentiator: Canvas keeps Home return < 200ms and RAM < 22MB witho
 | Tunnel staleness latches emergency | Low | Medium | 3 s staleness TTL reverts to normal |
 | MCU telemetry unavailable (headlights/reverse) | Medium | Low | Conditional: if available use it; else time-based/reverse-disabled |
 | Font loading impact on startup | Low | Low | Subset fonts; measure startup time |
-| Mockup↔app fidelity drift | Medium | Medium | Side-by-side diff at 1024×600 for the 6 CUJs (M-06) |
+| Mockup↔app fidelity drift | Medium | Medium | Side-by-side diff at 1024×600 for the 9 CUJs (M-06) |
 
 **Security & Privacy:** Location data is held in memory only; never logged to disk (private-use app, no internet permission). No location telemetry leaves the device.
 
@@ -330,7 +330,7 @@ Measurable differentiator: Canvas keeps Home return < 200ms and RAM < 22MB witho
 
 8.  Build: `./gradlew assembleRelease` must succeed.
 9.  Device test: install on headunit; verify all states render (side-by-side diff vs canonical mockup at 1024×600 for CUJ 1–9).
-10. Performance: verify Home return < 200ms, RAM < 25MB (measured via profiler).
+10. Performance: verify Home return < 200ms, RAM < 22MB (measured via profiler).
 11. Touch targets: verify all interactive elements ≥ 44px hit-area (authoritative: 66×76).
 12. Day/night: verify time-based switching at 17:00 and 05:00.
 13. Thresholds: verify hysteresis ±5 km/h + ≥1 s dwell (no strobe).
@@ -356,7 +356,7 @@ Measurable differentiator: Canvas keeps Home return < 200ms and RAM < 22MB witho
 *   **Build**: `./gradlew assembleRelease` must succeed.
 *   **Device test**: install on headunit; verify all states render (side-by-side diff vs canonical mockup at 1024×600 for CUJ 1–9).
 *   **Speed simulation**: use mockup simulator to verify palette transitions (design intent only; native verification requires on-device measurement).
-*   **Performance**: verify RAM < 25MB, Home return < 200ms (measured via systrace/profiler).
+*   **Performance**: verify RAM < 22MB, Home return < 200ms (measured via systrace/profiler).
 *   **Accessibility**: Tab navigation through hex grid, focus indicators visible.
 *   **Touch targets**: verify all interactive elements ≥ 44px hit-area (authoritative 66×76).
 *   **Day/night**: verify time-based switching at 17:00 and 05:00.

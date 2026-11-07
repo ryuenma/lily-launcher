@@ -2,6 +2,7 @@ package com.lily.launcher
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
@@ -153,11 +154,11 @@ class SheetView(ctx: Context, private val ui: Ui, private val car: Car,
         footer(c, r, pressed?.let { "SELECT // 選択" } ?: "READY // 待機")
 
         val tw = 106f
-        val th = 150f
+        val th = 120f
         val gx = 8f
-        val gy = 6f
+        val gy = 4f
         val x0 = r.left + (r.width() - (5 * tw + 4 * gx)) / 2f
-        val y0 = r.top + 46f + 34f
+        val y0 = r.top + 46f + 28f
         more.forEachIndexed { i, m ->
             val col = i % 5
             val row = i / 5
@@ -470,7 +471,17 @@ class SheetView(ctx: Context, private val ui: Ui, private val car: Car,
                     "restart" -> { close(false); try { Runtime.getRuntime().exec("reboot") } catch (e: Exception) { Log.w("LilySheet", "reboot", e) } }
                     else -> {
                         val component = m.optString("component")
-                        if (component.isNotEmpty()) { close(false); car.launch(component) }
+                        if (component.isNotEmpty()) {
+                            close(false)
+                            if (component.contains("/")) car.launch(component)
+                            else {
+                                // bare package name (e.g. Magisk) — launch by package
+                                try {
+                                    val intent = context.packageManager.getLaunchIntentForPackage(component)
+                                    if (intent != null) context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                                } catch (e: Exception) { Log.w("LilySheet", "launch $component", e) }
+                            }
+                        }
                     }
                 }
             }
