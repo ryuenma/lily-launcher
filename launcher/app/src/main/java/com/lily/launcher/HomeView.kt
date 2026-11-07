@@ -89,6 +89,21 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
         drawMagi(c)
         drawTicker(c)
         drawDeck(c)
+        drawWarningOverlay(c)
+    }
+
+    // ── fullscreen warning overlay (pulse, no layout shift) ──
+    private fun drawWarningOverlay(c: Canvas) {
+        val zone = car.speedZone
+        if (zone == SpeedZone.NORMAL) return
+        val color = if (zone == SpeedZone.EMERGENCY) ui.zoneColor("alert") else ui.zoneColor("caution")
+        val pulse = (Math.sin(SystemClock.uptimeMillis() / 300.0) * 0.3 + 0.7).toFloat()
+        fill.style = Paint.Style.FILL
+        fill.color = color
+        fill.alpha = (pulse * 40).toInt()
+        c.drawRect(0f, 0f, Nge.W.toFloat(), Nge.H.toFloat(), fill)
+        fill.alpha = 255
+        postInvalidateDelayed(50)
     }
 
     /** A.T. Field: one cached path holding every hexagon, drawn as a single stroke pass. */
