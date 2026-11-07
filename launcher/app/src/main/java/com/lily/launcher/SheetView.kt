@@ -186,7 +186,7 @@ class SheetView(ctx: Context, private val ui: Ui, private val car: Car,
 
         val lp = type.paint(8f, track = 1.2f, align = Paint.Align.CENTER)
         c.text(lp, label, cx, y + 92f + shift, col)
-        val jpP = type.paint(7f, track = 1f, align = Paint.Align.CENTER)
+        val jpP = type.paint(7f, jp = true, track = 1f, align = Paint.Align.CENTER)
         c.text(jpP, jp, cx, y + 104f + shift, if (down) withAlpha(accent(), .8f) else withAlpha(ink(), .45f))
 
         hot.add(Hot("tile:$i", RectF(x, y, x + w, y + h)))

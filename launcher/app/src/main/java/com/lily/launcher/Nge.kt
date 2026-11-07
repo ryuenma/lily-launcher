@@ -115,11 +115,15 @@ object Nge {
 class NgeType(private val ui: Ui) {
     private val cache = HashMap<String, Paint>()
 
-    fun paint(size: Float, mono: Boolean = false, track: Float = 0f,
+    fun paint(size: Float, mono: Boolean = false, jp: Boolean = false, track: Float = 0f,
               align: Paint.Align = Paint.Align.LEFT): Paint =
-        cache.getOrPut("$size|$mono|$track|${align.name}") {
+        cache.getOrPut("$size|$mono|$jp|$track|${align.name}") {
             Paint(Paint.ANTI_ALIAS_FLAG or Paint.SUBPIXEL_TEXT_FLAG).apply {
-                typeface = if (mono) ui.mono else ui.heros
+                typeface = when {
+                    mono -> ui.mono
+                    jp -> ui.notoSerifJp
+                    else -> ui.heros
+                }
                 textSize = size
                 if (size > 0f) letterSpacing = track / size
                 textAlign = align

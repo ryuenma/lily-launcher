@@ -134,7 +134,7 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
 
         val p = type.paint(9f, track = 2f)
         c.text(p, "SYSTEM ONLINE", 24f, 20f, ink())
-        val jp = type.paint(9f, track = 1f)
+        val jp = type.paint(9f, jp = true, track = 1f)
         c.text(jp, "稼働中", 24f + p.measureText("SYSTEM ONLINE") + 8f, 20f, withAlpha(ink(), .5f))
 
         // speed-zone chip, so the current palette is named in the rail as well as in the seals
@@ -200,7 +200,7 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
         tmp.set(b.left + 12f, b.centerY() - 7f, b.left + 64f, b.centerY() + 7f)
         bars(c, tmp, onFill(), 3f, 7f)
 
-        val jp = type.paint(13f, track = 3f)
+        val jp = type.paint(13f, jp = true, track = 3f)
         c.text(jp, zoneJp(), b.left + 76f, b.centerY() + 5f, onFill())
 
         val title = type.paint(15f, track = 5f, align = Paint.Align.CENTER)
@@ -546,7 +546,7 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
         val captions = arrayOf("メルキオール / 通信", "バルタザール / 音声", "カスパー / 車両")
         val nm = type.paint(11f, track = 1.8f)
         val st = type.paint(9.5f, mono = true, track = .6f, align = Paint.Align.RIGHT)
-        val jp = type.paint(7f, track = 1.2f)
+        val jp = type.paint(7f, jp = true, track = 1.2f)
         for (i in 0 until 3) {
             val tr = Nge.magiTrap(i)
             val active = when (i) {
@@ -622,7 +622,7 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
         val labels = arrayOf("PREV", "PLAY", "NEXT", "BT", "RADIO", "USB", "PHONE", "SWITCH", "AUTO", "MORE")
         val jp = arrayOf("前曲", "再生", "次曲", "無線", "受信", "記憶", "通話", "切替", "自動", "拡張")
         val lab = type.paint(8.5f, track = 1.2f, align = Paint.Align.CENTER)
-        val jpP = type.paint(6.4f, track = .6f, align = Paint.Align.CENTER)
+        val jpP = type.paint(6.4f, jp = true, track = .6f, align = Paint.Align.CENTER)
         val okCol = ui.zoneColor("ok")
 
         pads.forEachIndexed { i, t ->

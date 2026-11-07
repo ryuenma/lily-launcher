@@ -24,8 +24,9 @@ class Ui(private val ctx: Context, initialTheme: String) {
     private val img = json.getJSONObject("img")
     private val rects = json.getJSONObject("rect")
     val meta: JSONObject = json.getJSONObject("meta")
-    val heros: Typeface = Typeface.createFromAsset(ctx.assets, "fonts/texgyreheros-bold.otf")
+    val heros: Typeface = Typeface.createFromAsset(ctx.assets, "fonts/Oswald.ttf")
     val mono: Typeface = Typeface.createFromAsset(ctx.assets, "fonts/JetBrainsMono-Bold.ttf")
+    val notoSerifJp: Typeface = Typeface.createFromAsset(ctx.assets, "fonts/NotoSerifJP.ttf")
 
     var theme = initialTheme; private set
     private var pending: String? = null

@@ -130,7 +130,7 @@ class DeckView(ctx: Context, private val ui: Ui, private val car: Car) : View(ct
         val sub = "SPEED ${pad(car.speedKmh)} KM/H · LIMIT " +
             pad(if (em) car.emergencyThreshold() else car.cautionThreshold())
 
-        val jpP = type.paint(60f, track = 10f, align = Paint.Align.CENTER)
+        val jpP = type.paint(60f, jp = true, track = 10f, align = Paint.Align.CENTER)
         val enP = type.paint(22f, track = 9f, align = Paint.Align.CENTER)
         val subP = type.paint(10f, mono = true, track = 2f, align = Paint.Align.CENTER)
 
