@@ -97,12 +97,39 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
         val zone = car.speedZone
         if (zone == SpeedZone.NORMAL) return
         val color = if (zone == SpeedZone.EMERGENCY) ui.zoneColor("alert") else ui.zoneColor("caution")
+        val onFill = if (zone == SpeedZone.EMERGENCY) ui.zoneColor("ok") else Color.BLACK
+        val jp = if (zone == SpeedZone.EMERGENCY) "危険" else "注意"
+        val en = if (zone == SpeedZone.EMERGENCY) "EMERGENCY" else "CAUTION"
+        val sub = "SPEED ${String.format(Locale.US, "%03d", car.speedKmh)} KM/H · LIMIT ${String.format(Locale.US, "%03d", if (zone == SpeedZone.EMERGENCY) car.emergencyThreshold() else car.cautionThreshold())}"
+        val tag = if (zone == SpeedZone.EMERGENCY) "SPEED THRESHOLD EXCEEDED // 速度超過" else "SPEED THRESHOLD EXCEEDED // 速度超過"
         val pulse = (Math.sin(SystemClock.uptimeMillis() / 300.0) * 0.3 + 0.7).toFloat()
         fill.style = Paint.Style.FILL
         fill.color = color
         fill.alpha = (pulse * 80).toInt()
         c.drawRect(0f, 0f, Nge.W.toFloat(), Nge.H.toFloat(), fill)
         fill.alpha = 255
+        // center box
+        val boxW = 420f; val boxH = 120f
+        val boxL = (Nge.W - boxW) / 2f; val boxT = (Nge.H - boxH) / 2f
+        fill.color = Color.BLACK
+        fill.alpha = 200
+        c.drawRect(boxL, boxT, boxL + boxW, boxT + boxH, fill)
+        fill.alpha = 255
+        line.color = color; line.strokeWidth = 2f
+        c.drawRect(boxL, boxT, boxL + boxW, boxT + boxH, line)
+        // JP kanji
+        val jpP = type.paint(48f, track = 2f, align = Paint.Align.CENTER)
+        jpP.color = color
+        c.text(jpP, jp, Nge.W / 2f, boxT + 52f, color)
+        // EN text
+        val enP = type.paint(28f, track = 4f, align = Paint.Align.CENTER)
+        c.text(enP, en, Nge.W / 2f, boxT + 88f, onFill())
+        // sub
+        val subP = type.paint(11f, mono = true, track = 1.4f, align = Paint.Align.CENTER)
+        c.text(subP, sub, Nge.W / 2f, boxT + 110f, withAlpha(onFill(), .8f))
+        // bottom tag
+        val tagP = type.paint(9f, mono = true, track = 1.4f, align = Paint.Align.CENTER)
+        c.text(tagP, tag, Nge.W / 2f, Nge.H - 30f, withAlpha(color, .7f))
         postInvalidateDelayed(50)
     }
 
