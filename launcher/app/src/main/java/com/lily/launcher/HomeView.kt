@@ -207,11 +207,11 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
             align = Paint.Align.CENTER, weight = 700)
         c.text(title, zoneTitle(), Nge.W / 2f, b.centerY() + 6f, onFill())
 
-        drawSeal(c, 912f, b.centerY(), 15f, zoneJp(), zoneEn(), onFill(), 9.5f, 5.5f, jpTrack = 2f)
+        drawSeal(c, 880f, b.centerY(), 15f, zoneJp(), zoneEn(), onFill(), 9.5f, 5.5f, jpTrack = 2f)
 
         val rev = type.paint(8f, mono = true, track = 1f, align = Paint.Align.RIGHT)
-        c.text(rev, "REV 4.0", 1012f, b.top + 17f, withAlpha(onFill(), .75f))
-        c.text(rev, "7IN · 1024×600", 1012f, b.top + 30f, withAlpha(onFill(), .75f))
+        c.text(rev, "REV 4.0", 980f, b.top + 17f, withAlpha(onFill(), .75f))
+        c.text(rev, "7IN · 1024×600", 980f, b.top + 30f, withAlpha(onFill(), .75f))
     }
 
     /** Vertical hazard bars (the banner's `.bar` in the mockup). */
