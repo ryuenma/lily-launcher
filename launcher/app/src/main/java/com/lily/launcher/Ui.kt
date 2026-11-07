@@ -110,8 +110,12 @@ class Ui(private val ctx: Context, initialTheme: String) {
 
     private fun decode(f: String): Bitmap? {
         if ("$f.png" !in files) return null
+        val opts = BitmapFactory.Options().apply {
+            inScaled = false
+            inPreferredConfig = if (isEmulator()) Bitmap.Config.ARGB_8888 else Bitmap.Config.HARDWARE
+        }
         return try {
-            ctx.assets.open("ui/$f.png").use { BitmapFactory.decodeStream(it, null, OPTS) }
+            ctx.assets.open("ui/$f.png").use { BitmapFactory.decodeStream(it, null, opts) }
         } catch (e: IOException) { null } catch (e: OutOfMemoryError) { null }
     }
 
@@ -123,8 +127,11 @@ class Ui(private val ctx: Context, initialTheme: String) {
     fun themeVar(name: String): Int = parseCss(json.getJSONObject("vars").getJSONObject(theme).getString(name))
 
     companion object {
-        private val OPTS = BitmapFactory.Options().apply { inScaled = false; inPreferredConfig = Bitmap.Config.HARDWARE }
         private val SHEET = listOf("more_bg", "set_bg", "mi_", "opt_", "done_", "led_opt")
+        fun isEmulator(): Boolean {
+            val hw = android.os.Build.HARDWARE.lowercase()
+            return hw.contains("ranchu") || hw.contains("goldfish") || hw.contains("qemu")
+        }
     }
 }
 
