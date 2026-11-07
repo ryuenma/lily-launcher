@@ -111,18 +111,24 @@ object Nge {
     }
 }
 
-/** Cached NGE text styles: (size, face, tracking in px, alignment) → one Paint. Main thread only. */
+/**
+ * Cached NGE text styles: (size, face, weight, tracking px, alignment) → one Paint. Main thread only.
+ *
+ * [weight] is the CSS `font-weight` of the element the text belongs to, applied as a real variable-font
+ * instance: Oswald is 200–700, Noto Serif JP 200–900. Default 400 is the CSS default — anything the
+ * mockup bolds (600/700/900) must say so here, or it renders Regular.
+ */
 class NgeType(private val ui: Ui) {
     private val cache = HashMap<String, Paint>()
 
     fun paint(size: Float, mono: Boolean = false, jp: Boolean = false, track: Float = 0f,
-              align: Paint.Align = Paint.Align.LEFT): Paint =
-        cache.getOrPut("$size|$mono|$jp|$track|${align.name}") {
+              align: Paint.Align = Paint.Align.LEFT, weight: Int = 400): Paint =
+        cache.getOrPut("$size|$mono|$jp|$track|${align.name}|$weight") {
             Paint(Paint.ANTI_ALIAS_FLAG or Paint.SUBPIXEL_TEXT_FLAG).apply {
                 typeface = when {
-                    mono -> ui.mono
-                    jp -> ui.notoSerifJp
-                    else -> ui.heros
+                    mono -> ui.mono          // JetBrains Mono Bold — numerals, readouts, chips
+                    jp -> ui.jp(weight)      // Noto Serif JP (Mincho) — kanji runs
+                    else -> ui.latin(weight) // Oswald, Noto Serif JP behind it for stray kanji
                 }
                 textSize = size
                 if (size > 0f) letterSpacing = track / size

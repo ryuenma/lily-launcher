@@ -6,6 +6,8 @@ import android.graphics.BitmapFactory
 import android.graphics.BlurMaskFilter
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.fonts.Font
+import android.graphics.fonts.FontFamily
 import android.graphics.Paint
 import android.graphics.RectF
 import android.graphics.Typeface
@@ -24,9 +26,49 @@ class Ui(private val ctx: Context, initialTheme: String) {
     private val img = json.getJSONObject("img")
     private val rects = json.getJSONObject("rect")
     val meta: JSONObject = json.getJSONObject("meta")
-    val heros: Typeface = Typeface.createFromAsset(ctx.assets, "fonts/Oswald.ttf")
+    /**
+     * The three faces the mockup's CSS names, at the weights it asks for.
+     *
+     * Oswald and Noto Serif JP both ship as *variable* fonts, and their default instances are 400 and
+     * **ExtraLight 200** — so `Typeface.createFromAsset` silently paints every kanji hairline and every
+     * Oswald caption at regular, whatever the CSS says. Each face below is pinned to an explicit `wght`
+     * axis instance; the Latin face carries Noto Serif JP as its fallback so a kanji inside an Oswald
+     * run (`.banner .title{font-family:var(--font-en),var(--font-jp)}`) stays Mincho instead of dropping
+     * to the system sans. Mono is a static Bold file — JetBrains Mono has no wght axis here.
+     */
     val mono: Typeface = Typeface.createFromAsset(ctx.assets, "fonts/JetBrainsMono-Bold.ttf")
-    val notoSerifJp: Typeface = Typeface.createFromAsset(ctx.assets, "fonts/NotoSerifJP.ttf")
+
+    private val latinCache = HashMap<Int, Typeface>()
+    private val jpCache = HashMap<Int, Typeface>()
+
+    /** Oswald at [weight] (200–700), with Noto Serif JP behind it for the glyphs Oswald lacks. */
+    fun latin(weight: Int): Typeface = latinCache.getOrPut(weight) {
+        val w = weight.coerceIn(200, 700)
+        runCatching {
+            Typeface.CustomFallbackBuilder(family(OSWALD, w))
+                .addCustomFallback(family(NOTO, jpWeight(weight)))
+                .build()
+        }.getOrElse { e ->
+            Log.w(Car.TAG, "latin@$w: falling back to the default instance", e)
+            Typeface.createFromAsset(ctx.assets, "fonts/$OSWALD")
+        }
+    }
+
+    /** Noto Serif JP (Mincho) at [weight] (200–900). */
+    fun jp(weight: Int): Typeface = jpCache.getOrPut(jpWeight(weight)) {
+        runCatching { Typeface.CustomFallbackBuilder(family(NOTO, jpWeight(weight))).build() }
+            .getOrElse { e ->
+                Log.w(Car.TAG, "jp@${jpWeight(weight)}: falling back to the default instance", e)
+                Typeface.createFromAsset(ctx.assets, "fonts/$NOTO")
+            }
+    }
+
+    /** Noto tops out at 900 where Oswald stops at 700; 600/700/900 stay distinct. */
+    private fun jpWeight(weight: Int) = weight.coerceIn(200, 900)
+
+    private fun family(asset: String, weight: Int): FontFamily = FontFamily.Builder(
+        Font.Builder(ctx.assets, "fonts/$asset").setFontVariationSettings("'wght' $weight").build()
+    ).build()
 
     var theme = initialTheme; private set
     private var pending: String? = null
@@ -157,6 +199,8 @@ class Ui(private val ctx: Context, initialTheme: String) {
     var speedZone: SpeedZone = SpeedZone.NORMAL
 
     companion object {
+        private const val OSWALD = "Oswald.ttf"
+        private const val NOTO = "NotoSerifJP.ttf"
         private val SHEET = listOf("more_bg", "set_bg", "mi_", "opt_", "done_", "led_opt")
         fun isEmulator(): Boolean {
             val hw = android.os.Build.HARDWARE.lowercase()
@@ -180,7 +224,7 @@ class TextSpec(j: JSONObject, ui: Ui, scale: Float = 1f) {
     val firstBaseline: Float = (j.f("baseline") - y) * scale
     private val shadows = parseShadows(j.getString("shadow"))
     val paint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.SUBPIXEL_TEXT_FLAG).apply {
-        typeface = if (j.getBoolean("mono")) ui.mono else ui.heros
+        typeface = if (j.getBoolean("mono")) ui.mono else ui.latin(400)
         textSize = j.f("size") * scale
         letterSpacing = j.f("ls")
         color = this@TextSpec.color

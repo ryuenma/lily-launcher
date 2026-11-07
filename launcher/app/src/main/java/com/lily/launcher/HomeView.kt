@@ -132,13 +132,13 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
         fill.color = if (lit) ink() else withAlpha(ink(), .15f)
         c.drawRect(12f, 13f, 18f, 19f, fill)
 
-        val p = type.paint(9f, track = 2f)
+        val p = type.paint(9f, track = 2f, weight = 600)                      // .rail 9px / 2px · .sys 600
         c.text(p, "SYSTEM ONLINE", 24f, 20f, ink())
-        val jp = type.paint(9f, jp = true, track = 1f)
+        val jp = type.paint(9f, jp = true, track = 1f, weight = 600)          // .sys em → --font-jp
         c.text(jp, "稼働中", 24f + p.measureText("SYSTEM ONLINE") + 8f, 20f, withAlpha(ink(), .5f))
 
         // speed-zone chip, so the current palette is named in the rail as well as in the seals
-        val chipText = type.paint(8f, track = 1.2f, align = Paint.Align.CENTER)
+        val chipText = type.paint(8f, track = 1.6f, align = Paint.Align.CENTER, weight = 600)
         val zone = car.speedZone
         val zoneLabel = "ZONE · " + when (zone) {
             SpeedZone.CAUTION -> "CAUT"
@@ -150,7 +150,7 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
             if (zone == SpeedZone.NORMAL) Color.TRANSPARENT else zoneAccent(),
             if (zone == SpeedZone.NORMAL) withAlpha(ink(), .65f) else Color.BLACK)
 
-        val mid = type.paint(9f, track = 2.5f, align = Paint.Align.CENTER)
+        val mid = type.paint(9f, jp = true, track = 2.5f, align = Paint.Align.CENTER, weight = 700) // .rail .mid --font-jp 700
         c.text(mid, "第01種監視体制 // MAGI LINK ESTABLISHED", Nge.W / 2f, 20f, withAlpha(ink(), .55f))
 
         // right: clock · LAMP chip · AUTO/DAY chip
@@ -173,7 +173,7 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
         c.text(clock, String.format(Locale.US, "%02d:%02d:%02d",
             now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), now.get(Calendar.SECOND)),
             lampL - 10f, 21f, ink())
-        val tz = type.paint(8f, track = 1f, align = Paint.Align.RIGHT)
+        val tz = type.paint(8f, mono = true, track = 1f, align = Paint.Align.RIGHT)   // .clock small 8 mono
         c.text(tz, "LOC", lampL - 10f - clock.measureText("00:00:00") - 4f, 20f, withAlpha(ink(), .45f))
     }
 
@@ -200,15 +200,16 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
         tmp.set(b.left + 12f, b.centerY() - 7f, b.left + 64f, b.centerY() + 7f)
         bars(c, tmp, onFill(), 3f, 7f)
 
-        val jp = type.paint(13f, jp = true, track = 3f)
+        val jp = type.paint(13f, jp = true, track = 3f, weight = 700)
         c.text(jp, zoneJp(), b.left + 76f, b.centerY() + 5f, onFill())
 
-        val title = type.paint(15f, track = 5f, align = Paint.Align.CENTER)
+        val title = type.paint(15f, track = if (car.speedZone == SpeedZone.EMERGENCY) 7f else 5f,
+            align = Paint.Align.CENTER, weight = 700)
         c.text(title, zoneTitle(), Nge.W / 2f, b.centerY() + 6f, onFill())
 
-        drawSeal(c, 912f, b.centerY(), 15f, zoneJp(), zoneEn(), onFill(), 10f, 5f)
+        drawSeal(c, 912f, b.centerY(), 15f, zoneJp(), zoneEn(), onFill(), 9.5f, 5.5f, jpTrack = 2f)
 
-        val rev = type.paint(7.5f, mono = true, track = .8f, align = Paint.Align.RIGHT)
+        val rev = type.paint(8f, mono = true, track = 1f, align = Paint.Align.RIGHT)
         c.text(rev, "REV 4.0", 1012f, b.top + 17f, withAlpha(onFill(), .75f))
         c.text(rev, "7IN · 1024×600", 1012f, b.top + 30f, withAlpha(onFill(), .75f))
     }
@@ -231,7 +232,7 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
 
         val hd = type.paint(8f, track = 2.4f)
         c.text(hd, "TELEMETRY", l, t.top + 20f, withAlpha(ink(), .55f))
-        val hj = type.paint(7f, track = 1f, align = Paint.Align.RIGHT)
+        val hj = type.paint(7f, jp = true, track = 1f, align = Paint.Align.RIGHT)
         c.text(hj, "記録", r, t.top + 20f, withAlpha(ink(), .9f))
         line.color = rule(); line.strokeWidth = 1f
         c.drawLine(l, t.top + 26f, r, t.top + 26f, line)
@@ -288,7 +289,7 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
         c.drawLine(b.right - .5f, b.top, b.right - .5f, b.bottom, line)
 
         val chars = "監視記録 第零一号".replace(" ", "")
-        val p = type.paint(9f, track = 0f, align = Paint.Align.CENTER)
+        val p = type.paint(9f, jp = true, track = 0f, align = Paint.Align.CENTER, weight = 700) // .jp-band
         val pitch = 26f
         val start = b.centerY() - (chars.length - 1) * pitch / 2f
         chars.forEachIndexed { i, ch ->
@@ -304,7 +305,7 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
         val v = view3()
 
         val hb = s.top + 25f
-        val lab = type.paint(9f, track = 2.6f)
+        val lab = type.paint(9f, track = 2.6f, weight = 600)
         val label = stageLabel(v)
         c.text(lab, label, l, hb, ink())
 
@@ -393,7 +394,7 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
         c.drawPath(path, line)
         c.drawLine(r.centerX(), r.centerY() - 55f, r.centerX(), r.centerY() - 40f, line)
         c.drawLine(r.centerX(), r.centerY() + 40f, r.centerX(), r.centerY() + 55f, line)
-        val g = type.paint(42f, align = Paint.Align.CENTER)
+        val g = type.paint(42f, jp = true, align = Paint.Align.CENTER, weight = 900)   // .album .kanji
         c.text(g, glyph, r.centerX(), r.centerY() + 2f, ink())
         val sb = type.paint(7f, mono = true, track = 1f, align = Paint.Align.CENTER)
         c.text(sb, sub, r.centerX(), r.centerY() + 24f, withAlpha(ink(), .6f))
@@ -404,10 +405,11 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
         val k = type.paint(8f, track = 2.4f)
         c.text(k, k.fit(i.kicker, w), x, y, withAlpha(ink(), .5f))
         y += 34f
-        val big = type.paint(if (i.big) 56f else 30f, mono = i.big, track = if (i.big) 0f else .5f)
+        val big = type.paint(if (i.big) 56f else 30f, mono = i.big, track = if (i.big) 0f else .5f,
+            weight = if (i.big) 700 else 600)
         c.text(big, big.fit(i.title, w), x, y, ink())
         y += if (i.big) 26f else 24f
-        val a = type.paint(15f, track = 1f)
+        val a = type.paint(15f, jp = true, track = 1f, weight = 700)   // .track .artist --font-jp 700
         c.text(a, a.fit(i.artist, w), x, y, withAlpha(ink(), .82f))
         y += 18f
         val al = type.paint(8f, track = 2f)
@@ -537,14 +539,14 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
         val r = m.right - 10f
         val hd = type.paint(8f, track = 2.2f)
         c.text(hd, "MAGI SYSTEM", l, m.top + 20f, withAlpha(ink(), .55f))
-        val hj = type.paint(7f, track = 1f, align = Paint.Align.RIGHT)
+        val hj = type.paint(7f, jp = true, track = 1f, align = Paint.Align.RIGHT)
         c.text(hj, "三賢者", r, m.top + 20f, withAlpha(ink(), .9f))
         line.color = rule(); line.strokeWidth = 1f
         c.drawLine(l, m.top + 26f, r, m.top + 26f, line)
 
         val names = arrayOf("MELCHIOR", "BALTHASAR", "CASPER")
         val captions = arrayOf("メルキオール / 通信", "バルタザール / 音声", "カスパー / 車両")
-        val nm = type.paint(11f, track = 1.8f)
+        val nm = type.paint(11f, track = 1.8f, weight = 600)
         val st = type.paint(9.5f, mono = true, track = .6f, align = Paint.Align.RIGHT)
         val jp = type.paint(7f, jp = true, track = 1.2f)
         for (i in 0 until 3) {
@@ -621,8 +623,8 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
     private fun drawKeypad(c: Canvas) {
         val labels = arrayOf("PREV", "PLAY", "NEXT", "BT", "RADIO", "USB", "PHONE", "SWITCH", "AUTO", "MORE")
         val jp = arrayOf("前曲", "再生", "次曲", "無線", "受信", "記憶", "通話", "切替", "自動", "拡張")
-        val lab = type.paint(8.5f, track = 1.2f, align = Paint.Align.CENTER)
-        val jpP = type.paint(6.4f, jp = true, track = .6f, align = Paint.Align.CENTER)
+        val lab = type.paint(8.5f, track = 1.2f, align = Paint.Align.CENTER, weight = 600)
+        val jpP = type.paint(6.4f, jp = true, track = .6f, align = Paint.Align.CENTER, weight = 700)
         val okCol = ui.zoneColor("ok")
 
         pads.forEachIndexed { i, t ->
@@ -728,7 +730,7 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
                 c.drawPath(path, line)
             }
             T.AUTO -> {
-                val p = type.paint(13f, align = Paint.Align.CENTER)
+                val p = type.paint(13f, align = Paint.Align.CENTER, weight = 700)
                 c.text(p, "AA", cx, cy + 5f, col)
             }
             T.MORE -> {
@@ -750,7 +752,7 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
 
         val hd = type.paint(7.5f, track = 2.2f)
         c.text(hd, "GROUND SPEED", r.left + 10f, r.top + 16f, withAlpha(ink(), .55f))
-        val hj = type.paint(7f, track = 1f)
+        val hj = type.paint(7f, jp = true, track = 1f)
         c.text(hj, "対地速度", r.left + 10f + hd.measureText("GROUND SPEED") + 8f, r.top + 16f, withAlpha(ink(), .85f))
         val fx = type.paint(7f, mono = true, track = .8f, align = Paint.Align.RIGHT)
         c.text(fx, "GPS · 3D FIX", r.right - 10f, r.top + 16f, withAlpha(ink(), .8f))
@@ -760,7 +762,7 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
         c.text(np, num, r.left + 12f, 548f, ink())
         val numW = np.measureText(num)
 
-        val ub = type.paint(15f, track = 1.6f)
+        val ub = type.paint(15f, track = 1.6f, weight = 600)
         c.text(ub, "km/h", r.left + 12f + numW + 8f, 520f, ink())
         val ul = type.paint(7f, mono = true, track = 1f)
         c.text(ul, "LIM " + String.format(Locale.US, "%03d", car.cautionThreshold()),
@@ -807,7 +809,7 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
     }
 
     private fun drawSeal(c: Canvas, cx: Float, cy: Float, radius: Float, jp: String, en: String,
-                         color: Int, jpSize: Float, enSize: Float) {
+                         color: Int, jpSize: Float, enSize: Float, jpTrack: Float = 0f) {
         Nge.octagonPath(path, cx, cy, radius)
         line.strokeWidth = if (radius > 20f) 2f else 1.5f
         line.color = color
@@ -817,9 +819,9 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
         line.color = withAlpha(color, .5f)
         c.drawPath(path2, line)
 
-        val j = type.paint(jpSize, align = Paint.Align.CENTER)
+        val j = type.paint(jpSize, jp = true, track = jpTrack, align = Paint.Align.CENTER, weight = 900)
         c.text(j, jp, cx, cy + jpSize * (if (radius > 20f) .3f else .34f), color)
-        val e = type.paint(enSize, track = .4f, align = Paint.Align.CENTER)
+        val e = type.paint(enSize, track = 1.4f, align = Paint.Align.CENTER, weight = 600)
         c.text(e, en, cx, cy + radius * .62f, withAlpha(color, .8f))
     }
 

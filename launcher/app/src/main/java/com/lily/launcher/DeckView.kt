@@ -69,7 +69,7 @@ class DeckView(ctx: Context, private val ui: Ui, private val car: Car) : View(ct
 
         c.save()
         c.clipRect(t.left, t.top + 1f, t.right, t.bottom)
-        val p = type.paint(9f, track = 2.4f)
+        val p = type.paint(9f, track = 2.4f, weight = 700)          // .ticker 9/2.4 700
         p.color = if (em) GREEN else Color.BLACK          // color: var(--on-fill) / #000
         val msg = tickerText(em)
         val span = p.measureText(msg) + 48f               // .ticker-track span{padding-right:48px}
@@ -130,8 +130,8 @@ class DeckView(ctx: Context, private val ui: Ui, private val car: Car) : View(ct
         val sub = "SPEED ${pad(car.speedKmh)} KM/H · LIMIT " +
             pad(if (em) car.emergencyThreshold() else car.cautionThreshold())
 
-        val jpP = type.paint(60f, jp = true, track = 10f, align = Paint.Align.CENTER)
-        val enP = type.paint(22f, track = 9f, align = Paint.Align.CENTER)
+        val jpP = type.paint(60f, jp = true, track = 10f, align = Paint.Align.CENTER, weight = 900)
+        val enP = type.paint(22f, track = 9f, align = Paint.Align.CENTER, weight = 700)
         val subP = type.paint(10f, mono = true, track = 2f, align = Paint.Align.CENTER)
 
         // .warn-box is 14/40 padding + a 3px border around its widest line; the divs stack as

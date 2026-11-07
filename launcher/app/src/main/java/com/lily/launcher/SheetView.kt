@@ -122,9 +122,9 @@ class SheetView(ctx: Context, private val ui: Ui, private val car: Car,
         fill.color = Color.BLACK
         c.drawRect(tmp.left, tmp.bottom - 2f, tmp.right, tmp.bottom, fill)
 
-        val t = type.paint(15f, track = 5f)
+        val t = type.paint(15f, track = 5f, weight = 700)                    // .sheet-hd .t
         c.text(t, title, r.left + 14f, r.top + 29f, onFill())
-        val j = type.paint(11f, track = 3f)
+        val j = type.paint(11f, jp = true, track = 3f, weight = 700)         // .sheet-hd .j
         c.text(j, jp, r.left + 14f + t.measureText(title) + 12f, r.top + 28f, withAlpha(onFill(), .85f))
         val m = type.paint(8f, mono = true, track = 1.4f, align = Paint.Align.RIGHT)
         c.text(m, meta, r.right - 14f - 52f, r.top + 28f, withAlpha(onFill(), .75f))
@@ -184,9 +184,9 @@ class SheetView(ctx: Context, private val ui: Ui, private val car: Car,
         val col = if (down) accent() else ink()
         tileIcon(c, i, cx, cy + shift, col)
 
-        val lp = type.paint(8f, track = 1.2f, align = Paint.Align.CENTER)
+        val lp = type.paint(8f, track = 1.2f, align = Paint.Align.CENTER, weight = 600)
         c.text(lp, label, cx, y + 92f + shift, col)
-        val jpP = type.paint(7f, jp = true, track = 1f, align = Paint.Align.CENTER)
+        val jpP = type.paint(7f, jp = true, track = 1f, align = Paint.Align.CENTER, weight = 700)
         c.text(jpP, jp, cx, y + 104f + shift, if (down) withAlpha(accent(), .8f) else withAlpha(ink(), .45f))
 
         hot.add(Hot("tile:$i", RectF(x, y, x + w, y + h)))
@@ -362,7 +362,7 @@ class SheetView(ctx: Context, private val ui: Ui, private val car: Car,
     private fun rowLabel(c: Canvas, x: Float, y: Float, w: Float, key: String, sub: String, controlW: Float) {
         val kp = type.paint(9f, track = 1.8f)
         c.text(kp, kp.fit(key, w - controlW - 10f), x, y + 22f, ink())
-        val sp = type.paint(7f, track = 1f)
+        val sp = type.paint(7f, jp = true, track = 1f)                       // .srow .k small
         c.text(sp, sp.fit(sub, w - controlW - 10f), x, y + 38f, withAlpha(ink(), .5f))
         line.color = rule(); line.strokeWidth = 1f
         c.drawLine(x, y + 52f, x + w, y + 52f, line)
@@ -370,8 +370,9 @@ class SheetView(ctx: Context, private val ui: Ui, private val car: Car,
 
     private fun segRow(c: Canvas, x: Float, y: Float, w: Float, key: String, sub: String, id: String,
                        options: List<Pair<String, String>>, active: String) {
-        val bp = type.paint(9f, track = 1.4f, align = Paint.Align.CENTER)
-        val widths = options.map { bp.measureText(it.second) + 20f }
+        val bp = type.paint(9f, track = 1.4f, align = Paint.Align.CENTER, weight = 500)   // .seg button
+        val bpOn = type.paint(9f, track = 1.4f, align = Paint.Align.CENTER, weight = 700) // .seg button.on
+        val widths = options.map { bpOn.measureText(it.second) + 20f }
         val total = widths.sum() + 3f * (options.size - 1)
         val bx = x + w - total
         rowLabel(c, x, y, w, key, sub, total)
@@ -388,7 +389,7 @@ class SheetView(ctx: Context, private val ui: Ui, private val car: Car,
                 line.color = withAlpha(ink(), .35f); line.strokeWidth = 1f
                 c.drawRect(tmp, line)
             }
-            c.text(bp, label, tmp.centerX(), tmp.top + 28f, if (on) Color.BLACK else ink())
+            c.text(if (on) bpOn else bp, label, tmp.centerX(), tmp.top + 28f, if (on) Color.BLACK else ink())
             hot.add(Hot(id2, RectF(tmp)))
             bx2 += bw + 3f
         }
