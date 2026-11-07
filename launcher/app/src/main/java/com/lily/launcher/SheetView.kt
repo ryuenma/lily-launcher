@@ -10,6 +10,7 @@ import android.graphics.RectF
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.PathInterpolator
+import android.util.Log
 import java.util.Locale
 
 /**
@@ -38,12 +39,17 @@ class SheetView(ctx: Context, private val ui: Ui, private val car: Car,
     private val hot = ArrayList<Hot>(24)
     private var pressed: String? = null
 
-    private val more = ui.meta.getJSONArray("more").let { a -> (0 until a.length()).map { a.getJSONObject(it) } }
+    private val more = run {
+        val base = ui.meta.getJSONArray("more").let { a -> (0 until a.length()).map { a.getJSONObject(it) } }.toMutableList()
+        base.add(org.json.JSONObject().apply { put("name", "Magisk"); put("component", "com.topjohnwu.magisk"); put("special", null) })
+        base.add(org.json.JSONObject().apply { put("name", "Restart"); put("component", null); put("special", "restart") })
+        base
+    }
 
     private val moreSheet = RectF(62f, 92f, 962f, 544f)
     private val setSheet = RectF(132f, 88f, 892f, 512f)
     private val jpNames = arrayOf("受信機", "記憶媒体", "映像", "記録映像", "音響", "外部入力", "書庫",
-        "車両", "車載網", "操舵", "接続", "消灯", "画面設定")
+        "車両", "車載網", "操舵", "接続", "消灯", "画面設定", "管理", "再起動")
 
     init {
         visibility = GONE
@@ -150,11 +156,11 @@ class SheetView(ctx: Context, private val ui: Ui, private val car: Car,
         val th = 150f
         val gx = 8f
         val gy = 6f
-        val x0 = r.left + (r.width() - (7 * tw + 6 * gx)) / 2f
+        val x0 = r.left + (r.width() - (5 * tw + 4 * gx)) / 2f
         val y0 = r.top + 46f + 34f
         more.forEachIndexed { i, m ->
-            val col = i % 7
-            val row = i / 7
+            val col = i % 5
+            val row = i / 5
             val x = x0 + col * (tw + gx)
             val y = y0 + row * (th + gy)
             tile(c, x, y, tw, th, i, m.optString("name").uppercase(Locale.US), jpNames.getOrElse(i) { "" })
@@ -277,6 +283,31 @@ class SheetView(ctx: Context, private val ui: Ui, private val car: Car,
                 c.drawLine(cx, cy - 22f, cx, cy - 4f, line)
                 tmp.set(cx - 18f, cy - 16f, cx + 18f, cy + 20f)
                 c.drawArc(tmp, 130f, 280f, false, line)
+            }
+            12 -> { // home setup
+                path.reset()
+                path.moveTo(cx, cy - 22f); path.lineTo(cx - 24f, cy - 2f)
+                path.lineTo(cx - 24f, cy + 22f); path.lineTo(cx + 24f, cy + 22f)
+                path.lineTo(cx + 24f, cy - 2f); path.close()
+                c.drawPath(path, line)
+                c.drawRect(cx - 6f, cy + 6f, cx + 6f, cy + 22f, line)
+            }
+            13 -> { // magisk: shield
+                path.reset()
+                path.moveTo(cx, cy - 24f); path.lineTo(cx - 18f, cy - 14f)
+                path.lineTo(cx - 18f, cy + 8f); path.lineTo(cx, cy + 24f)
+                path.lineTo(cx + 18f, cy + 8f); path.lineTo(cx + 18f, cy - 14f); path.close()
+                c.drawPath(path, line)
+                val mp = type.paint(12f, mono = true, align = Paint.Align.CENTER)
+                c.text(mp, "M", cx, cy + 6f, ink())
+            }
+            14 -> { // restart: circular arrow
+                tmp.set(cx - 20f, cy - 20f, cx + 20f, cy + 20f)
+                c.drawArc(tmp, 45f, 270f, false, line)
+                path.reset()
+                path.moveTo(cx + 14f, cy - 14f); path.lineTo(cx + 20f, cy - 20f)
+                path.lineTo(cx + 20f, cy - 8f); path.close()
+                c.drawPath(path, fill)
             }
             else -> { // home
                 path.reset()
@@ -436,6 +467,7 @@ class SheetView(ctx: Context, private val ui: Ui, private val car: Car,
                 when (m.optString("special")) {
                     "settings" -> open(Kind.SETTINGS)
                     "screenoff" -> { close(false); car.launch(Car.SCREEN_OFF_UI) }
+                    "restart" -> { close(false); try { Runtime.getRuntime().exec("reboot") } catch (e: Exception) { Log.w("LilySheet", "reboot", e) } }
                     else -> {
                         val component = m.optString("component")
                         if (component.isNotEmpty()) { close(false); car.launch(component) }
