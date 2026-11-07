@@ -101,6 +101,13 @@ class HomeActivity : Activity() {
         }
         // long-press anywhere → threshold settings dialog
         root.setOnLongClickListener { showThresholdDialog(); true }
+        // debug floating speed button (remove before release)
+        val dbgBtn = android.widget.Button(this).apply {
+            text = "SPD"
+            setOnClickListener { showSpeedDialog() }
+        }
+        val dbgParams = FrameLayout.LayoutParams(80, 80).apply { gravity = android.view.Gravity.BOTTOM or android.view.Gravity.END; rightMargin = 10; bottomMargin = 10 }
+        root.addView(dbgBtn, dbgParams)
         setContentView(root)
         car.onVolume = { stage.home.onVolume(); stage.knob.onVolume() }
 
@@ -192,6 +199,30 @@ class HomeActivity : Activity() {
                 stage.render()
             }
             .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun showSpeedDialog() {
+        val layout = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(40, 20, 40, 20) }
+        val label = TextView(this).apply { text = "Speed: ${car.speedKmh} km/h" }
+        val seek = android.widget.SeekBar(this).apply {
+            max = 160
+            progress = car.speedKmh
+            setOnSeekBarChangeListener(object : android.widget.SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(s: android.widget.SeekBar?, p: Int, fromUser: Boolean) {
+                    label.text = "Speed: $p km/h"
+                    car.setSpeed(p)
+                    stage.render()
+                }
+                override fun onStartTrackingTouch(s: android.widget.SeekBar?) {}
+                override fun onStopTrackingTouch(s: android.widget.SeekBar?) {}
+            })
+        }
+        layout.addView(label); layout.addView(seek)
+        AlertDialog.Builder(this)
+            .setTitle("Debug speed")
+            .setView(layout)
+            .setPositiveButton("Done") { _, _ -> }
             .show()
     }
 
