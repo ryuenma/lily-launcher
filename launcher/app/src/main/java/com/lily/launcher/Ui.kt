@@ -130,9 +130,9 @@ class Ui(private val ctx: Context, initialTheme: String) {
     fun zoneColor(name: String): Int {
         val base = when (name) {
             "bg" -> parseCss("#0a0a12")
-            "text" -> parseCss("#b9afcb")
+            "text" -> if (speedZone == SpeedZone.NORMAL) parseCss("#4de89a") else parseCss("#b9afcb")
             "text2" -> parseCss("#888888")
-            "accent" -> parseCss("#ff4a1c")
+            "accent" -> if (speedZone == SpeedZone.NORMAL) parseCss("#4de89a") else parseCss("#ff4a1c")
             "alert" -> parseCss("#e31c23")
             "caution" -> parseCss("#f5b400")
             "ok" -> parseCss("#4de89a")

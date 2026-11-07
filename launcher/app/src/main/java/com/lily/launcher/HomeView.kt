@@ -665,7 +665,7 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
         fill.color = col
         when (t) {
             T.PREV, T.NEXT -> {
-                val d = if (t == T.PREV) -1f else 1f
+                val d = if (t == T.PREV) 1f else -1f
                 path.reset()
                 path.moveTo(cx + 2f * d, cy - 7f); path.lineTo(cx - 5f * d, cy); path.lineTo(cx + 2f * d, cy + 7f); path.close()
                 path2.reset()
