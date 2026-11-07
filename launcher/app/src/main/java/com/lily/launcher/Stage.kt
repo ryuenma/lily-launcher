@@ -25,12 +25,12 @@ class Stage(ctx: Context, val ui: Ui, val car: Car) : FrameLayout(ctx) {
         knob.setLayerType(LAYER_TYPE_HARDWARE, null)
 
         addView(home, LayoutParams(W, H))
-        addView(deck, LayoutParams(W, H))
         val k = Nge.knobArea
         addView(knob, LayoutParams(k.width().toInt() + 1, k.height().toInt() + 1).apply {
             leftMargin = k.left.toInt()
             topMargin = k.top.toInt()
         })
+        addView(deck, LayoutParams(W, H))
         addView(sheet, LayoutParams(W, H))
         render()
     }

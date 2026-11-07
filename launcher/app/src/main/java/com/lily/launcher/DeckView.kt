@@ -37,7 +37,7 @@ class DeckView(ctx: Context, private val ui: Ui, private val car: Car) : View(ct
         val now = SystemClock.uptimeMillis()
         val accent = ui.zoneColor("accent")
         val em = zone == SpeedZone.EMERGENCY
-        val onFill = if (em) ui.zoneColor("ok") else Color.BLACK
+        val onFill = Color.BLACK
         val alertColor = if (em) ui.zoneColor("alert") else ui.zoneColor("caution")
         val jp = if (em) "危険" else "注意"
         val en = if (em) "EMERGENCY" else "CAUTION"
