@@ -300,9 +300,15 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
         c.drawRect(rt.x, rt.y, rt.x + rtW, rt.y + rt.h, fill)
         rt.draw(c, r[0], rt.x + rt.padL, rt.y + rt.firstBaseline)
         val show = v != View3.EMPTY
-        img(c, "stPlay_${if (show && playing) "on" else "off"}")
-        img(c, "stPause_${if (show && !playing) "on" else "off"}")
-        img(c, "stRec_${if (show && playing) "on" else "off"}")
+        val stX = 899f; val stY = 148.59375f
+        fill.style = Paint.Style.FILL
+        for ((i, on) in listOf(show && playing, show && !playing, show && playing).withIndex()) {
+            val x = stX + i * 32f
+            fill.color = if (on) ui.zoneColor("ok") else ui.zoneColor("text2")
+            fill.alpha = if (on) 255 else 80
+            c.drawCircle(x + 11f, stY + 11f, 6f, fill)
+        }
+        fill.alpha = 255
         val ro = ui.rect("ro")
         val gS = ui.text("roGhost"); val vS = ui.text("roVal"); val bS = ui.text("roBot")
         gS.draw(c, r[1], ro.right - gS.width(r[1]), gS.y + gS.firstBaseline)
