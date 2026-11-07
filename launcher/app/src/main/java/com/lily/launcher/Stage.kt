@@ -28,6 +28,7 @@ class Stage(ctx: Context, val ui: Ui, val car: Car) : FrameLayout(ctx) {
     }
 
     fun render() {
+        ui.speedZone = car.speedZone
         ui.setTheme(home.themeName()) { render() }
         home.restyle()
         deck.visibility = if (home.view3() == HomeView.View3.TAPE) View.VISIBLE else View.INVISIBLE

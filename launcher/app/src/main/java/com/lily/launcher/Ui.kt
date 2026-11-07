@@ -126,6 +126,35 @@ class Ui(private val ctx: Context, initialTheme: String) {
 
     fun themeVar(name: String): Int = parseCss(json.getJSONObject("vars").getJSONObject(theme).getString(name))
 
+    /** Zone-aware color accessor for Canvas rendering (NGE palette). */
+    fun zoneColor(name: String): Int {
+        val base = when (name) {
+            "bg" -> parseCss("#0a0a12")
+            "text" -> parseCss("#b9afcb")
+            "text2" -> parseCss("#888888")
+            "accent" -> parseCss("#ff4a1c")
+            "alert" -> parseCss("#e31c23")
+            "caution" -> parseCss("#f5b400")
+            "ok" -> parseCss("#4de89a")
+            else -> parseCss("#b9afcb")
+        }
+        return when (speedZone) {
+            SpeedZone.CAUTION -> when (name) {
+                "text" -> parseCss("#f5b400")
+                "accent" -> parseCss("#f5b400")
+                else -> base
+            }
+            SpeedZone.EMERGENCY -> when (name) {
+                "text" -> parseCss("#e31c23")
+                "accent" -> parseCss("#e31c23")
+                else -> base
+            }
+            else -> base
+        }
+    }
+
+    var speedZone: SpeedZone = SpeedZone.NORMAL
+
     companion object {
         private val SHEET = listOf("more_bg", "set_bg", "mi_", "opt_", "done_", "led_opt")
         fun isEmulator(): Boolean {
