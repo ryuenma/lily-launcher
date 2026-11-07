@@ -4,9 +4,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.RectF
+import android.graphics.Shader
 import android.os.SystemClock
 import android.view.MotionEvent
 import android.view.View
@@ -92,45 +94,107 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
         drawWarningOverlay(c)
     }
 
-    // ── fullscreen warning overlay (pulse, no layout shift) ──
+    // ── fullscreen warning overlay (the mockup's .warn CSS: wash, marching bars, pulsing plate) ──
     private fun drawWarningOverlay(c: Canvas) {
         val zone = car.speedZone
         if (zone == SpeedZone.NORMAL) return
-        val color = if (zone == SpeedZone.EMERGENCY) ui.zoneColor("alert") else ui.zoneColor("caution")
-        val onFill = if (zone == SpeedZone.EMERGENCY) ui.zoneColor("ok") else Color.BLACK
-        val jp = if (zone == SpeedZone.EMERGENCY) "危険" else "注意"
-        val en = if (zone == SpeedZone.EMERGENCY) "EMERGENCY" else "CAUTION"
-        val sub = "SPEED ${String.format(Locale.US, "%03d", car.speedKmh)} KM/H · LIMIT ${String.format(Locale.US, "%03d", if (zone == SpeedZone.EMERGENCY) car.emergencyThreshold() else car.cautionThreshold())}"
-        val tag = if (zone == SpeedZone.EMERGENCY) "SPEED THRESHOLD EXCEEDED // 速度超過" else "SPEED THRESHOLD EXCEEDED // 速度超過"
-        val pulse = (Math.sin(SystemClock.uptimeMillis() / 300.0) * 0.3 + 0.7).toFloat()
+        val emergency = zone == SpeedZone.EMERGENCY
+        val alert = if (emergency) ui.zoneColor("alert") else ui.zoneColor("caution")
+        val onFill = onFill()                 // --on-fill: #000 normally, ok-green in emergency
+        val jp = if (emergency) "危険" else "注意"
+        val en = if (emergency) "EMERGENCY" else "CAUTION"
+        val sub = "SPEED ${String.format(Locale.US, "%03d", car.speedKmh)} KM/H · LIMIT " +
+            String.format(Locale.US, "%03d",
+                if (emergency) car.emergencyThreshold() else car.cautionThreshold())
+        val tag = "SPEED THRESHOLD EXCEEDED // 速度超過"
+
+        // one 1.1 s master clock drives both animations (CSS: march + pulse)
+        val frac = SystemClock.uptimeMillis() % 1100L / 1100f
+
+        /** Baseline of a CSS line box: half-leading down from the line top, then the ascent. */
+        fun baseline(p: Paint, lineTop: Float, lineH: Float): Float {
+            val fm = p.fontMetrics
+            return lineTop + (lineH - (fm.descent - fm.ascent)) / 2f - fm.ascent
+        }
+
         fill.style = Paint.Style.FILL
-        fill.color = color
-        fill.alpha = (pulse * 80).toInt()
-        c.drawRect(0f, 0f, Nge.W.toFloat(), Nge.H.toFloat(), fill)
-        fill.alpha = 255
-        // center box
-        val boxW = 420f; val boxH = 120f
-        val boxL = (Nge.W - boxW) / 2f; val boxT = (Nge.H - boxH) / 2f
-        fill.color = Color.BLACK
-        fill.alpha = 200
+
+        // (1) backdrop — caution: linear-gradient(180deg, .72 black → .18 → .18 → .72);
+        // emergency: flat rgba(0,0,0,.62)
+        if (emergency) {
+            fill.color = withAlpha(Color.BLACK, .62f)
+            c.drawRect(0f, 0f, Nge.W, Nge.H, fill)
+        } else {
+            fill.shader = LinearGradient(0f, 0f, 0f, Nge.H, intArrayOf(
+                withAlpha(Color.BLACK, .72f), withAlpha(Color.BLACK, .18f),
+                withAlpha(Color.BLACK, .18f), withAlpha(Color.BLACK, .72f)),
+                floatArrayOf(0f, .26f, .74f, 1f), Shader.TileMode.CLAMP)
+            c.drawRect(0f, 0f, Nge.W, Nge.H, fill)
+            fill.shader = null
+        }
+
+        // (2) hazard bars: 26px strips at the top and bottom edges, -45° stripes (alert 12px,
+        // black 12px) tiled every 34px and marching right one tile per cycle
+        fun bars(top: Float) {
+            c.save()
+            c.clipRect(0f, top, Nge.W, top + 26f)
+            fill.color = Color.BLACK
+            c.drawRect(0f, top, Nge.W, top + 26f, fill)
+            val bandW = 12f * Math.sqrt(2.0).toFloat()   // 12px measured across a 45° band
+            fill.color = alert
+            path.reset()
+            var j = -2
+            while (true) {
+                val s = frac * 34f + j * 34f             // x−y of each band's left edge, in px
+                if (s + top >= Nge.W) break
+                if (s + bandW + top + 26f > 0f) {        // still reaches the bottom-left corner
+                    path.moveTo(s + top, top)
+                    path.lineTo(s + bandW + top, top)
+                    path.lineTo(s + bandW + top + 26f, top + 26f)
+                    path.lineTo(s + top + 26f, top + 26f)
+                    path.close()
+                }
+                j++
+            }
+            c.drawPath(path, fill)
+            c.restore()
+        }
+        bars(0f)
+        bars(Nge.H - 26f)
+
+        // (3) centre plate (padding 14px 40px): alert ground, 3px solid #000 border, 2px alert
+        // outline outside the border box, opacity stepping 1 → .38 per cycle (steps(1,end))
+        val jpP = type.paint(60f, track = 10f, align = Paint.Align.CENTER)              // .warn-jp
+        val enP = type.paint(22f, track = 9f, align = Paint.Align.CENTER)               // .warn-en
+        val subP = type.paint(10f, mono = true, track = 2f, align = Paint.Align.CENTER) // .warn-sub
+        val boxW = maxOf(jpP.measureText(jp), enP.measureText(en), subP.measureText(sub)) + 80f
+        val boxH = 14f + 60f + 2f + 26.4f + 6f + 12f + 14f     // padding + the three line boxes
+        val boxL = (Nge.W - boxW) / 2f
+        val boxT = (Nge.H - boxH) / 2f
+        val pulse = if (frac < .65f) 1f else .38f
+
+        line.strokeWidth = 2f                                  // outline: starts at the border edge, outwards
+        line.color = withAlpha(alert, pulse)
+        c.drawRect(boxL - 1f, boxT - 1f, boxL + boxW + 1f, boxT + boxH + 1f, line)
+        fill.color = withAlpha(alert, pulse)                   // ground runs under the border rim
         c.drawRect(boxL, boxT, boxL + boxW, boxT + boxH, fill)
-        fill.alpha = 255
-        line.color = color; line.strokeWidth = 2f
-        c.drawRect(boxL, boxT, boxL + boxW, boxT + boxH, line)
-        // JP kanji
-        val jpP = type.paint(48f, track = 2f, align = Paint.Align.CENTER)
-        jpP.color = color
-        c.text(jpP, jp, Nge.W / 2f, boxT + 52f, color)
-        // EN text
-        val enP = type.paint(28f, track = 4f, align = Paint.Align.CENTER)
-        c.text(enP, en, Nge.W / 2f, boxT + 88f, onFill())
-        // sub
-        val subP = type.paint(11f, mono = true, track = 1.4f, align = Paint.Align.CENTER)
-        c.text(subP, sub, Nge.W / 2f, boxT + 110f, withAlpha(onFill(), .8f))
-        // bottom tag
-        val tagP = type.paint(9f, mono = true, track = 1.4f, align = Paint.Align.CENTER)
-        c.text(tagP, tag, Nge.W / 2f, Nge.H - 30f, withAlpha(color, .7f))
-        postInvalidateDelayed(50)
+        line.strokeWidth = 3f                                  // border: 3px solid #000
+        line.color = withAlpha(Color.BLACK, pulse)
+        c.drawRect(boxL + 1.5f, boxT + 1.5f, boxL + boxW - 1.5f, boxT + boxH - 1.5f, line)
+
+        // box copy: all var(--on-fill); the sub line adds its own opacity .85
+        val mid = boxL + boxW / 2f
+        val contentT = boxT + 14f
+        c.text(jpP, jp, mid, baseline(jpP, contentT, 60f), withAlpha(onFill, pulse))
+        c.text(enP, en, mid, baseline(enP, contentT + 62f, 26.4f), withAlpha(onFill, pulse))
+        c.text(subP, sub, mid, baseline(subP, contentT + 94.4f, 12f), withAlpha(onFill, pulse * .85f))
+
+        // (5) tag pinned 46px above the bottom edge: --ink normally, #4de89a in emergency
+        val tagP = type.paint(9f, mono = true, track = 2.4f, align = Paint.Align.CENTER)
+        c.text(tagP, tag, Nge.W / 2f, baseline(tagP, Nge.H - 46f - 10.8f, 10.8f),
+            if (emergency) ui.zoneColor("ok") else ink())
+
+        postInvalidateDelayed(32)
     }
 
     /** A.T. Field: one cached path holding every hexagon, drawn as a single stroke pass. */
