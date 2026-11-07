@@ -103,7 +103,6 @@ class HomeActivity : Activity() {
         root.setOnLongClickListener { showThresholdDialog(); true }
         setContentView(root)
         car.onVolume = { stage.home.onVolume(); stage.knob.onVolume() }
-        root.post { ui.preloadSheets() }
 
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager

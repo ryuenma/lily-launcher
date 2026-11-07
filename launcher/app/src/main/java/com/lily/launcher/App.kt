@@ -11,7 +11,7 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         car = Car(this).also { it.start() }
-        val theme = car.themeName(); val accent = car.str("accent")
-        ui = FutureTask { Ui(this, theme).also { it.preloadHome(accent) } }.also { Thread(it, "ui-load").start() }
+        val theme = car.themeName()
+        ui = FutureTask { Ui(this, theme) }.also { Thread(it, "ui-load").start() }
     }
 }
