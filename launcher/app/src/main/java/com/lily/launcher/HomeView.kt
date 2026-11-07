@@ -203,8 +203,8 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
         val jp = type.paint(13f, jp = true, track = 3f, weight = 700)
         c.text(jp, zoneJp(), b.left + 76f, b.centerY() + 5f, onFill())
 
-        val title = type.paint(15f, track = if (car.speedZone == SpeedZone.EMERGENCY) 7f else 5f,
-            align = Paint.Align.CENTER, weight = 700)
+        val title = type.paint(15f, title = true, track = if (car.speedZone == SpeedZone.EMERGENCY) 7f else 5f,
+            align = Paint.Align.CENTER, weight = 900)
         c.text(title, zoneTitle(), Nge.W / 2f, b.centerY() + 6f, onFill())
 
         drawSeal(c, 880f, b.centerY(), 15f, zoneJp(), zoneEn(), onFill(), 9.5f, 5.5f, jpTrack = 2f)

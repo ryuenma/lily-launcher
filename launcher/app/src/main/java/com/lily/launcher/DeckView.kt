@@ -131,7 +131,7 @@ class DeckView(ctx: Context, private val ui: Ui, private val car: Car) : View(ct
             pad(if (em) car.emergencyThreshold() else car.cautionThreshold())
 
         val jpP = type.paint(60f, jp = true, track = 10f, align = Paint.Align.CENTER, weight = 900)
-        val enP = type.paint(22f, track = 9f, align = Paint.Align.CENTER, weight = 700)
+        val enP = type.paint(22f, warn = true, track = 9f, align = Paint.Align.CENTER, weight = 700)
         val subP = type.paint(10f, mono = true, track = 2f, align = Paint.Align.CENTER)
 
         // .warn-box is 14/40 padding + a 3px border around its widest line; the divs stack as

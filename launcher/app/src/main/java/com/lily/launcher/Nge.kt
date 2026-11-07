@@ -127,14 +127,16 @@ object Nge {
 class NgeType(private val ui: Ui) {
     private val cache = HashMap<String, Paint>()
 
-    fun paint(size: Float, mono: Boolean = false, jp: Boolean = false, track: Float = 0f,
+    fun paint(size: Float, mono: Boolean = false, jp: Boolean = false, title: Boolean = false, warn: Boolean = false, track: Float = 0f,
               align: Paint.Align = Paint.Align.LEFT, weight: Int = 400): Paint =
-        cache.getOrPut("$size|$mono|$jp|$track|${align.name}|$weight") {
+        cache.getOrPut("$size|$mono|$jp|$title|$warn|$track|$weight|${align.name}") {
             Paint(Paint.ANTI_ALIAS_FLAG or Paint.SUBPIXEL_TEXT_FLAG).apply {
                 typeface = when {
-                    mono -> ui.mono          // JetBrains Mono Bold — numerals, readouts, chips
-                    jp -> ui.jp(weight)      // Noto Serif JP (Mincho) — kanji runs
-                    else -> ui.latin(weight) // Oswald, Noto Serif JP behind it for stray kanji
+                    mono -> ui.mono
+                    jp -> ui.jp(weight)
+                    title -> ui.title(weight)
+                    warn -> ui.warn(weight)
+                    else -> ui.latin(weight)
                 }
                 textSize = size
                 if (size > 0f) letterSpacing = track / size

@@ -33,16 +33,24 @@ class Ui(private val ctx: Context, initialTheme: String) {
      * to the system sans. Mono is a static Bold file — JetBrains Mono has no wght axis here.
      */
     val mono: Typeface = Typeface.createFromAsset(ctx.assets, "fonts/JetBrainsMono-Bold.ttf")
+    // NERV UI fonts (nerv-ui reference)
+    val notoSerifDisplay: Typeface = Typeface.createFromAsset(ctx.assets, "fonts/NotoSerifDisplay.ttf")
+    val shipporiMinchoB1: Typeface = Typeface.createFromAsset(ctx.assets, "fonts/ShipporiMinchoB1.ttf")
+    val sairaExtraCondensed: Typeface = Typeface.createFromAsset(ctx.assets, "fonts/SairaExtraCondensed.ttf")
 
     private val latinCache = HashMap<Int, Typeface>()
     private val jpCache = HashMap<Int, Typeface>()
+    private val titleCache = HashMap<Int, Typeface>()
+    private val warnCache = HashMap<Int, Typeface>()
 
-    /** Oswald at [weight] (200–700), with Noto Serif JP behind it for the glyphs Oswald lacks. */
+    /** Oswald at [weight] (200–700), with Shippori Mincho B1 behind it for glyphs Oswald lacks. */
     fun latin(weight: Int): Typeface = latinCache.getOrPut(weight) {
         val w = weight.coerceIn(200, 700)
         runCatching {
-            Typeface.CustomFallbackBuilder(family("Oswald.ttf", w))
-                .addCustomFallback(family("NotoSerifJP.ttf", jpWeight(weight)))
+            val oswaldFont = Font.Builder(ctx.assets, "fonts/Oswald.ttf").setFontVariationSettings("'wght' $w").build()
+            val notoFont = Font.Builder(ctx.assets, "fonts/ShipporiMinchoB1.ttf").build()
+            Typeface.CustomFallbackBuilder(FontFamily.Builder(oswaldFont).build())
+                .addCustomFallback(FontFamily.Builder(notoFont).build())
                 .build()
         }.getOrElse { e ->
             Log.w(Car.TAG, "latin@$w: falling back to the default instance", e)
@@ -51,22 +59,26 @@ class Ui(private val ctx: Context, initialTheme: String) {
         }
     }
 
-    /** Noto Serif JP (Mincho) at [weight] (200–900). */
-    fun jp(weight: Int): Typeface = jpCache.getOrPut(jpWeight(weight)) {
-        runCatching { Typeface.CustomFallbackBuilder(family("NotoSerifJP.ttf", jpWeight(weight))).build() }
-            .getOrElse { e ->
-                Log.w(Car.TAG, "jp@${jpWeight(weight)}: falling back to the default instance", e)
-                runCatching { Typeface.createFromAsset(ctx.assets, "fonts/NotoSerifJP.ttf") }
-                    .getOrDefault(Typeface.SERIF)
-            }
+    /** Shippori Mincho B1 (NERV institutional JP) at [weight]. */
+    fun jp(weight: Int): Typeface = jpCache.getOrPut(weight) {
+        runCatching { Typeface.createFromAsset(ctx.assets, "fonts/ShipporiMinchoB1.ttf") }
+            .getOrDefault(Typeface.SERIF)
     }
 
-    /** Noto tops out at 900 where Oswald stops at 700; 600/700/900 stay distinct. */
-    private fun jpWeight(weight: Int) = weight.coerceIn(200, 900)
+    /** Noto Serif Display (NERV title) at [weight] (700–900), variable font. */
+    fun title(weight: Int): Typeface = titleCache.getOrPut(weight) {
+        runCatching {
+            val w = weight.coerceIn(700, 900)
+            val font = Font.Builder(ctx.assets, "fonts/NotoSerifDisplay.ttf").setFontVariationSettings("'wght' $w").build()
+            Typeface.CustomFallbackBuilder(FontFamily.Builder(font).build()).build()
+        }.getOrDefault(Typeface.SERIF)
+    }
 
-    private fun family(asset: String, weight: Int): FontFamily = FontFamily.Builder(
-        Font.Builder(ctx.assets, "fonts/$asset").setFontVariationSettings("'wght' $weight").build()
-    ).build()
+    /** Saira Extra Condensed (warning stamps) at [weight]. */
+    fun warn(weight: Int): Typeface = warnCache.getOrPut(weight) {
+        runCatching { Typeface.createFromAsset(ctx.assets, "fonts/SairaExtraCondensed-Bold.ttf") }
+            .getOrDefault(Typeface.SANS_SERIF)
+    }
 
     var theme = initialTheme; private set
     private var pending: String? = null
