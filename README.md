@@ -1,5 +1,7 @@
 # Lily: NERV's MAGI Terminal Access, in your car. (For NWD K2501).
 
+![Lily Launcher — NERV Terminal Interface](docs/social-preview.png)
+
 My car has a Chinese-made Android head unit (NWD K2501, Allwinner T507, Android 10, 1024x600). It works, but is so laggy. i debloated the android, and made my own launcher. **a native Android launcher that replaces it**, drawn in the visual language of Neon Genesis Evangelion's NERV terminal interface.
 
 ## Before vs After
