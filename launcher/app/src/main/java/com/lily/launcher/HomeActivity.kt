@@ -219,9 +219,11 @@ class HomeActivity : Activity() {
             })
         }
         layout.addView(label); layout.addView(seek)
+        stopLocationUpdates()
         AlertDialog.Builder(this)
             .setTitle("Debug speed")
             .setView(layout)
+            .setOnDismissListener { startLocationUpdates() }
             .setPositiveButton("Done") { _, _ -> }
             .show()
     }
