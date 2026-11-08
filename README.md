@@ -20,10 +20,6 @@ All captures are from the real K2501 head unit (1024×600) or the 1024×600 emul
 
 *Captured on the 1024×600 emulator at 160 dpi. Speed zones (caution/emergency) can be tested with the long-press threshold dialog (long-press anywhere → set thresholds to 1/2 km/h).*
 
-### Screens
-
-*The following are older mockup renders (TE-style layout) kept for reference. The current app uses the NGE Canvas rendering.*
-
 ### Animations (GIF demos)
 
 | Caution zone | Emergency zone |
