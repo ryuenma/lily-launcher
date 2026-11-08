@@ -16,7 +16,13 @@ It puts what's playing in the middle of the screen, hexagonal keys under it, a s
 
 [![Watch the trailer](docs/trailer-poster.jpg)](docs/lily-launcher-trailer.mp4)
 
-## What it does
+## Screenshots
+
+| Normal (day) | More sheet | Settings sheet |
+|---|---|---|
+| ![Lily, day theme](docs/screenshot-day.png) | ![Lily, More sheet](docs/screenshot-more.png) | ![Lily, Settings sheet](docs/screenshot-settings.png) |
+
+*Captured on the 1024×600 emulator at 160 dpi. Speed zones (caution/emergency) can be tested with the debug slider.*
 
 - **Now playing is the main thing:** Bluetooth song and artist, FM station and frequency, or the USB track, with an animated tape deck that only moves while music plays.
 - **BT / RADIO / USB keys switch the source and start playing in place**, with no app opening. Prev / Play / Next / Seek work for each source.
@@ -78,6 +84,14 @@ What `install.sh` changes: installs the app; grants it the `SYSTEM_ALERT_WINDOW`
 - `READ_LOGS` is used for one thing: reading the Bluetooth daemon's log tag (`nwdbt`) to get a song's length, which the stock Bluetooth app doesn't pass on. It is filtered to that tag and nothing is saved.
 - `SYSTEM_ALERT_WINDOW` lets it start Android Auto while another app is in front.
 - `ACCESS_FINE_LOCATION` is used for vehicle speed (GPS), stored in memory only, never logged to disk.
+
+## Credits
+
+- **Design inspiration:** [NERV UI](https://github.com/TheGreatGildo/nerv-ui) — NERV Operations Console design system (MIT). [idrive7-EVAHUD](https://github.com/PenguinDukeYDAuto/idrive7-EVAHUD) — EVA HUD for BMW iDrive 7 (MIT).
+- **Upstream launcher:** [calm-launcher](https://github.com/speghetimafia/calm-launcher) (forked, MIT).
+- **Visual style:** Neon Genesis Evangelion (khara) — NERV terminal interface design language.
+- **Fonts:** Oswald, Shippori Mincho B1, Saira Extra Condensed, JetBrains Mono (all SIL OFL 1.1).
+- **Trailer music:** "Happy Beats / Business Moves" by [ende.app](https://ende.app) (CC BY 4.0). Sound effects from [Kenney](https://kenney.nl) (CC0). Made with [Hyperframes](https://hyperframes.heygen.com/).
 
 ## Legal and credits
 
