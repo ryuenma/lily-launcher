@@ -12,13 +12,13 @@ My car has a Chinese-made Android head unit (NWD K2501, Allwinner T507, Android 
 
 ## Screenshots
 
-All captures are from the real K2501 head unit (1024x600) or the 1024x600 emulator.
+All captures are from the real K2501 head unit (1024×600) or the 1024×600 emulator.
 
-| Normal (day) | More sheet (15 tiles) | Settings sheet |
-|---|---|---|
-| ![Lily, day theme](docs/screenshot-day.png) | ![Lily, More sheet](docs/screenshot-more.png) | ![Lily, Settings sheet](docs/screenshot-settings.png) |
+| Normal (day) |
+|---|
+| ![Lily, day theme](docs/screenshot-day.png) |
 
-*Captured on the 1024x600 emulator at 160 dpi.*
+*Captured on the 1024×600 emulator at 160 dpi. Speed zones (caution/emergency) can be tested with the long-press threshold dialog (long-press anywhere → set thresholds to 1/2 km/h).*
 
 ### Mockup simulator (HTML reference)
 
