@@ -209,6 +209,25 @@ Time-based: night 17:00, morning 05:00. AUTO mode follows the system clock. MANU
 
 Canonical mockup: `mockup/nge-terminal-deepseek-v4.html` (84 KB, single file). Pixel layout, DOM nesting, and pseudocode live in the mockup; the design doc describes behavior and contracts only. See the mockup for: 32px status rail, 42px banner, 338px main (152px telemetry rail · 18px kanji band · 638px stage · 216px MAGI stack), 18px ticker, 170px deck (11-hex honeycomb, 104px knob, 480px speed plate), 116px speed readout, 24-seg ladder, 15-tile MORE sheet (13 + Magisk + Restart), 5-color accent picker, simulated clock for drift testing.
 
+### 8.6.1 7" layout revision (implementation, supersedes §8.6 metrics)
+
+The mockup's CSS pixel sizes were authored for a 1:1 desktop render. On the actual 7" 1024×600 panel (≈170 dpi, 1 px = 1 dp), 9 px labels and 67×78 hexes read as ~10 mm touch targets and borderline-unreadable metadata. The native layout therefore keeps the four bands and the NGE grammar but reallocates the 600 px:
+
+| Band | v4 mockup | 7" app | Notes |
+|---|---|---|---|
+| Status rail | 32 | **40** | 11 px labels, 17 px clock, 24 px chips |
+| Banner | 42 | **54** | 19 px title, 16 px kanji, 18 px seal |
+| Main | 338 | **300** | 168 telemetry · 24 kanji · 616 stage · 216 MAGI |
+| Ticker | 18 | **22** | 11 px marquee |
+| Deck | 170 | **184** | 80×92 hexes · 112 knob · 398×168 speed plate |
+
+* **Keypad:** 11 hexes, 80×92 at 69 px pitch (was 67×78 at 58.25) — +19 % linear per pad.
+* **Stage:** 128×152 album hex, 42 px track title (52 px radio), 20 px artist, 12 px progress bar, 4×48 px data cells; the Android Auto map is replaced by an `AA LINK` chip so the track block gets the full 436 px width.
+* **Speed plate:** 124 px odometer, 96 px seal, 24-segment ladder with 13 px segments.
+* **One visualiser only:** the telemetry `.signals` strip is removed. The stage spectrum (36 bars, CSS `@keyframes spec` equivalents) is the single animation loop and is drawn by `SpectrumView` at 20 fps in its own 436×38 layer, so the loop does not repaint the whole Canvas.
+* Geometry lives in `Nge.kt`; the mockup remains the visual reference for colour and shape, not for pixel sizes.
+
+
 *   Fonts: Noto Serif JP (Mincho) + Oswald (condensed) + JetBrains Mono.
 *   State: `S` (speed, source, track, night, dayNightMode, usb, bt, reverse, call, …) + prefs.
 *   Palette: `applyPalette()` based on speed zone.

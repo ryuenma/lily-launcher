@@ -107,11 +107,11 @@ class KnobView(ctx: Context, private val ui: Ui, private val car: Car,
         c.restore()
 
         // value in the well, then the labels under the dial
-        val vp = type.paint(22f, mono = true, align = Paint.Align.CENTER)
-        c.text(vp, "$shown", cx, cy + 8f, ink)
-        val lab = type.paint(7f, track = 2.4f, align = Paint.Align.CENTER)
+        val vp = type.paint(26f, mono = true, align = Paint.Align.CENTER)
+        c.text(vp, "$shown", cx, cy + 9f, ink)
+        val lab = type.paint(8f, track = 2.4f, align = Paint.Align.CENTER)
         c.text(lab, "VOLUME", cx, cy + 52f * unit + 16f, withAlpha(ink, .5f))
-        val out = type.paint(10f, mono = true, track = .6f, align = Paint.Align.CENTER)
+        val out = type.paint(11f, mono = true, track = .6f, align = Paint.Align.CENTER)
         c.text(out, "$shown / ${car.maxVol}", cx, cy + 52f * unit + 30f, ink)
     }
 

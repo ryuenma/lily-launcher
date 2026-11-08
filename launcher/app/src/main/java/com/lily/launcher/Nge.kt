@@ -7,19 +7,25 @@ import android.graphics.RectF
 
 /**
  * Geometry and shared drawing helpers for the NGE terminal — the one source of truth for the
- * 1024×600 panel. Band heights are taken straight from the canonical mockup
- * (32 rail · 42 banner · 338 main · 18 ticker · 170 deck = 600), so HomeView, DeckView, KnobView,
- * SheetView and Stage all agree on where things sit without reading layout.json.
+ * 1024×600 panel.
+ *
+ * **7" revision.** The first pass traced the mockup's CSS pixel-for-pixel, which on a 7" 1024×600
+ * panel reads as 9 px labels and 67×78 hexes — about 10 mm of glass per touch target. This pass
+ * keeps the four bands and the NGE grammar (rail · banner · main · ticker · deck) but spends the
+ * height on legibility instead of side-channels: rail and banner grow to fit 11–19 px text, the deck
+ * grows to fit 80×92 hexes and a 124 px odometer, and the main area is rebalanced so the stage — the
+ * part you actually read while driving — owns the room the telemetry signal bars used to waste.
+ * Band budget: 40 + 54 + 300 + 22 + 184 = 600.
  */
 object Nge {
     const val W = 1024f
     const val H = 600f
 
-    const val RAIL_H = 32f
-    const val BANNER_H = 42f
-    const val MAIN_H = 338f
-    const val TICKER_H = 18f
-    const val DECK_H = 170f
+    const val RAIL_H = 40f
+    const val BANNER_H = 54f
+    const val TICKER_H = 22f
+    const val DECK_H = 184f
+    const val MAIN_H = H - RAIL_H - BANNER_H - TICKER_H - DECK_H   // 300
 
     val rail = RectF(0f, 0f, W, RAIL_H)
     val banner = RectF(0f, RAIL_H, W, RAIL_H + BANNER_H)
@@ -27,34 +33,37 @@ object Nge {
     val ticker = RectF(0f, main.bottom, W, main.bottom + TICKER_H)
     val deck = RectF(0f, ticker.bottom, W, H)
 
-    /** 152px telemetry rail · 18px kanji band · 638px stage · 216px MAGI stack. */
-    val telemetry = RectF(0f, main.top, 152f, main.bottom)
-    val jpBand = RectF(152f, main.top, 170f, main.bottom)
-    val stage = RectF(170f, main.top, 808f, main.bottom)
+    /** 168 telemetry rail · 24 kanji band · 616 stage · 216 MAGI stack. */
+    val telemetry = RectF(0f, main.top, 168f, main.bottom)
+    val jpBand = RectF(168f, main.top, 192f, main.bottom)
+    val stage = RectF(192f, main.top, 808f, main.bottom)
     val magi = RectF(808f, main.top, W, main.bottom)
 
-    /** Deck row: 372×150 keypad · 132 knob · speed plate to the right edge (`.deck` padding 8px 10px). */
-    val keypad = RectF(10f, deck.top + 10.5f, 382f, deck.top + 160.5f)
-    val knobArea = RectF(392f, deck.top + 14f, 524f, deck.bottom - 8f)
-    val knob = RectF(406f, deck.top + 22f, 510f, deck.top + 126f)
-    val speed = RectF(534f, deck.top + 8f, 1014f, deck.bottom - 10f)
+    /**
+     * The one live visualiser: a full-width spectrum band under the track block. [SpectrumView]
+     * paints it in its own pass, so the 20 fps loop repaints 436×38 px instead of the whole canvas.
+     */
+    val spectrum = RectF(stage.left + 164f, stage.top + 160f, stage.right - 16f, stage.top + 198f)
 
-    // ── hex pads: the mockup's `#keypad` svg, viewBox 0 0 364 138 in a 372×150 CSS box ──
-    // The element keeps its aspect ratio (SVG `preserveAspectRatio` defaults to xMidYMid meet), so the
-    // viewBox is scaled uniformly by KEY_SCALE and letterboxed 4.48px top and bottom. Every number in
-    // hexCenters is the mockup's own coordinate × KEY_SCALE, so the two layouts cannot drift apart.
-    // Row 1 is six hexes at y=40, row 2 is five at y=97 — staggered by half a pitch (57 vs 28.5).
-    const val KEY_SCALE = 372f / 364f                                // 1.02198
-    private const val KEY_VB_TOP = (150f - 138f * KEY_SCALE) / 2f    // 4.4835 letterbox
-    const val HEX_W = 65.82f * KEY_SCALE                             // polygon 2 × 32.91 → 67.27
-    const val HEX_H = 76f * KEY_SCALE                                // polygon 2 × 38 → 77.67
-    const val HEX_PITCH = 57f * KEY_SCALE                            // 58.25
+    /** Deck row: 468×164 keypad · 112 knob · 398 speed plate (`.deck` padding 10 px). */
+    val keypad = RectF(10f, deck.top + 10f, 478f, deck.top + 174f)
+    val knobArea = RectF(482f, deck.top + 8f, 610f, deck.bottom - 8f)
+    val knob = RectF(490f, deck.top + 8f, 602f, deck.top + 120f)     // 112 px dial
+    val speed = RectF(616f, deck.top + 8f, 1014f, deck.bottom - 8f)  // 398×168
+
+    // ── hex pads: two staggered rows, six over five ──
+    // Pointy-top hexes: width = √3 · hh, horizontal pitch = 1.5 · hh, row pitch = 1.5 · hh.
+    // 80×92 is +19 % linear on the v4 mockup's 67×78 — the size a thumb on a 7" 2-DIN needs.
+    const val HEX_W = 80f
+    const val HEX_H = 92f
+    const val HEX_PITCH = 69f
+    /** Icons are drawn in mockup viewBox units; this is how far they grow with the pad. */
+    const val ICON_SCALE = 1.18f
 
     val hexCenters: List<Pair<Float, Float>> = ArrayList<Pair<Float, Float>>(11).apply {
-        val ox = keypad.left
-        val oy = keypad.top + KEY_VB_TOP
-        for (i in 0 until 6) add((ox + (41f + i * 57f) * KEY_SCALE) to (oy + 40f * KEY_SCALE))
-        for (i in 0 until 5) add((ox + (69f + i * 57f) * KEY_SCALE) to (oy + 97f * KEY_SCALE))
+        val cx0 = keypad.centerX()
+        for (i in 0 until 6) add((cx0 - 2.5f * HEX_PITCH + i * HEX_PITCH) to (keypad.top + 8f + HEX_H / 2f))
+        for (i in 0 until 5) add((cx0 - 2f * HEX_PITCH + i * HEX_PITCH) to (keypad.top + 8f + HEX_H / 2f + HEX_PITCH))
     }
 
     /** Point-in-hexagon test (bounding boxes overlap at the interlocking edges). */
@@ -65,15 +74,16 @@ object Nge {
         val hw = HEX_W / 2f
         val hh = HEX_H / 2f
         if (dx > hw || dy > hh) return false
-        val shoulder = HEX_H / 4f
+        val shoulder = hh / 2f                     // the slant spans hh/2, not hh/4
         return dy <= shoulder || dx <= hw * (hh - dy) / shoulder
     }
 
-    /** MAGI source trapezoids: 196×44 each, 10px inset inside the 216px column. */
+    /** MAGI source trapezoids: 196×52 each, 64 px pitch inside the 216 px column. */
     fun magiTrap(i: Int): RectF {
-        val top = magi.top + 30f + i * 58f
-        return RectF(magi.left + 10f, top, magi.right - 10f, top + 44f)
+        val top = magi.top + 36f + i * 64f
+        return RectF(magi.left + 10f, top, magi.right - 10f, top + 52f)
     }
+
 
     // ── shapes ──
     fun hexPath(p: Path, cx: Float, cy: Float, hw: Float, hh: Float): Path {

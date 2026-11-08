@@ -7,14 +7,15 @@ import android.widget.FrameLayout
 
 /**
  * The 1024×600 home, composed in NGE z-order: [HomeView] paints the background, rail, banner,
- * main area and deck; [DeckView] adds the animated ticker and hazard stripes; [KnobView] owns the
- * 104px dial; [SheetView] sits on top for More / Setup. No baked layout rects are involved — every
- * view reads its geometry from [Nge].
+ * main area and deck; [SpectrumView] runs the one animated visualiser under the track; [DeckView]
+ * adds the animated ticker and hazard stripes; [KnobView] owns the 112 px dial; [SheetView] sits on
+ * top for More / Setup. No baked layout rects are involved — every view reads its geometry from [Nge].
  */
 @SuppressLint("ViewConstructor")
 class Stage(ctx: Context, val ui: Ui, val car: Car) : FrameLayout(ctx) {
     val home = HomeView(ctx, ui, car, { sheet.open(SheetView.Kind.MORE) },
                                       { sheet.open(SheetView.Kind.SETTINGS) })
+    val spectrum = SpectrumView(ctx, ui, car)
     val deck = DeckView(ctx, ui, car)
     val knob = KnobView(ctx, ui, car, { home.acc }) { home.onVolume() }
     val sheet = SheetView(ctx, ui, car) { render() }
@@ -26,6 +27,11 @@ class Stage(ctx: Context, val ui: Ui, val car: Car) : FrameLayout(ctx) {
         knob.setLayerType(LAYER_TYPE_HARDWARE, null)
 
         addView(home, LayoutParams(W, H))
+        val sp = Nge.spectrum
+        addView(spectrum, LayoutParams(sp.width().toInt(), sp.height().toInt()).apply {
+            leftMargin = sp.left.toInt()
+            topMargin = sp.top.toInt()
+        })
         val k = Nge.knobArea
         addView(knob, LayoutParams(k.width().toInt() + 1, k.height().toInt() + 1).apply {
             leftMargin = k.left.toInt()
@@ -42,6 +48,7 @@ class Stage(ctx: Context, val ui: Ui, val car: Car) : FrameLayout(ctx) {
         deck.visibility = if (home.view3() == HomeView.View3.TAPE || car.speedZone != SpeedZone.NORMAL) View.VISIBLE else View.INVISIBLE
         deck.playing = car.playing
         home.invalidate()
+        spectrum.invalidate()
         deck.invalidate()
         knob.invalidate()
         sheet.invalidate()

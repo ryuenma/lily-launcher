@@ -69,10 +69,10 @@ class DeckView(ctx: Context, private val ui: Ui, private val car: Car) : View(ct
 
         c.save()
         c.clipRect(t.left, t.top + 1f, t.right, t.bottom)
-        val p = type.paint(9f, track = 2.4f, weight = 700)          // .ticker 9/2.4 700
+        val p = type.paint(11f, track = 2.6f, weight = 700)         // .ticker 9/2.4 700 → 7" pass
         p.color = if (em) GREEN else Color.BLACK          // color: var(--on-fill) / #000
         val msg = tickerText(em)
-        val span = p.measureText(msg) + 48f               // .ticker-track span{padding-right:48px}
+        val span = p.measureText(msg) + 56f               // .ticker-track span{padding-right:48px}
         val fm = p.fontMetrics
         val base = (t.top + 1f + t.bottom) / 2f - (fm.ascent + fm.descent) / 2f
         // @keyframes marquee{0%:translateX(0) 100%:translateX(-25%)} over 26s = exactly one span
