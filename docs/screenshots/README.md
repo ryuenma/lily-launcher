@@ -11,7 +11,7 @@ scales to any window, so on a portrait phone it is pillarboxed. On the real K250
 
 The app is intentionally inert without the vendor layer, which is why this is the only state
 we can capture off-headunit. Full BT / Radio / USB / AA behaviours require the real K2501
-(head unit (when online) when online) or a mock provider — see the mockup in `mockup/index.html`.
+head unit (when online) or a mock provider — see the mockup in `mockup/index.html`.
 
 ## Head-unit mockup renders (ship in repo)
 
