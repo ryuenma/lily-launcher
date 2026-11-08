@@ -1,0 +1,28 @@
+# Auto-detect text files and normalize line endings
+* text=auto
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.bmp binary
+*.ttf binary
+*.otf binary
+*.apk binary
+*.aab binary
+*.jks binary
+*.keystore binary
+*.zip binary
+*.img binary
+
+# Kotlin/Java source
+*.kt text
+*.java text
+*.xml text
+*.gradle text
+*.kts text
+*.properties text
+
+# Markdown
+*.md text
