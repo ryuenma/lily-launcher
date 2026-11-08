@@ -1,6 +1,6 @@
 # Lily: I hated my car's infotainment screen, so I replaced it
 
-My car has a Chinese-made Android head unit (NWD K2501, Allwinner T507, Android 10, 1024×600). It works, but I hated how its stock home screen looked every single time I got in. So I built my own: **a native Android launcher that replaces it**, drawn in the visual language of Neon Genesis Evangelion's NERV terminal interface.
+My car has a Chinese-made Android head unit (NWD K2501, Allwinner T507, Android 10, 1024x600). It works, but I hated how its stock home screen looked every single time I got in. So I built my own: **a native Android launcher that replaces it**, drawn in the visual language of Neon Genesis Evangelion's NERV terminal interface.
 
 ## Before vs After
 
@@ -8,17 +8,17 @@ My car has a Chinese-made Android head unit (NWD K2501, Allwinner T507, Android 
 |---|---|
 | ![Stock home screen](docs/before-stock.jpg) | ![Lily, day theme](docs/screenshot-day.png) |
 
-*Left: the head unit's stock launcher. Right: Lily rendering the NGE terminal interface on the unit (1024×600, 160 dpi).*
+*Left: the head unit's stock launcher. Right: Lily rendering the NGE terminal interface on the unit (1024x600, 160 dpi).*
 
 ## Screenshots
 
-All captures are from the real K2501 head unit (1024×600) or the 1024×600 emulator.
+All captures are from the real K2501 head unit (1024x600) or the 1024x600 emulator.
 
 | Normal (day) | More sheet (15 tiles) | Settings sheet |
 |---|---|---|
 | ![Lily, day theme](docs/screenshot-day.png) | ![Lily, More sheet](docs/screenshot-more.png) | ![Lily, Settings sheet](docs/screenshot-settings.png) |
 
-*Captured on the 1024×600 emulator at 160 dpi.*
+*Captured on the 1024x600 emulator at 160 dpi.*
 
 ### Mockup simulator (HTML reference)
 
@@ -38,7 +38,7 @@ The canonical mockup (`mockup/nge-terminal-deepseek-v4.html`) includes a simulat
 
 ### Animations (GIF demos)
 
-*Coming soon — GIF files demonstrating the speed-zone transitions, hazard stripe march, ticker scroll, warning pulse, and day/night toggle will be added here.*
+*Coming soon - GIF files demonstrating the speed-zone transitions, hazard stripe march, ticker scroll, warning pulse, and day/night toggle will be added here.*
 
 ## What it does
 
