@@ -20,32 +20,24 @@ All captures are from the real K2501 head unit (1024×600) or the 1024×600 emul
 
 *Captured on the 1024×600 emulator at 160 dpi. Speed zones (caution/emergency) can be tested with the long-press threshold dialog (long-press anywhere → set thresholds to 1/2 km/h).*
 
-### Mockup simulator (HTML reference)
+### Screens
 
-The canonical mockup (`mockup/nge-terminal-deepseek-v4.html`) includes a simulator panel for testing all states:
-
-| Tape (day) | Tape (night) | Radio | USB |
-|---|---|---|---|
-| ![Tape day](docs/screenshots/mockup-tape-day.png) | ![Tape night](docs/screenshots/mockup-tape-night.png) | ![Radio](docs/screenshots/mockup-radio.png) | ![USB](docs/screenshots/mockup-usb.png) |
-
-| Android Auto | Reverse camera | Incoming call | More sheet |
-|---|---|---|---|
-| ![AA connected](docs/screenshots/mockup-aa-connected.png) | ![Reverse](docs/screenshots/mockup-reverse.png) | ![Incoming call](docs/screenshots/mockup-incoming-call.png) | ![More sheet](docs/screenshots/mockup-more-sheet.png) |
-
-| Settings sheet | Empty (no BT) |
-|---|---|
-| ![Settings sheet](docs/screenshots/mockup-settings-sheet.png) | ![Empty](docs/screenshots/mockup-empty.png) |
+*The following are older mockup renders (TE-style layout) kept for reference. The current app uses the NGE Canvas rendering.*
 
 ### Animations (GIF demos)
 
-*Coming soon - GIF files demonstrating the speed-zone transitions, hazard stripe march, ticker scroll, warning pulse, and day/night toggle will be added here.*
+| Caution zone | Emergency zone |
+|---|---|
+| ![Caution overlay](docs/CautionGif.gif) | ![Emergency overlay](docs/EmergencyGif.gif) |
+
+*GIF demos of the caution and emergency fullscreen warning overlay animations (hazard stripes, ticker scroll, pulsing center box).*
 
 ## What it does
 
 - **Now playing is the main thing:** Bluetooth song and artist, FM station and frequency, or the USB track, with an animated tape deck that only moves while music plays.
 - **BT / RADIO / USB keys switch the source and start playing in place**, with no app opening. Prev / Play / Next / Seek work for each source.
 - **Phone:** shows the connected phone and opens the stock phone app to call or switch phones.
-- **Android Auto / CarPlay** (via the unit's zlink app) opens by itself when the phone connects, but never over the reverse camera or a call.
+- **Android Auto / CarPlay** (via the unit's zlink app) opens by itself when the phone connects.
 - **Starts the music when the phone connects** (can be turned off in Home settings).
 - **Speed-aware palette:** green below 60 km/h, yellow (caution) 60-100 km/h, red (emergency) above 100 km/h. Hazard stripes, a scrolling ticker, and a pulsing fullscreen warning overlay activate in caution/emergency zones. Thresholds configurable.
 - **Day/night mode:** time-based (17:00 night, 05:00 morning), toggleable AUTO/MANUAL. Headlight override if available.
