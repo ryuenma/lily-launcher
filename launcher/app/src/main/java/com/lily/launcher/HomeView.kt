@@ -738,7 +738,7 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
         val hj = type.paint(9f, jp = true, track = 1f)
         c.text(hj, "対地速度", r.left + 12f + hd.measureText("GROUND SPEED") + 10f, r.top + 22f, withAlpha(ink(), .85f))
         val fx = type.paint(9f, mono = true, track = .8f, align = Paint.Align.RIGHT)
-        c.text(fx, "GPS · 3D FIX", r.right - 12f, r.top + 22f, withAlpha(ink(), .8f))
+        c.text(fx, "GPS · 3D FIX", r.right - 130f, r.top + 22f, withAlpha(ink(), .8f))
 
         val num = String.format(Locale.US, "%03d", car.speedKmh.coerceIn(0, 999))
         val np = type.paint(124f, mono = true, track = -4f)
