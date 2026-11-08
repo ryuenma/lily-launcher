@@ -80,6 +80,18 @@ What `install.sh` changes: installs the app; grants it the `SYSTEM_ALERT_WINDOW`
 
 **`eq/` is riskier:** `apply.sh` overwrites the stock DSP settings file and locks its folder read-only. The values are tuned for my car and speakers (speaker delays, bass boost). Try them at low volume, keep `eq/original.xml` to undo, and don't expect them to suit another car.
 
+## Known issues
+
+Tested on the NWD K2501 head unit (Android 10, 1024×600). The following are known limitations:
+
+- **Auto day/night cycle** — fixed in latest build (clock tick now re-evaluates time-based switching). Previously only worked on manual toggle.
+- **Night brightness** — LCD contrast/saturation set to 40 at night (was 50). May still be too bright for some; adjustable via `PANEL_DAY` constant in `Car.kt`.
+- **Android Auto / CarPlay reopen** — pressing Home and then AUTO hex should now bring zlink back to foreground (added `REORDER_TO_FRONT`). If it still doesn't reopen, the zlink app may need to be restarted.
+- **Play/Pause delay** — 1–2 second delay when pressing Play/Pause is a vendor AIDL service limitation, not a launcher bug. The launcher sends the command immediately; the vendor BT service processes it with delay.
+- **CarPlay "No title"** — when CarPlay is active, audio metadata (title/artist) is not recognized by the launcher. The music plays correctly, but the launcher shows "No title". This is because CarPlay audio goes through a different path (zlink app) that the launcher doesn't monitor. Fix would require monitoring zlink's audio broadcasts.
+- **Music playback choppiness** — occasional choppiness during Bluetooth/Android Auto playback is a Bluetooth/AA issue, not a launcher issue.
+- **GPS speed** — works correctly on the head unit. Emulator has no GPS speed simulation.
+
 ## Privacy and permissions
 
 - **No internet permission.** The app can't send anything off the unit, and it stores only a few settings and the last source in its own private preferences.
