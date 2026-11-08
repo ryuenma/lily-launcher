@@ -24,6 +24,8 @@ It puts what's playing in the middle of the screen, hexagonal keys under it, a s
 
 *Captured on the 1024×600 emulator at 160 dpi. Speed zones (caution/emergency) can be tested with the debug slider.*
 
+## What it does
+
 - **Now playing is the main thing:** Bluetooth song and artist, FM station and frequency, or the USB track, with an animated tape deck that only moves while music plays.
 - **BT / RADIO / USB keys switch the source and start playing in place**, with no app opening. Prev / Play / Next / Seek work for each source.
 - **Phone:** shows the connected phone and opens the stock phone app to call or switch phones.
