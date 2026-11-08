@@ -45,10 +45,12 @@ object Nge {
      */
     val spectrum = RectF(stage.left + 164f, stage.top + 160f, stage.right - 16f, stage.top + 198f)
 
-    /** Deck row: 468×164 keypad · 112 knob · 398 speed plate (`.deck` padding 10 px). */
-    val keypad = RectF(10f, deck.top + 10f, 478f, deck.top + 174f)
+    /** Deck row: 468×168 keypad · 112 knob · 398 speed plate (`.deck` padding 8 px vertical, 10 px sides). */
+    val keypad = RectF(10f, deck.top + 8f, 478f, deck.bottom - 8f)
     val knobArea = RectF(482f, deck.top + 8f, 610f, deck.bottom - 8f)
-    val knob = RectF(490f, deck.top + 8f, 602f, deck.top + 120f)     // 112 px dial
+    /** 112 px dial. Its VOLUME / value labels add 32 px below the dial, so the dial sits low in the
+     *  deck to centre the whole stack (mockup `.deck{align-items:center}`), not flush with the top. */
+    val knob = RectF(490f, deck.top + 20f, 602f, deck.top + 132f)
     val speed = RectF(616f, deck.top + 8f, 1014f, deck.bottom - 8f)  // 398×168
 
     // ── hex pads: two staggered rows, six over five ──
@@ -62,8 +64,12 @@ object Nge {
 
     val hexCenters: List<Pair<Float, Float>> = ArrayList<Pair<Float, Float>>(11).apply {
         val cx0 = keypad.centerX()
-        for (i in 0 until 6) add((cx0 - 2.5f * HEX_PITCH + i * HEX_PITCH) to (keypad.top + 8f + HEX_H / 2f))
-        for (i in 0 until 5) add((cx0 - 2f * HEX_PITCH + i * HEX_PITCH) to (keypad.top + 8f + HEX_H / 2f + HEX_PITCH))
+        // Two interlocking rows cover HEX_H + HEX_PITCH, which is 161 px in the 168 px box: centre
+        // the block instead of pinning it 8 px from the top, or the lower row hangs past the keypad
+        // box and lands 5 px off the bottom of the screen.
+        val cy1 = keypad.top + (keypad.height() - (HEX_H + HEX_PITCH)) / 2f + HEX_H / 2f
+        for (i in 0 until 6) add((cx0 - 2.5f * HEX_PITCH + i * HEX_PITCH) to cy1)
+        for (i in 0 until 5) add((cx0 - 2f * HEX_PITCH + i * HEX_PITCH) to (cy1 + HEX_PITCH))
     }
 
     /** Point-in-hexagon test (bounding boxes overlap at the interlocking edges). */

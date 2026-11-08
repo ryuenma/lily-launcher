@@ -150,7 +150,7 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
             SpeedZone.EMERGENCY -> "EMER"
             else -> "NORM"
         }
-        chip(c, 170f, 8f, 110f, 24f, zoneLabel, chipText,
+        chip(c, 186f, 8f, 110f, 24f, zoneLabel, chipText,
             if (zone == SpeedZone.NORMAL) withAlpha(ink(), .3f) else zoneAccent(),
             if (zone == SpeedZone.NORMAL) Color.TRANSPARENT else zoneAccent(),
             if (zone == SpeedZone.NORMAL) withAlpha(ink(), .65f) else Color.BLACK)
@@ -214,9 +214,10 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
 
         drawSeal(c, 866f, b.centerY(), 18f, zoneJp(), zoneEn(), onFill(), 12f, 7f, jpTrack = 2f)
 
+        // right-aligned on the banner's 12 px padding, flush with the rail's theme chip
         val rev = type.paint(9f, mono = true, track = 1f, align = Paint.Align.RIGHT)
-        c.text(rev, "REV 4.0", 980f, b.top + 22f, withAlpha(onFill(), .75f))
-        c.text(rev, "7IN · 1024×600", 980f, b.top + 40f, withAlpha(onFill(), .75f))
+        c.text(rev, "REV 4.0", 1012f, b.top + 22f, withAlpha(onFill(), .75f))
+        c.text(rev, "7IN · 1024×600", 1012f, b.top + 40f, withAlpha(onFill(), .75f))
     }
 
     /** Vertical hazard bars (the banner's `.bar` in the mockup). */
@@ -328,7 +329,8 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
         val trackX = l + 148f
         drawTrack(c, info, trackX, bodyTop, r - trackX)
 
-        drawProgress(c, v, l, r, s.top + 214f)
+        // 8 px above the cells, like the mockup's `.stage{gap:8px}` — they used to share an edge
+        drawProgress(c, v, l, r, s.top + 206f)
         drawCells(c, v, l, r, s.top + 244f)
     }
 
@@ -523,7 +525,9 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
             val inset = if (inverted) 30f else 22f
             c.text(nm, names[i], tr.left + inset, tr.centerY() + 5f, fg)
             c.text(st, status, tr.right - inset, tr.centerY() + 5f, if (active) fg else withAlpha(ink(), .8f))
-            c.text(jp, captions[i], tr.left + 4f, tr.bottom + 11f, withAlpha(ink(), .45f))
+            // caption in the 12 px seam under each trapezoid; +9 keeps its descender clear of the
+            // next node (and of the LAYER rows under the third one)
+            c.text(jp, captions[i], tr.left + 4f, tr.bottom + 9f, withAlpha(ink(), .45f))
         }
 
         val rows = listOf(
@@ -737,8 +741,10 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
         c.text(hd, "GROUND SPEED", r.left + 12f, r.top + 22f, withAlpha(ink(), .55f))
         val hj = type.paint(9f, jp = true, track = 1f)
         c.text(hj, "対地速度", r.left + 12f + hd.measureText("GROUND SPEED") + 10f, r.top + 22f, withAlpha(ink(), .85f))
+        // .speed .head .fix{margin-left:auto}: right-aligned to the plate's content edge, now that the
+        // seal has moved down out of the header row
         val fx = type.paint(9f, mono = true, track = .8f, align = Paint.Align.RIGHT)
-        c.text(fx, "GPS · 3D FIX", r.right - 130f, r.top + 22f, withAlpha(ink(), .8f))
+        c.text(fx, "GPS · 3D FIX", r.right - 12f, r.top + 22f, withAlpha(ink(), .8f))
 
         val num = String.format(Locale.US, "%03d", car.speedKmh.coerceIn(0, 999))
         val np = type.paint(124f, mono = true, track = -4f)
@@ -751,7 +757,9 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
         c.text(ul, "LIM " + String.format(Locale.US, "%03d", car.cautionThreshold()),
             r.left + 12f + numW + 12f, r.top + 100f, withAlpha(ink(), .45f))
 
-        drawSeal(c, r.right - 64f, r.top + 62f, 44f, zoneJp(), zoneEn(), ink(), 24f, 8f, jpTrack = 1f)
+        // .zone-seal{grid-row:2/4;align-self:center}: level with the readout, clear of the header row
+        // above and the 24-segment ladder below
+        drawSeal(c, r.right - 64f, r.top + 80f, 44f, zoneJp(), zoneEn(), ink(), 24f, 8f, jpTrack = 1f)
 
         drawLadder(c, r.left + 12f, r.top + 136f, r.width() - 24f)
     }

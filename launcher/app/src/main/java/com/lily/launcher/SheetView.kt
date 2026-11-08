@@ -115,6 +115,15 @@ class SheetView(ctx: Context, private val ui: Ui, private val car: Car,
         c.drawRect(r, line)
     }
 
+    /**
+     * CSS `align-items:center` for a single line: centre the glyph box in [h]. The three header
+     * strings are different sizes, so a hand-picked baseline makes the small ones sit low.
+     */
+    private fun mid(p: Paint, top: Float, h: Float): Float {
+        val fm = p.fontMetrics
+        return top + (h - (fm.descent - fm.ascent)) / 2f - fm.ascent
+    }
+
     private fun header(c: Canvas, r: RectF, title: String, jp: String, meta: String) {
         tmp.set(r.left, r.top, r.right, r.top + 46f)
         fill.color = accent()
@@ -123,11 +132,11 @@ class SheetView(ctx: Context, private val ui: Ui, private val car: Car,
         c.drawRect(tmp.left, tmp.bottom - 2f, tmp.right, tmp.bottom, fill)
 
         val t = type.paint(16f, track = 5f, weight = 700)                    // .sheet-hd .t
-        c.text(t, title, r.left + 14f, r.top + 30f, onFill())
+        c.text(t, title, r.left + 14f, mid(t, r.top, 46f), onFill())
         val j = type.paint(12f, jp = true, track = 3f, weight = 700)         // .sheet-hd .j
-        c.text(j, jp, r.left + 14f + t.measureText(title) + 12f, r.top + 29f, withAlpha(onFill(), .85f))
+        c.text(j, jp, r.left + 14f + t.measureText(title) + 12f, mid(j, r.top, 46f), withAlpha(onFill(), .85f))
         val m = type.paint(9f, mono = true, track = 1.4f, align = Paint.Align.RIGHT)
-        c.text(m, meta, r.right - 14f - 52f, r.top + 28f, withAlpha(onFill(), .75f))
+        c.text(m, meta, r.right - 14f - 52f, mid(m, r.top, 46f), withAlpha(onFill(), .75f))
 
         val x = RectF(r.right - 14f - 44f, r.top + 1f, r.right - 14f, r.top + 45f)
         fill.color = Color.BLACK
@@ -154,11 +163,13 @@ class SheetView(ctx: Context, private val ui: Ui, private val car: Car,
         footer(c, r, pressed?.let { "SELECT // 選択" } ?: "READY // 待機")
 
         val tw = 106f
-        val th = 100f
+        val th = 108f          // 88 px hex + label + jp sub-label, so nothing hangs past the tile
         val gx = 8f
         val gy = 4f
+        val rows = (more.size + 4) / 5
+        val gridH = rows * th + (rows - 1) * gy
         val x0 = r.left + (r.width() - (5 * tw + 4 * gx)) / 2f
-        val y0 = r.top + 46f + 24f
+        val y0 = r.top + 46f + (r.bottom - 32f - (r.top + 46f) - gridH) / 2f
         more.forEachIndexed { i, m ->
             val col = i % 5
             val row = i / 5
@@ -170,11 +181,11 @@ class SheetView(ctx: Context, private val ui: Ui, private val car: Car,
 
     private fun tile(c: Canvas, x: Float, y: Float, w: Float, h: Float, i: Int, label: String, jp: String) {
         val cx = x + w / 2f
-        val cy = y + 40f
+        val cy = y + 46f
         val down = pressed == "tile:$i"
         val shift = if (down) 2f else 0f
 
-        Nge.hexPath(path, cx, cy + shift, 40f, 45f)
+        Nge.hexPath(path, cx, cy + shift, 39f, 44f)
         fill.color = if (down) withAlpha(accent(), .22f) else Color.BLACK
         c.drawPath(path, fill)
         line.strokeWidth = if (down) 2f else 1.5f
@@ -185,9 +196,9 @@ class SheetView(ctx: Context, private val ui: Ui, private val car: Car,
         tileIcon(c, i, cx, cy + shift, col)
 
         val lp = type.paint(9.5f, track = 1.2f, align = Paint.Align.CENTER, weight = 600)
-        c.text(lp, label, cx, y + 92f + shift, col)
+        c.text(lp, label, cx, y + 100f + shift, col)
         val jpP = type.paint(8f, jp = true, track = 1f, align = Paint.Align.CENTER, weight = 700)
-        c.text(jpP, jp, cx, y + 104f + shift, if (down) withAlpha(accent(), .8f) else withAlpha(ink(), .45f))
+        c.text(jpP, jp, cx, y + 107f + shift, if (down) withAlpha(accent(), .8f) else withAlpha(ink(), .45f))
 
         hot.add(Hot("tile:$i", RectF(x, y, x + w, y + h)))
     }
@@ -300,7 +311,7 @@ class SheetView(ctx: Context, private val ui: Ui, private val car: Car,
                 path.lineTo(cx + 18f, cy + 8f); path.lineTo(cx + 18f, cy - 14f); path.close()
                 c.drawPath(path, line)
                 val mp = type.paint(12f, mono = true, align = Paint.Align.CENTER)
-                c.text(mp, "M", cx, cy + 6f, ink())
+                c.text(mp, "M", cx, cy + 6f, col)
             }
             14 -> { // restart: circular arrow
                 tmp.set(cx - 20f, cy - 20f, cx + 20f, cy + 20f)
