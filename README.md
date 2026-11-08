@@ -2,27 +2,43 @@
 
 My car has a Chinese-made Android head unit (NWD K2501, Allwinner T507, Android 10, 1024×600). It works, but I hated how its stock home screen looked every single time I got in. So I built my own: **a native Android launcher that replaces it**, drawn in the visual language of Neon Genesis Evangelion's NERV terminal interface.
 
-| Before: the stock home screen | After: Lily |
+## Before vs After
+
+| Before: stock home screen | After: Lily (NGE terminal) |
 |---|---|
-| ![Stock home screen of the head unit](docs/before-stock.jpg) | ![Lily, day theme](docs/screenshot-day.png) |
+| ![Stock home screen](docs/before-stock.jpg) | ![Lily, day theme](docs/screenshot-day.png) |
 
-*Left: the head unit's stock launcher, shown for comparison. Right: Lily rendering the NGE terminal interface on the unit.*
-
-It puts what's playing in the middle of the screen, hexagonal keys under it, a speed-aware color palette that shifts as you drive (green → yellow → red), and gets out of the way when Android Auto, a call, or the reverse camera takes over. At night (17:00–05:00) it switches to a dark theme, manually overridable:
-
-![Lily, night theme](docs/screenshot-night.png)
-
-**Watch the 25-second launch trailer** (a straight-faced keynote parody; every number in it is measured, and the fine print is honest):
-
-[![Watch the trailer](docs/trailer-poster.jpg)](docs/lily-launcher-trailer.mp4)
+*Left: the head unit's stock launcher. Right: Lily rendering the NGE terminal interface on the unit (1024×600, 160 dpi).*
 
 ## Screenshots
 
-| Normal (day) | More sheet | Settings sheet |
+All captures are from the real K2501 head unit (1024×600) or the 1024×600 emulator.
+
+| Normal (day) | More sheet (15 tiles) | Settings sheet |
 |---|---|---|
 | ![Lily, day theme](docs/screenshot-day.png) | ![Lily, More sheet](docs/screenshot-more.png) | ![Lily, Settings sheet](docs/screenshot-settings.png) |
 
-*Captured on the 1024×600 emulator at 160 dpi. Speed zones (caution/emergency) can be tested with the debug slider.*
+*Captured on the 1024×600 emulator at 160 dpi.*
+
+### Mockup simulator (HTML reference)
+
+The canonical mockup (`mockup/nge-terminal-deepseek-v4.html`) includes a simulator panel for testing all states:
+
+| Tape (day) | Tape (night) | Radio | USB |
+|---|---|---|---|
+| ![Tape day](docs/screenshots/mockup-tape-day.png) | ![Tape night](docs/screenshots/mockup-tape-night.png) | ![Radio](docs/screenshots/mockup-radio.png) | ![USB](docs/screenshots/mockup-usb.png) |
+
+| Android Auto | Reverse camera | Incoming call | More sheet |
+|---|---|---|---|
+| ![AA connected](docs/screenshots/mockup-aa-connected.png) | ![Reverse](docs/screenshots/mockup-reverse.png) | ![Incoming call](docs/screenshots/mockup-incoming-call.png) | ![More sheet](docs/screenshots/mockup-more-sheet.png) |
+
+| Settings sheet | Empty (no BT) |
+|---|---|
+| ![Settings sheet](docs/screenshots/mockup-settings-sheet.png) | ![Empty](docs/screenshots/mockup-empty.png) |
+
+### Animations (GIF demos)
+
+*Coming soon — GIF files demonstrating the speed-zone transitions, hazard stripe march, ticker scroll, warning pulse, and day/night toggle will be added here.*
 
 ## What it does
 
@@ -31,7 +47,7 @@ It puts what's playing in the middle of the screen, hexagonal keys under it, a s
 - **Phone:** shows the connected phone and opens the stock phone app to call or switch phones.
 - **Android Auto / CarPlay** (via the unit's zlink app) opens by itself when the phone connects, but never over the reverse camera or a call.
 - **Starts the music when the phone connects** (can be turned off in Home settings).
-- **Speed-aware palette:** green below 60 km/h, yellow (caution) 60–100 km/h, red (emergency) above 100 km/h. Hazard stripes, a scrolling ticker, and a pulsing fullscreen warning overlay activate in caution/emergency zones. Thresholds configurable.
+- **Speed-aware palette:** green below 60 km/h, yellow (caution) 60-100 km/h, red (emergency) above 100 km/h. Hazard stripes, a scrolling ticker, and a pulsing fullscreen warning overlay activate in caution/emergency zones. Thresholds configurable.
 - **Day/night mode:** time-based (17:00 night, 05:00 morning), toggleable AUTO/MANUAL. Headlight override if available.
 - **Volume knob** that follows your finger and shows the real stereo volume.
 - **MAGI system:** three trapezoid indicators (Melchior/Balthasar/Casper) mapping to BT/RADIO/USB, with inverted middle node.
@@ -42,8 +58,8 @@ It puts what's playing in the middle of the screen, hexagonal keys under it, a s
 
 The unit's only WebView is from 2019, so it can't render the mockup's CSS. Instead of a WebView app:
 
-1. The design lives in `mockup/nge-terminal-deepseek-v4.html` (the canonical mockup), which you can open in any browser. It has a simulator panel to fake signals (phone plugged in, reverse gear, headlights, speed…).
-2. The Kotlin app draws the NGE terminal interface directly on `View + Canvas` — no baked images, no WebView, no AndroidX, no libraries. Colors are driven by a speed-zone palette enum (green/yellow/red). All geometry comes from `Nge.kt` constants.
+1. The design lives in `mockup/nge-terminal-deepseek-v4.html` (the canonical mockup), which you can open in any browser. It has a simulator panel to fake signals (phone plugged in, reverse gear, headlights, speed...).
+2. The Kotlin app draws the NGE terminal interface directly on `View + Canvas` - no baked images, no WebView, no AndroidX, no libraries. Colors are driven by a speed-zone palette enum (green/yellow/red). All geometry comes from `Nge.kt` constants.
 3. It talks to the head unit the way the stock launcher does: broadcasts, `Settings.System` values, and two vendor AIDL services called with raw binder transactions. See [docs/INTEGRATION.md](docs/INTEGRATION.md).
 
 ## Repo layout
@@ -66,7 +82,7 @@ cd launcher
 
 Fonts are bundled in `launcher/app/src/main/assets/fonts/`: Oswald, Shippori Mincho B1, Saira Extra Condensed, JetBrains Mono (all OFL-licensed).
 
-## Install on a head unit — read this first
+## Install on a head unit - read this first
 
 This is **experimental software for one specific device and firmware**. It needs root ADB over Wi-Fi and changes system settings. I only tested it on my own NWD K2501 (Android 10). Use it at your own risk, and nothing here is meant to be used while driving.
 
@@ -82,15 +98,15 @@ What `install.sh` changes: installs the app; grants it the `SYSTEM_ALERT_WINDOW`
 
 ## Known issues
 
-Tested on the NWD K2501 head unit (Android 10, 1024×600). The following are known limitations:
+Tested on the NWD K2501 head unit (Android 10, 1024x600). The following are known limitations:
 
-- **Auto day/night cycle** — fixed in latest build (clock tick now re-evaluates time-based switching). Previously only worked on manual toggle.
-- **Night brightness** — LCD contrast/saturation set to 40 at night (was 50). May still be too bright for some; adjustable via `PANEL_DAY` constant in `Car.kt`.
-- **Android Auto / CarPlay reopen** — pressing Home and then AUTO hex should now bring zlink back to foreground (added `REORDER_TO_FRONT`). If it still doesn't reopen, the zlink app may need to be restarted.
-- **Play/Pause delay** — 1–2 second delay when pressing Play/Pause is a vendor AIDL service limitation, not a launcher bug. The launcher sends the command immediately; the vendor BT service processes it with delay.
-- **CarPlay "No title"** — when CarPlay is active, audio metadata (title/artist) is not recognized by the launcher. The music plays correctly, but the launcher shows "No title". This is because CarPlay audio goes through a different path (zlink app) that the launcher doesn't monitor. Fix would require monitoring zlink's audio broadcasts.
-- **Music playback choppiness** — occasional choppiness during Bluetooth/Android Auto playback is a Bluetooth/AA issue, not a launcher issue.
-- **GPS speed** — works correctly on the head unit. Emulator has no GPS speed simulation.
+- **Auto day/night cycle** - fixed in latest build (clock tick now re-evaluates time-based switching). Previously only worked on manual toggle.
+- **Night brightness** - LCD contrast/saturation set to 40 at night (was 50). May still be too bright for some; adjustable via `PANEL_DAY` constant in `Car.kt`.
+- **Android Auto / CarPlay reopen** - pressing Home and then AUTO hex should now bring zlink back to foreground (added `REORDER_TO_FRONT`). If it still doesn't reopen, the zlink app may need to be restarted.
+- **Play/Pause delay** - 1-2 second delay when pressing Play/Pause is a vendor AIDL service limitation, not a launcher bug. The launcher sends the command immediately; the vendor BT service processes it with delay.
+- **CarPlay "No title"** - when CarPlay is active, audio metadata (title/artist) is not recognized by the launcher. The music plays correctly, but the launcher shows "No title". This is because CarPlay audio goes through a different path (zlink app) that the launcher doesn't monitor. Fix would require monitoring zlink's audio broadcasts.
+- **Music playback choppiness** - occasional choppiness during Bluetooth/Android Auto playback is a Bluetooth/AA issue, not a launcher issue.
+- **GPS speed** - works correctly on the head unit. Emulator has no GPS speed simulation.
 
 ## Privacy and permissions
 
@@ -101,9 +117,9 @@ Tested on the NWD K2501 head unit (Android 10, 1024×600). The following are kno
 
 ## Credits
 
-- **Design inspiration:** [NERV UI](https://github.com/TheGreatGildo/nerv-ui) — NERV Operations Console design system (MIT). [idrive7-EVAHUD](https://github.com/PenguinDukeYDAuto/idrive7-EVAHUD) — EVA HUD for BMW iDrive 7 (MIT).
+- **Design inspiration:** [NERV UI](https://github.com/TheGreatGildo/nerv-ui) - NERV Operations Console design system (MIT). [idrive7-EVAHUD](https://github.com/PenguinDukeYDAuto/idrive7-EVAHUD) - EVA HUD for BMW iDrive 7 (MIT).
 - **Upstream launcher:** [calm-launcher](https://github.com/speghetimafia/calm-launcher) (forked, MIT).
-- **Visual style:** Neon Genesis Evangelion (khara) — NERV terminal interface design language.
+- **Visual style:** Neon Genesis Evangelion (khara) - NERV terminal interface design language.
 - **Fonts:** Oswald, Shippori Mincho B1, Saira Extra Condensed, JetBrains Mono (all SIL OFL 1.1).
 - **Trailer music:** "Happy Beats / Business Moves" by [ende.app](https://ende.app) (CC BY 4.0). Sound effects from [Kenney](https://kenney.nl) (CC0). Made with [Hyperframes](https://hyperframes.heygen.com/).
 
