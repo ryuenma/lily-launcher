@@ -1,6 +1,6 @@
-# Lily: I hated my car's infotainment screen, so I replaced it
+# Lily: NERV's MAGI Terminal Access, in your car. (For NWD K2501).
 
-My car has a Chinese-made Android head unit (NWD K2501, Allwinner T507, Android 10, 1024x600). It works, but I hated how its stock home screen looked every single time I got in. So I built my own: **a native Android launcher that replaces it**, drawn in the visual language of Neon Genesis Evangelion's NERV terminal interface.
+My car has a Chinese-made Android head unit (NWD K2501, Allwinner T507, Android 10, 1024x600). It works, but is so laggy. i debloated the android, and made my own launcher. **a native Android launcher that replaces it**, drawn in the visual language of Neon Genesis Evangelion's NERV terminal interface.
 
 ## Before vs After
 
