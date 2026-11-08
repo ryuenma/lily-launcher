@@ -38,7 +38,10 @@ class HomeActivity : Activity() {
     private lateinit var stage: Stage
 
     private val clock = object : BroadcastReceiver() {
-        override fun onReceive(c: Context, i: Intent) = stage.home.invalidate()
+        override fun onReceive(c: Context, i: Intent) {
+            car.updateDayNight()
+            stage.home.invalidate()
+        }
     }
     private val refresh: () -> Unit = { stage.render() }
 

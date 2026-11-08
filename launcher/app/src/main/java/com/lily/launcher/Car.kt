@@ -46,6 +46,9 @@ class Car(private val app: Context) {
     var reverse = false; private set
     // ── day/night mode (time-based, AUTO/MANUAL) ──
     var dayNightMode = "auto"; private set
+    /** Called on clock tick to re-evaluate time-based day/night in AUTO mode. */
+    fun updateDayNight() { readSettings() }
+
     fun setDayNightMode(mode: String) {
         dayNightMode = mode
         prefs.edit().putString("dayNightMode", mode).apply()
@@ -182,7 +185,7 @@ class Car(private val app: Context) {
      * on start, at ignition-on and when the headlights switch.
      */
     private fun applyPanel() = io.post {
-        val v = if (night) 50 else PANEL_DAY
+        val v = if (night) 40 else PANEL_DAY
         for (f in listOf("lcd_contrast", "lcd_satuation")) {
             try { java.io.File("/sys/devices/virtual/disp/disp/attr/$f").writeText("$v") } catch (e: Exception) { Log.w(TAG, "panel $f", e) }
         }
@@ -467,7 +470,8 @@ class Car(private val app: Context) {
     fun launch(component: String) {
         val cn = ComponentName.unflattenFromString(component) ?: return
         try {
-            app.startActivity(Intent(Intent.ACTION_MAIN).setComponent(cn).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            app.startActivity(Intent(Intent.ACTION_MAIN).setComponent(cn)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_SINGLE_TOP))
         } catch (e: Exception) { Log.w(TAG, "launch $component", e) }
     }
 
