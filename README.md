@@ -118,7 +118,7 @@ Tested on the NWD K2501 head unit (Android 10, 1024x600). The following are know
 ## Credits
 
 - **Design inspiration:** [NERV UI](https://github.com/TheGreatGildo/nerv-ui) - NERV Operations Console design system (MIT). [idrive7-EVAHUD](https://github.com/PenguinDukeYDAuto/idrive7-EVAHUD) - EVA HUD for BMW iDrive 7 (MIT).
-- **Upstream launcher:** [calm-launcher](https://github.com/speghetimafia/calm-launcher) (forked, MIT).
+- **Upstream launcher:** forked from an open-source Android launcher (MIT).
 - **Visual style:** Neon Genesis Evangelion (khara) - NERV terminal interface design language.
 - **Fonts:** Oswald, Shippori Mincho B1, Saira Extra Condensed, JetBrains Mono (all SIL OFL 1.1).
 - **Trailer music:** "Happy Beats / Business Moves" by [ende.app](https://ende.app) (CC BY 4.0). Sound effects from [Kenney](https://kenney.nl) (CC0). Made with [Hyperframes](https://hyperframes.heygen.com/).
