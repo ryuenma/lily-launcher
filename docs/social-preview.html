@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<!--
+  Source for docs/social-preview.png (1280×640 Open Graph image).
+  Render from the lily-launcher repo root:
+    python3 -m http.server 8765
+    "C:/Program Files/Google/Chrome/Application/chrome.exe" --headless=new --disable-gpu \
+      --hide-scrollbars --force-device-scale-factor=2 --window-size=1280,640 \
+      --screenshot=out@2x.png http://127.0.0.1:8765/docs/social-preview.html
+  then downscale out@2x.png to 1280×640 (Lanczos) and save as docs/social-preview.png.
+  Uses the launcher's bundled OFL fonts; no webfonts, no network.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Lily Launcher — social preview 1280×640</title>
+<style>
+/* ------------------------------------------------------------------ fonts
+   The same files the Android launcher ships. Oswald is variable (200-700),
+   Shippori Mincho B1 is the ExtraBold instance, JetBrains Mono is Bold. */
+@font-face{font-family:"Oswald";src:url("../launcher/app/src/main/assets/fonts/Oswald.ttf") format("truetype");font-weight:200 700;font-style:normal;}
+@font-face{font-family:"Shippori";src:url("../launcher/app/src/main/assets/fonts/ShipporiMinchoB1.ttf") format("truetype");font-weight:800;font-style:normal;}
+@font-face{font-family:"JBMono";src:url("../launcher/app/src/main/assets/fonts/JetBrainsMono-Bold.ttf") format("truetype");font-weight:700;font-style:normal;}
+
+:root{
+  --bg:#0a0a12;
+  --text:#b9afcb;
+  --accent:#ff4a1c;
+  --green:#4de89a;
+  --yellow:#f5b400;
+  --red:#e31c23;
+  --rule:rgba(77,232,154,.20);
+  --dim:rgba(185,175,203,.55);
+  --faint:rgba(185,175,203,.14);
+  --font-en:"Oswald","Arial Narrow",sans-serif;
+  --font-jp:"Shippori","Yu Mincho",serif;
+  --font-mono:"JBMono","Consolas",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:1280px;height:640px;overflow:hidden;background:var(--bg);}
+body{
+  font-family:var(--font-en);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:geometricPrecision;
+}
+.poster{position:relative;width:1280px;height:640px;overflow:hidden;background:var(--bg);}
+
+/* background A.T. field honeycomb */
+.hny{position:absolute;inset:0;color:var(--green);opacity:.062;pointer-events:none;}
+
+/* ------------------------------------------------------------------ rail */
+.rail{
+  position:absolute;left:0;right:0;top:0;height:34px;z-index:5;
+  display:flex;align-items:center;gap:16px;padding:0 40px 0 48px;
+  background:#000;border-bottom:1px solid var(--rule);
+  font-size:9.5px;font-weight:600;letter-spacing:2.4px;text-transform:uppercase;color:var(--green);
+  white-space:nowrap;
+}
+.dot{width:6px;height:6px;background:var(--green);flex:none;}
+.rail .jp{font-family:var(--font-jp);font-weight:800;letter-spacing:1.4px;font-size:9px;opacity:.5;}
+.rail .mid{
+  position:absolute;left:50%;transform:translateX(-50%);
+  font-family:var(--font-jp);font-weight:800;letter-spacing:3px;font-size:9px;opacity:.48;
+}
+.rail .right{margin-left:auto;display:flex;align-items:center;gap:14px;}
+.clock{font-family:var(--font-mono);font-size:13px;font-weight:700;letter-spacing:1px;}
+.clock small{font-size:7px;opacity:.45;margin-left:4px;letter-spacing:1px;}
+.theme-chip{border:1px solid var(--green);padding:3px 7px;font-size:8px;letter-spacing:1.8px;font-weight:600;}
+.theme-chip b{font-family:var(--font-mono);font-weight:700;letter-spacing:.5px;}
+
+/* ------------------------------------------------------------------ left copy block */
+.left{position:absolute;left:48px;top:74px;width:440px;z-index:4;}
+.eyebrow{display:flex;align-items:center;gap:9px;height:12px;white-space:nowrap;}
+.eyebrow .bar{width:26px;height:3px;background:var(--accent);flex:none;}
+.eyebrow .en{font-size:9.5px;font-weight:600;letter-spacing:3px;color:var(--accent);text-transform:uppercase;}
+.eyebrow .jp{font-family:var(--font-jp);font-weight:800;font-size:9px;letter-spacing:1.6px;color:var(--dim);}
+
+h1.title{margin-top:12px;font-weight:700;font-size:96px;line-height:.84;letter-spacing:.5px;text-transform:uppercase;}
+h1.title .a{display:block;color:var(--text);}
+h1.title .b{display:block;color:var(--accent);}
+
+.jp-title{
+  margin-top:16px;font-family:var(--font-jp);font-weight:800;font-size:27px;
+  letter-spacing:3.4px;color:var(--text);opacity:.92;line-height:1.15;white-space:nowrap;
+}
+.jp-title i{font-style:normal;color:var(--accent);opacity:.9;margin-right:10px;}
+
+.subtitle{
+  margin-top:16px;font-size:26px;font-weight:600;letter-spacing:1.2px;line-height:1.2;
+  color:var(--text);opacity:1;text-transform:uppercase;
+}
+
+/* feature list */
+.features{margin-top:16px;list-style:none;border-bottom:1px solid var(--faint);}
+.feat{display:flex;align-items:center;gap:12px;height:44px;border-top:1px solid var(--faint);}
+.feat .mark{width:10px;height:10px;background:var(--green);flex:none;}
+.feat .lab{font-size:14px;font-weight:600;letter-spacing:1.7px;text-transform:uppercase;color:var(--text);}
+.feat .val{margin-left:auto;font-family:var(--font-mono);font-size:9.5px;font-weight:700;letter-spacing:.4px;color:rgba(185,175,203,.78);white-space:nowrap;}
+.chips{display:flex;gap:4px;}
+.chips i{width:11px;height:11px;display:block;}
+
+/* ------------------------------------------------------------------ right panel */
+.panel{position:absolute;left:520px;top:74px;width:720px;z-index:4;}
+.panel-head{display:flex;align-items:baseline;height:15px;margin-bottom:7px;padding:0 2px;
+  font-family:var(--font-mono);font-size:9px;font-weight:700;letter-spacing:1.4px;color:var(--green);opacity:.78;}
+.panel-head .l{display:flex;align-items:center;gap:7px;}
+.panel-head .l .dot{width:5px;height:5px;}
+.panel-head .r{margin-left:auto;}
+
+.bezel{position:relative;background:#050509;border:1px solid rgba(77,232,154,.34);padding:7px;}
+.bezel .note{
+  display:flex;align-items:center;height:24px;margin-top:7px;padding:0 8px;
+  background:#000;border:1px solid rgba(77,232,154,.16);
+  font-family:var(--font-mono);font-size:8px;font-weight:700;letter-spacing:1.2px;color:var(--green);opacity:.68;
+}
+.bezel .note .r{margin-left:auto;}
+.slot{position:relative;width:704px;height:412.5px;overflow:hidden;background:#0b0b13;}
+
+/* corner brackets */
+.corner{position:absolute;width:11px;height:11px;border:0 solid var(--green);opacity:.55;}
+.corner.tl{left:-1px;top:-1px;border-left-width:2px;border-top-width:2px;}
+.corner.tr{right:-1px;top:-1px;border-right-width:2px;border-top-width:2px;}
+.corner.bl{left:-1px;bottom:-1px;border-left-width:2px;border-bottom-width:2px;}
+.corner.br{right:-1px;bottom:-1px;border-right-width:2px;border-bottom-width:2px;}
+
+.panel-foot{display:flex;align-items:center;margin-top:9px;padding:0 2px;
+  font-family:var(--font-mono);font-size:8.5px;font-weight:700;letter-spacing:1.2px;color:var(--dim);opacity:.7;}
+.panel-foot .r{margin-left:auto;}
+
+/* ------------------------------------------------------------------ footer */
+.foot{
+  position:absolute;left:0;right:0;bottom:0;height:34px;z-index:5;
+  display:flex;align-items:center;gap:14px;padding:0 40px 0 48px;
+  background:#000;border-top:1px solid var(--rule);
+  font-family:var(--font-mono);font-size:9px;font-weight:700;letter-spacing:1.2px;color:var(--green);opacity:.8;
+  white-space:nowrap;
+}
+.foot .jp{font-family:var(--font-jp);font-weight:800;letter-spacing:2.4px;font-size:9px;opacity:.7;}
+.foot .r{margin-left:auto;color:var(--text);opacity:.9;font-size:10px;}
+
+/* ==================================================================
+   THE SCREEN — 1024×600 replica, scaled into the panel
+   ================================================================== */
+.screen{
+  --bg:#0b0b13;--panel:#050509;
+  --ink:#4de89a;--ink-2:#f5b400;--ink-dim:#2c7252;
+  --alert:#ff4a1c;--alert-2:#e31c23;
+  --rule:rgba(77,232,154,.28);
+  --on-fill:#000;
+  --accent:#ff4a1c;
+  --button:#b9afcb;
+  --font-jp:"Shippori",serif;
+  --font-en:"Oswald",sans-serif;
+  --font-mono:"JBMono",monospace;
+  position:absolute;left:0;top:0;
+  width:1024px;height:600px;
+  transform:scale(.6875);transform-origin:top left;
+  background:var(--bg);color:var(--ink);
+  font-family:var(--font-en);font-size:12px;line-height:1.2;
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.screen *{animation:none!important;transition:none!important;}
+.screen .honeycomb{position:absolute;inset:0;color:var(--ink);opacity:.075;pointer-events:none;z-index:0;}
+
+/* rail */
+.s-rail{height:32px;flex:none;position:relative;z-index:2;display:flex;align-items:center;gap:14px;padding:0 12px;
+  background:#000;border-bottom:1px solid var(--rule);font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;}
+.s-rail .jp{font-family:var(--font-jp);font-style:normal;opacity:.5;letter-spacing:1px;font-weight:800;}
+.s-rail .mid{flex:1;text-align:center;opacity:.55;white-space:nowrap;font-family:var(--font-jp);letter-spacing:2.5px;font-weight:800;}
+.s-rail .clock{font-family:var(--font-mono);font-size:14px;font-weight:700;letter-spacing:1px;color:var(--ink);}
+.s-rail .clock small{font-size:8px;opacity:.45;letter-spacing:1px;margin-left:4px;}
+.lamp-chip{border:1px solid var(--ink-dim);padding:3px 7px;font-size:8px;letter-spacing:1.6px;font-weight:600;white-space:nowrap;opacity:.65;}
+.theme-chip2{border:1px solid var(--ink);padding:3px 7px;font-size:8px;letter-spacing:1.6px;font-weight:600;white-space:nowrap;}
+.theme-chip2 b{font-weight:700;font-family:var(--font-mono);font-size:8px;}
+
+/* banner */
+.banner{height:42px;flex:none;position:relative;z-index:2;display:flex;align-items:center;gap:14px;padding:0 12px;
+  background:var(--alert);color:var(--on-fill);border-bottom:2px solid #000;}
+.banner .bar{width:52px;height:14px;flex:none;background:repeating-linear-gradient(90deg,currentColor 0 3px,transparent 3px 7px);opacity:.85;}
+.banner .title{flex:1;text-align:center;font-weight:700;font-size:15px;letter-spacing:5px;text-transform:uppercase;white-space:nowrap;overflow:hidden;}
+.banner .rev{font-family:var(--font-mono);font-size:8px;letter-spacing:1px;opacity:.75;text-align:right;line-height:1.4;flex:none;}
+
+/* main */
+.main{height:338px;flex:none;position:relative;z-index:2;display:grid;grid-template-columns:152px 18px 1fr 216px;
+  border-bottom:1px solid var(--rule);overflow:hidden;}
+.telemetry{padding:10px;border-right:1px solid var(--rule);display:flex;flex-direction:column;gap:5px;}
+.col-head{display:flex;justify-content:space-between;align-items:baseline;font-size:8px;letter-spacing:2.4px;opacity:.55;text-transform:uppercase;border-bottom:1px solid var(--rule);padding-bottom:3px;margin-bottom:2px;}
+.col-head span:last-child{font-family:var(--font-jp);font-weight:800;letter-spacing:1px;font-size:7px;opacity:.9;}
+.trow{border-left:2px solid var(--ink-dim);padding:3px 0 3px 6px;}
+.trow .k{font-size:7px;letter-spacing:1.8px;opacity:.45;text-transform:uppercase;}
+.trow .v{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.4px;white-space:nowrap;overflow:hidden;}
+.signals{display:flex;align-items:flex-end;gap:2px;height:22px;margin-top:auto;}
+.signals i{width:4px;background:var(--ink);opacity:.8;}
+.signals i:nth-child(4n){opacity:.25;}
+.sig-note{font-size:7px;letter-spacing:1.6px;opacity:.4;margin-top:3px;}
+
+.jp-band{writing-mode:vertical-rl;text-orientation:upright;background:#000;border-right:1px solid var(--rule);
+  display:flex;align-items:center;justify-content:center;font-family:var(--font-jp);font-weight:800;font-size:9px;letter-spacing:5px;color:var(--alert);opacity:.85;}
+
+.stage{padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-width:0;border-right:1px solid var(--rule);position:relative;}
+.stage-head{display:flex;align-items:center;gap:8px;height:18px;flex:none;padding-right:68px;}
+.stage-head .lab{font-size:9px;letter-spacing:2.6px;font-weight:600;text-transform:uppercase;}
+.stage-head .sp{flex:1;height:1px;background:var(--rule);}
+.chip{border:1px solid var(--ink-dim);padding:2px 6px;font-size:7.5px;letter-spacing:1.4px;font-family:var(--font-mono);white-space:nowrap;}
+.stage-body{flex:1;display:flex;gap:14px;min-height:0;}
+.album{width:118px;flex:none;display:flex;align-items:center;}
+.album svg{width:118px;height:128px;display:block;}
+.album .kanji{font-family:var(--font-jp);font-weight:800;font-size:42px;fill:var(--ink);}
+.album .sub{font-family:var(--font-mono);font-size:7px;letter-spacing:1px;fill:var(--ink);opacity:.6;}
+.track{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:4px;}
+.track .kicker{font-size:8px;letter-spacing:2.4px;opacity:.5;text-transform:uppercase;}
+.track .title{font-size:32px;font-weight:600;letter-spacing:.5px;line-height:1;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.track .artist{font-family:var(--font-jp);font-weight:800;font-size:15px;letter-spacing:1px;opacity:.82;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.track .albumname{font-size:8px;letter-spacing:2px;opacity:.4;text-transform:uppercase;}
+.spectrum{display:flex;align-items:flex-end;gap:3px;height:28px;margin-top:5px;padding-bottom:3px;border-bottom:1px solid var(--rule);width:max-content;}
+.spectrum i{width:4px;background:var(--ink);opacity:.9;}
+.prog{flex:none;height:30px;display:flex;flex-direction:column;gap:4px;}
+.prog-meta{display:flex;align-items:baseline;gap:8px;font-family:var(--font-mono);font-size:9px;letter-spacing:.5px;}
+.prog-meta .pl{font-family:var(--font-en);letter-spacing:2px;font-size:7.5px;opacity:.5;flex:1;}
+.prog-meta .len{opacity:.45;}
+.prog-bar{height:6px;background:#000;border:1px solid var(--ink-dim);position:relative;}
+.prog-bar i{display:block;height:100%;background:var(--accent);width:41%;}
+.prog-bar::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 19px,rgba(0,0,0,.55) 19px 20px);}
+.cells{flex:none;height:40px;display:grid;grid-template-columns:repeat(4,1fr);gap:5px;}
+.cell{border:1px solid var(--rule);padding:3px 6px;min-width:0;}
+.cell .k{font-size:6.5px;letter-spacing:1.6px;opacity:.45;text-transform:uppercase;}
+.cell .v{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:.4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.seal{position:absolute;right:14px;top:0;background:var(--ink);clip-path:polygon(30% 0,70% 0,100% 30%,100% 70%,70% 100%,30% 100%,0 70%,0 30%);padding:2px;transform:rotate(-5deg);z-index:3;}
+.seal>div{clip-path:inherit;background:#000;padding:4px 9px;text-align:center;font-family:var(--font-jp);font-weight:800;font-size:9.5px;letter-spacing:2px;line-height:1.15;color:var(--ink);}
+.seal small{display:block;font-family:var(--font-en);font-size:5.5px;letter-spacing:1.2px;font-weight:600;opacity:.6;}
+
+/* MAGI */
+.magi-col{padding:10px;display:flex;flex-direction:column;gap:4px;min-width:0;}
+.magi-head{display:flex;justify-content:space-between;align-items:baseline;font-size:8px;letter-spacing:2.2px;opacity:.55;text-transform:uppercase;border-bottom:1px solid var(--rule);padding-bottom:3px;margin-bottom:3px;}
+.magi-head span:last-child{font-family:var(--font-jp);font-weight:800;letter-spacing:1px;font-size:7px;}
+.magi{margin-bottom:2px;}
+.trap{height:44px;background:var(--ink-dim);padding:2px;clip-path:polygon(9% 0,91% 0,100% 100%,0 100%);}
+.magi.inv .trap{clip-path:polygon(0 0,100% 0,91% 100%,9% 100%);}
+.trap .in{clip-path:inherit;background:#000;height:100%;display:flex;align-items:center;justify-content:space-between;padding:0 12px;gap:6px;}
+.trap .nm{font-size:11px;font-weight:600;letter-spacing:1.8px;white-space:nowrap;}
+.trap .st{font-family:var(--font-mono);font-size:9.5px;font-weight:700;letter-spacing:.6px;white-space:nowrap;opacity:.8;}
+.magi.live .trap{background:var(--ink);}
+.magi.live .trap .in{background:var(--ink);}
+.magi.live .trap .nm,.magi.live .trap .st{color:#000;opacity:1;}
+.mj{font-family:var(--font-jp);font-weight:800;font-size:7px;letter-spacing:1.2px;opacity:.45;padding:2px 4px 0;}
+.layers{margin-top:auto;display:flex;flex-direction:column;gap:0;}
+.lrow{display:flex;justify-content:space-between;align-items:center;font-size:7.5px;letter-spacing:1.4px;padding:3px 0;border-bottom:1px dotted var(--rule);opacity:.75;}
+.lrow b{font-family:var(--font-mono);font-weight:700;font-size:8px;letter-spacing:.4px;opacity:1;}
+
+/* ticker */
+.ticker{height:18px;flex:none;position:relative;z-index:3;overflow:hidden;display:flex;align-items:center;
+  border-top:1px solid transparent;font-size:9px;font-weight:700;letter-spacing:2.4px;text-transform:uppercase;white-space:nowrap;}
+.ticker-track{display:inline-flex;flex:none;opacity:.6;}
+.ticker-track span{padding-right:48px;}
+
+/* deck */
+.deck{height:170px;flex:none;position:relative;z-index:2;display:flex;align-items:center;gap:10px;padding:8px 10px;border-top:1px solid var(--rule);}
+.keypad{width:372px;height:150px;flex:none;overflow:visible;}
+.hex .face{fill:#000;stroke:var(--ink-dim);stroke-width:1.5;}
+.hex .sym,.hex .lab,.hex .jp{font-family:var(--font-en);fill:var(--ink);text-anchor:middle;}
+.hex .lab{font-size:8.5px;font-weight:600;letter-spacing:1.2px;}
+.hex .jp{font-family:var(--font-jp);font-weight:800;font-size:6.4px;opacity:.5;letter-spacing:.6px;}
+.hex .ico path,.hex .ico circle,.hex .ico rect{fill:none;stroke:var(--ink);stroke-width:1.5;stroke-linecap:square;}
+.hex .ico .solid{fill:var(--ink);stroke:none;}
+.hex.latched .face{fill:var(--alert);stroke:var(--alert);}
+.hex.latched .lab,.hex.latched .jp{fill:var(--on-fill);}
+.hex.latched .ico path,.hex.latched .ico circle,.hex.latched .ico rect{stroke:var(--on-fill);}
+.hex.latched .ico .solid{fill:var(--on-fill);}
+.knob-wrap{width:132px;flex:none;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.knob{width:104px;height:104px;position:relative;}
+.knob svg{width:104px;height:104px;display:block;}
+.knob .ring{fill:none;stroke:var(--button);stroke-width:7;}
+.knob .well{fill:#000;stroke:var(--ink);stroke-width:1.5;}
+.knob .arc{fill:none;stroke:var(--accent);stroke-width:3;stroke-linecap:butt;}
+.knob .tick{stroke:var(--ink);opacity:.35;stroke-width:1;}
+.knob .notch{stroke:var(--accent);stroke-width:3;}
+.knob-val{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:22px;font-weight:700;color:var(--ink);}
+.knob-lab{font-size:7px;letter-spacing:2.4px;opacity:.5;text-transform:uppercase;}
+.knob-out{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:.6px;}
+
+.speed{flex:1;min-width:0;height:152px;border:1px solid var(--rule);background:#000;display:grid;grid-template-columns:1fr 112px;grid-template-rows:16px 1fr 34px;padding:6px 10px;gap:0 8px;}
+.speed .head{grid-column:1/3;display:flex;align-items:baseline;gap:8px;font-size:7.5px;letter-spacing:2.2px;opacity:.55;text-transform:uppercase;}
+.speed .head .jp{font-family:var(--font-jp);font-weight:800;letter-spacing:1px;font-size:7px;opacity:.85;}
+.speed .head .fix{margin-left:auto;font-family:var(--font-mono);font-size:7px;letter-spacing:.8px;opacity:.8;}
+.speed-main{display:flex;align-items:flex-end;gap:8px;min-width:0;}
+.spd-num{font-family:var(--font-mono);font-weight:700;font-size:116px;line-height:.8;letter-spacing:-4px;white-space:nowrap;}
+.spd-unit{display:flex;flex-direction:column;gap:2px;padding-bottom:8px;}
+.spd-unit b{font-size:15px;font-weight:600;letter-spacing:1.6px;}
+.spd-unit span{font-family:var(--font-mono);font-size:7px;opacity:.45;letter-spacing:1px;}
+.zone-seal{grid-row:2/4;grid-column:2;align-self:center;justify-self:center;width:100px;height:100px;}
+.zone-seal .out{fill:none;stroke:var(--ink);stroke-width:2;}
+.zone-seal .inn{fill:none;stroke:var(--ink-dim);stroke-width:1;}
+.zone-seal .jp{font-family:var(--font-jp);font-weight:800;font-size:26px;fill:var(--ink);text-anchor:middle;}
+.zone-seal .en{font-size:6.5px;font-weight:600;letter-spacing:1.4px;fill:var(--ink);text-anchor:middle;opacity:.7;}
+.ladder{grid-column:1;display:flex;flex-direction:column;gap:2px;align-self:end;}
+.ladder .segs{display:flex;gap:2px;height:11px;}
+.ladder .segs i{flex:1;background:#101019;border-top:1px solid var(--ink-dim);}
+.ladder .segs i.on{background:var(--ink);border-color:var(--ink);}
+.ladder .base{position:relative;height:12px;font-family:var(--font-mono);font-size:7px;letter-spacing:.4px;opacity:.6;}
+.ladder .base span{position:absolute;transform:translateX(-50%);white-space:nowrap;}
+.ladder .base span:first-child{transform:none;}
+.ladder .base span:last-child{transform:translateX(-100%);}
+.ladder .mk{position:absolute;top:-14px;width:1px;height:25px;background:var(--ink);}
+</style>
+</head>
+<body>
+<div class="poster">
+
+  <!-- A.T. field honeycomb -->
+  <svg class="hny" viewBox="0 0 1280 640" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs>
+      <pattern id="hnyBg" width="24.25" height="42" patternUnits="userSpaceOnUse">
+        <polygon points="12.12,0 24.25,7 24.25,21 12.12,28 0,21 0,7" fill="none" stroke="currentColor" stroke-width=".5"/>
+        <polygon points="0,21 12.12,28 12.12,42 0,49 -12.12,42 -12.12,28" fill="none" stroke="currentColor" stroke-width=".5"/>
+        <polygon points="24.25,21 36.37,28 36.37,42 24.25,49 12.12,42 12.12,28" fill="none" stroke="currentColor" stroke-width=".5"/>
+      </pattern>
+    </defs>
+    <rect width="1280" height="640" fill="url(#hnyBg)"/>
+  </svg>
+
+  <!-- status rail -->
+  <div class="rail">
+    <span class="dot"></span>
+    <span>System Online <span class="jp">稼働中</span></span>
+    <span class="mid">第01種監視体制 // MAGI LINK ESTABLISHED</span>
+    <div class="right">
+      <span class="clock">07:42:18<small>JST</small></span>
+      <span class="theme-chip"><b>AUTO</b> · DAY</span>
+      <span style="opacity:.45">REV 4.0</span>
+    </div>
+  </div>
+
+  <!-- left: identity -->
+  <div class="left">
+    <div class="eyebrow">
+      <span class="bar"></span>
+      <span class="en">Direct Link Connection</span>
+      <span class="jp">// 直通回線</span>
+    </div>
+
+    <h1 class="title"><span class="a">Lily</span><span class="b">Launcher</span></h1>
+
+    <div class="jp-title"><i>//</i>リリィ・ランチャー</div>
+
+    <div class="subtitle">NERV Terminal Interface<br>for Android Head Units</div>
+
+    <ul class="features">
+      <li class="feat">
+        <span class="mark" style="background:#4de89a"></span>
+        <span class="lab">Speed-aware palette</span>
+        <span class="val chips"><i style="background:#4de89a"></i><i style="background:#f5b400"></i><i style="background:#e31c23"></i></span>
+      </li>
+      <li class="feat">
+        <span class="mark" style="background:#f5b400"></span>
+        <span class="lab">Day / Night</span>
+        <span class="val">AUTO · 17:00 → 05:00</span>
+      </li>
+      <li class="feat">
+        <span class="mark" style="background:#4de89a"></span>
+        <span class="lab">Hexagonal Keypad</span>
+        <span class="val">11 PADS · 6 + 5</span>
+      </li>
+      <li class="feat">
+        <span class="mark" style="background:#e31c23"></span>
+        <span class="lab">MAGI System</span>
+        <span class="val">MELCHIOR · BALTHASAR · CASPER</span>
+      </li>
+    </ul>
+  </div>
+
+  <!-- right: live terminal -->
+  <div class="panel">
+    <div class="panel-head">
+      <span class="l"><span class="dot"></span>TERMINAL 01 // LIVE RENDER</span>
+      <span class="r">1024 × 600 · 7 IN · REV 4.0</span>
+    </div>
+
+    <div class="bezel">
+      <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+      <div class="slot">
+        <!-- ================= 1024x600 screen replica ================= -->
+        <div class="screen" data-zone="normal" data-theme="day">
+
+          <svg class="honeycomb" viewBox="0 0 1024 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <defs>
+              <pattern id="hnyScr" width="24.25" height="42" patternUnits="userSpaceOnUse">
+                <polygon points="12.12,0 24.25,7 24.25,21 12.12,28 0,21 0,7" fill="none" stroke="currentColor" stroke-width=".5"/>
+                <polygon points="0,21 12.12,28 12.12,42 0,49 -12.12,42 -12.12,28" fill="none" stroke="currentColor" stroke-width=".5"/>
+                <polygon points="24.25,21 36.37,28 36.37,42 24.25,49 12.12,42 12.12,28" fill="none" stroke="currentColor" stroke-width=".5"/>
+              </pattern>
+            </defs>
+            <rect width="1024" height="600" fill="url(#hnyScr)"/>
+          </svg>
+
+          <div class="s-rail">
+            <span class="dot"></span>
+            <span>System Online <span class="jp">稼働中</span></span>
+            <span class="mid">第01種監視体制 // MAGI LINK ESTABLISHED</span>
+            <span class="clock">07:42:18<small>JST</small></span>
+            <span class="lamp-chip">LAMP · OFF</span>
+            <span class="theme-chip2"><b>AUTO</b> DAY</span>
+          </div>
+
+          <div class="banner">
+            <span class="bar"></span>
+            <span class="title">DIRECT LINK CONNECTION : LILY</span>
+            <span class="bar"></span>
+            <span class="rev">REV 4.0<br>7IN / 1024×600</span>
+          </div>
+
+          <div class="main">
+            <div class="telemetry">
+              <div class="col-head"><span>Telemetry</span><span>記録</span></div>
+              <div class="trow"><div class="k">CODE</div><div class="v">LILY-01</div></div>
+              <div class="trow"><div class="k">FILE</div><div class="v">HOME_SYS</div></div>
+              <div class="trow"><div class="k">MODE</div><div class="v">AUTO·DAY</div></div>
+              <div class="trow"><div class="k">PRIORITY</div><div class="v">AAA</div></div>
+              <div class="trow"><div class="k">UPLINK</div><div class="v">S23 / BT</div></div>
+              <div class="trow"><div class="k">VOLUME</div><div class="v">18 / 40</div></div>
+              <div class="signals" aria-hidden="true">
+                <i style="height:20%"></i><i style="height:34%"></i><i style="height:52%"></i><i style="height:40%"></i>
+                <i style="height:68%"></i><i style="height:82%"></i><i style="height:64%"></i><i style="height:92%"></i>
+                <i style="height:76%"></i><i style="height:100%"></i><i style="height:70%"></i><i style="height:88%"></i>
+              </div>
+              <div class="sig-note">SIGNAL / 24 CH</div>
+            </div>
+
+            <div class="jp-band">監視記録 第零一号</div>
+
+            <div class="stage">
+              <div class="stage-head">
+                <span class="lab">NOW PLAYING // TAPE</span>
+                <span class="sp"></span>
+                <span class="chip">SRC BT</span>
+                <span class="chip">AAC 320</span>
+              </div>
+
+              <div class="seal"><div>承認<small>APPROVED</small></div></div>
+
+              <div class="stage-body">
+                <div class="album">
+                  <svg viewBox="0 0 118 128" aria-hidden="true">
+                    <polygon points="59,1 112.4,32 112.4,96 59,127 5.6,96 5.6,32" fill="none" stroke="var(--ink-dim)" stroke-width="1"/>
+                    <polygon points="59,9 105.2,36 105.2,92 59,119 12.8,92 12.8,36" fill="none" stroke="var(--ink)" stroke-width="1.5"/>
+                    <line x1="59" y1="9" x2="59" y2="24" stroke="var(--ink)" stroke-width="1"/>
+                    <line x1="59" y1="104" x2="59" y2="119" stroke="var(--ink)" stroke-width="1"/>
+                    <text class="kanji" x="59" y="76" text-anchor="middle">音</text>
+                    <text class="sub" x="59" y="98" text-anchor="middle">BT · A2DP</text>
+                  </svg>
+                </div>
+                <div class="track">
+                  <div class="kicker">S23 · TRACK 02 / 03</div>
+                  <div class="title">NEON HIGHWAY</div>
+                  <div class="artist">MAGI ARCHIVE</div>
+                  <div class="albumname">TERMINAL 01 · OST</div>
+                  <div class="spectrum" aria-hidden="true">
+                    <i style="height:40%"></i><i style="height:72%"></i><i style="height:55%"></i><i style="height:90%"></i>
+                    <i style="height:64%"></i><i style="height:100%"></i><i style="height:48%"></i><i style="height:82%"></i>
+                    <i style="height:58%"></i><i style="height:94%"></i><i style="height:68%"></i><i style="height:44%"></i>
+                    <i style="height:86%"></i><i style="height:60%"></i>
+                  </div>
+                </div>
+              </div>
+
+              <div class="prog">
+                <div class="prog-meta">
+                  <span class="pl">TIME</span>
+                  <span>01:42</span>
+                  <span style="flex:1"></span>
+                  <span class="len">04:08</span>
+                </div>
+                <div class="prog-bar"><i></i></div>
+              </div>
+
+              <div class="cells">
+                <div class="cell"><div class="k">CODEC</div><div class="v">AAC</div></div>
+                <div class="cell"><div class="k">RATE</div><div class="v">320K</div></div>
+                <div class="cell"><div class="k">CHANNEL</div><div class="v">2.0</div></div>
+                <div class="cell"><div class="k">STATE</div><div class="v">PLAYING</div></div>
+              </div>
+            </div>
+
+            <div class="magi-col">
+              <div class="magi-head"><span>MAGI SYSTEM</span><span>三賢者</span></div>
+
+              <div class="magi live">
+                <div class="trap"><div class="in"><span class="nm">MELCHIOR</span><span class="st">LINK</span></div></div>
+                <div class="mj">メルキオール / 通信</div>
+              </div>
+              <div class="magi inv">
+                <div class="trap"><div class="in"><span class="nm">BALTHASAR</span><span class="st">TAPE</span></div></div>
+                <div class="mj">バルタザール / 音声</div>
+              </div>
+              <div class="magi">
+                <div class="trap"><div class="in"><span class="nm">CASPER</span><span class="st">000</span></div></div>
+                <div class="mj">カスパー / 車両</div>
+              </div>
+
+              <div class="layers">
+                <div class="lrow"><span>LAYER 3 · CONNECTION</span><b>BT</b></div>
+                <div class="lrow"><span>LAYER 2 · DATA LINK</span><b>OK</b></div>
+                <div class="lrow"><span>LAYER 1 · PHYSICAL</span><b>12V</b></div>
+                <div class="lrow"><span>SPEED ZONE</span><b>NORMAL</b></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ticker"><div class="ticker-track"><span>NERV CENTRAL DOGMA // TERMINAL 01 ACTIVE · SPEED ZONE NORMAL · BT LINK ESTABLISHED · 第01種監視体制 · ALL SYSTEMS NOMINAL ·</span></div></div>
+
+          <div class="deck">
+            <svg class="keypad" viewBox="0 0 364 138" aria-label="Primary controls">
+              <g class="hex" transform="translate(41,40)">
+                <polygon class="face" points="0,-38 32.91,-19 32.91,19 0,38 -32.91,19 -32.91,-19"/>
+                <g class="ico" transform="translate(0,-10)"><path class="solid" d="M-2,-7 L-10,0 L-2,7 Z M8,-7 L0,0 L8,7 Z"/></g>
+                <text class="lab" y="12">PREV</text><text class="jp" y="21">前曲</text>
+              </g>
+              <g class="hex" transform="translate(98,40)">
+                <polygon class="face" points="0,-38 32.91,-19 32.91,19 0,38 -32.91,19 -32.91,-19"/>
+                <g class="ico" transform="translate(0,-10)"><path class="solid" d="M-5,-8 L9,0 L-5,8 Z"/></g>
+                <text class="lab" y="12">PLAY</text><text class="jp" y="21">再生</text>
+              </g>
+              <g class="hex" transform="translate(155,40)">
+                <polygon class="face" points="0,-38 32.91,-19 32.91,19 0,38 -32.91,19 -32.91,-19"/>
+                <g class="ico" transform="translate(0,-10)"><path class="solid" d="M-9,-7 L-1,0 L-9,7 Z M1,-7 L9,0 L1,7 Z"/></g>
+                <text class="lab" y="12">NEXT</text><text class="jp" y="21">次曲</text>
+              </g>
+              <g class="hex latched" transform="translate(212,40)">
+                <polygon class="face" points="0,-38 32.91,-19 32.91,19 0,38 -32.91,19 -32.91,-19"/>
+                <g class="ico" transform="translate(0,-10)"><path d="M-4,-7 L4,0 L-4,7 M-4,-7 L2,-3 M-4,7 L2,3 M-8,0 L4,0"/></g>
+                <text class="lab" y="12">BT</text><text class="jp" y="21">無線</text>
+              </g>
+              <g class="hex" transform="translate(269,40)">
+                <polygon class="face" points="0,-38 32.91,-19 32.91,19 0,38 -32.91,19 -32.91,-19"/>
+                <g class="ico" transform="translate(0,-10)"><path d="M-8,4 A11,11 0 0 1 8,4"/><path d="M-4,0 A6,6 0 0 1 4,0"/><circle class="solid" cx="0" cy="5" r="1.6"/></g>
+                <text class="lab" y="12">RADIO</text><text class="jp" y="21">受信</text>
+              </g>
+              <g class="hex" transform="translate(326,40)">
+                <polygon class="face" points="0,-38 32.91,-19 32.91,19 0,38 -32.91,19 -32.91,-19"/>
+                <g class="ico" transform="translate(0,-10)"><path d="M0,8 L0,-8 M0,-8 L-3,-4 M0,-8 L3,-4 M0,-1 L-4,-4 M0,-1 L4,-4"/><circle class="solid" cx="0" cy="8" r="2"/></g>
+                <text class="lab" y="12">USB</text><text class="jp" y="21">記憶</text>
+              </g>
+              <g class="hex" transform="translate(69,97)">
+                <polygon class="face" points="0,-38 32.91,-19 32.91,19 0,38 -32.91,19 -32.91,-19"/>
+                <g class="ico" transform="translate(0,-10)"><path d="M-6,-6 L-3,-8 L0,-3 L-2,-1 A11,11 0 0 0 3,4 L5,2 L9,5 L7,8 C1,9 -7,1 -6,-6 Z"/></g>
+                <text class="lab" y="12">PHONE</text><text class="jp" y="21">通話</text>
+              </g>
+              <g class="hex" transform="translate(126,97)">
+                <polygon class="face" points="0,-38 32.91,-19 32.91,19 0,38 -32.91,19 -32.91,-19"/>
+                <g class="ico" transform="translate(0,-10)"><path d="M-8,-4 L7,-4 L4,-7 M8,4 L-7,4 L-4,7"/></g>
+                <text class="lab" y="12">SWITCH</text><text class="jp" y="21">切替</text>
+              </g>
+              <g class="hex" transform="translate(183,97)">
+                <polygon class="face" points="0,-38 32.91,-19 32.91,19 0,38 -32.91,19 -32.91,-19"/>
+                <g class="ico" transform="translate(0,-10)"><text x="0" y="5" text-anchor="middle" style="font-family:var(--font-en);font-size:13px;font-weight:700;fill:#4de89a;stroke:none">AA</text></g>
+                <text class="lab" y="12">AUTO</text><text class="jp" y="21">自動</text>
+              </g>
+              <g class="hex" transform="translate(240,97)">
+                <polygon class="face" points="0,-38 32.91,-19 32.91,19 0,38 -32.91,19 -32.91,-19"/>
+                <g class="ico" transform="translate(0,-10)"><path d="M-8,-5 H-2 M2,-5 H8 M-8,1 H2 M5,1 H8 M-8,6 H-3 M0,6 H8"/><circle class="solid" cx="0" cy="-5" r="1.8"/><circle class="solid" cx="3.5" cy="1" r="1.8"/><circle class="solid" cx="-1.5" cy="6" r="1.8"/></g>
+                <text class="lab" y="12">SETUP</text><text class="jp" y="21">設定</text>
+              </g>
+              <g class="hex" transform="translate(297,97)">
+                <polygon class="face" points="0,-38 32.91,-19 32.91,19 0,38 -32.91,19 -32.91,-19"/>
+                <g class="ico" transform="translate(0,-10)"><circle class="solid" cx="-6" cy="0" r="2"/><circle class="solid" cx="0" cy="0" r="2"/><circle class="solid" cx="6" cy="0" r="2"/></g>
+                <text class="lab" y="12">MORE</text><text class="jp" y="21">拡張</text>
+              </g>
+            </svg>
+
+            <div class="knob-wrap">
+              <div class="knob">
+                <svg viewBox="0 0 100 100" aria-hidden="true">
+                  <circle class="ring" cx="50" cy="50" r="45"/>
+                  <circle class="arc" cx="50" cy="50" r="38" transform="rotate(135 50 50)" stroke-dasharray="108 999"/>
+                  <circle class="well" cx="50" cy="50" r="31"/>
+                  <line class="notch" x1="50" y1="21" x2="50" y2="30" transform="rotate(108 50 50)"/>
+                </svg>
+                <div class="knob-val">18</div>
+              </div>
+              <div class="knob-lab">VOLUME</div>
+              <div class="knob-out">18 / 40</div>
+            </div>
+
+            <div class="speed">
+              <div class="head">
+                <span>GROUND SPEED</span><span class="jp">対地速度</span>
+                <span class="fix">GPS · 3D FIX</span>
+              </div>
+              <div class="speed-main">
+                <span class="spd-num">042</span>
+                <span class="spd-unit"><b>km/h</b><span>LIM 060</span></span>
+              </div>
+              <svg class="zone-seal" viewBox="0 0 100 100" aria-hidden="true">
+                <polygon class="inn" points="32,5 68,5 95,32 95,68 68,95 32,95 5,68 5,32"/>
+                <polygon class="out" points="30,2 70,2 98,30 98,70 70,98 30,98 2,70 2,30"/>
+                <text class="jp" x="50" y="50">通常</text>
+                <text class="en" x="50" y="66">NORMAL</text>
+              </svg>
+              <div class="ladder">
+                <div class="segs">
+                  <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+                  <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+                </div>
+                <div class="base">
+                  <span style="left:0">000</span>
+                  <span style="left:37.5%">060</span>
+                  <span style="left:62.5%">100</span>
+                  <span style="left:100%">160</span>
+                  <div class="mk" style="left:37.5%"></div>
+                  <div class="mk" style="left:62.5%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <!-- ================= /screen replica ================= -->
+      </div>
+
+      <div class="note">
+        <span>ZONE NORMAL · 042 KM/H · 07:42 JST</span>
+        <span class="r">BT LINK · MAGI 3/3 · NO WEBVIEW</span>
+      </div>
+    </div>
+
+    <div class="panel-foot">
+      <span>DRAWN ON CANVAS · NATIVE KOTLIN</span>
+      <span class="r">SPEED-AWARE PALETTE · DAY / NIGHT</span>
+    </div>
+  </div>
+
+  <!-- footer -->
+  <div class="foot">
+    <span class="dot" style="width:5px;height:5px"></span>
+    <span>LILY LAUNCHER // NGE TERMINAL v4</span>
+    <span class="jp">第01種監視体制</span>
+    <span class="r">github.com/ryuenma/lily-launcher</span>
+  </div>
+
+</div>
+</body>
+</html>
