@@ -156,7 +156,7 @@ class HomeView(ctx: Context, private val ui: Ui, private val car: Car,
             if (zone == SpeedZone.NORMAL) withAlpha(ink(), .65f) else Color.BLACK)
 
         val mid = type.paint(11f, jp = true, track = 2.5f, align = Paint.Align.CENTER, weight = 700)
-        c.text(mid, "第01種監視体制 // MAGI LINK", Nge.W / 2f, 26f, withAlpha(ink(), .55f))
+        c.text(mid, "第01種監視体制 // " + if (car.btName != null) "MAGI LINK" else "MAGI OFFLINE", Nge.W / 2f, 26f, withAlpha(ink(), .55f))
 
         // right: clock · LAMP chip · AUTO/DAY chip
         val themeW = 104f
